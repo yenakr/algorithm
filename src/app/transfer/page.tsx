@@ -322,31 +322,22 @@ export default function TransferPage() {
 
           {/* Tab 3: 알고리즘 학습 */}
           {activeTab === 'learning' && (
-            <div className="space-y-8 animate-fade-in flex-1 flex flex-col">
+            <div className="space-y-6 animate-fade-in flex-1 flex flex-col">
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">
-                  알고리즘 학습
+                  알고리즘 학습 및 자가평가
                 </h2>
                 <p className="text-sm sm:text-base text-slate-500 leading-relaxed font-semibold">
-                  질문 진행에 따라 알고리즘 맵의 해당 경로가 어떻게 하이라이트되는지 시뮬레이션으로 살펴볼 수 있습니다.
+                  단계별 평가 문항에 답하면서 현재 돌봄 환경과 환자 상태에 맞는 최적의 돌봄로봇 매칭 결과를 실시간으로 학습합니다.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-5 w-full">
-                  <AlgorithmRunner
-                    algorithm={transferCareAlgorithm}
-                    mode="learning"
-                    onPathChange={(path) => setLearningPath(path)}
-                  />
-                </div>
-
-                <div className="lg:col-span-7 w-full overflow-x-auto">
-                  <AlgorithmFlowchart
-                    algorithmId="transfer"
-                    activePath={learningPath}
-                  />
-                </div>
+              <div className="w-full">
+                <AlgorithmRunner
+                  algorithm={transferCareAlgorithm}
+                  mode="learning"
+                  onPathChange={(path) => setLearningPath(path)}
+                />
               </div>
             </div>
           )}
