@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, ChevronRight, ChevronLeft, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ThumbsUp, AlertTriangle } from 'lucide-react';
 
 // Data imports
 import { toiletingCareAlgorithm } from '@/data/algorithms/toiletingCare';
@@ -23,6 +23,17 @@ export default function ToiletingPage() {
   const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+
+  // Collapsible categories state for Care Robot Types
+  const [openCats, setOpenCats] = useState<Record<string, boolean>>({
+    '위생 케어': true,
+    '이동 및 자세 보조': true,
+    '배설처리로봇': true,
+  });
+
+  const toggleCat = (catName: string) => {
+    setOpenCats(prev => ({ ...prev, [catName]: !prev[catName] }));
+  };
 
   const tabs = [
     { id: 'info', name: '소개 & 평가기준', icon: BookOpen },
@@ -190,72 +201,131 @@ export default function ToiletingPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {toiletingEducationData.devices.list.map((device) => {
-                  const imgPath = getToiletImage(device.id);
+              {/* Collapsible Categories Accordion */}
+              <div className="space-y-6">
+                {[
+                  {
+                    name: '위생 케어',
+                    description: '스스로 화장실로 이동하여 용변은 보나, 관절염 등으로 뒤처리가 힘든 분을 위한 위생 보조 장비입니다.',
+                    targetLevel: '인지 양호, 이동 양호, 청결 관리 장해',
+                    devices: toiletingEducationData.devices.list.filter(d => d.category === '위생 케어'),
+                  },
+                  {
+                    name: '이동 및 자세 보조',
+                    description: '보행이나 무릎 힘이 약해 화장실 이동 시 낙상이 우려되거나 침상 옆에서 즉시 해결해야 하는 분을 위한 보조 리프트 및 변기입니다.',
+                    targetLevel: '인지 양호, 화장실 이동 장해',
+                    devices: toiletingEducationData.devices.list.filter(d => d.category === '이동 및 자세 보조'),
+                  },
+                  {
+                    name: '배설처리로봇',
+                    description: '화장실 이동이 불가하고 스스로 배설 시기를 감지하기 어려운 와상 환자의 위생 처리를 자동화하는 로봇 장비군입니다.',
+                    targetLevel: '배설 인지 및 이동 장해 (와상 상태)',
+                    devices: toiletingEducationData.devices.list.filter(d => d.category === '배설처리로봇'),
+                  },
+                ].map((cat) => {
+                  const isOpen = openCats[cat.name];
                   return (
-                    <div key={device.id} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
-                      <div className="p-5 sm:p-6 space-y-6">
-                        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                          {/* Device Image - Responsively constrained size */}
-                          <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
-                            <Image
-                              src={imgPath}
-                              alt={device.name}
-                              fill
-                              className="object-contain p-1"
-                            />
+                    <div key={cat.name} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                      {/* Accordion Header */}
+                      <button
+                        onClick={() => toggleCat(cat.name)}
+                        className="w-full text-left p-6 bg-slate-50/70 hover:bg-slate-100/80 transition-all flex justify-between items-start gap-4 border-b border-slate-200/60"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-lg font-bold text-slate-800">{cat.name}</h3>
+                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                              {cat.targetLevel}
+                            </span>
                           </div>
-                          
-                          {/* Device Info */}
-                          <div className="flex-1 space-y-3 text-center sm:text-left">
-                            <div>
-                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
-                                {device.category}
-                              </span>
-                              <h3 className="text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
+                          <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
+                            {cat.description}
+                          </p>
+                        </div>
+                        <div className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-500 shrink-0 mt-1">
+                          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </div>
+                      </button>
+
+                      {/* Accordion Content */}
+                      {isOpen && (
+                        <div className="p-6 bg-slate-50/20">
+                          {cat.devices.length === 0 ? (
+                            <p className="text-sm text-slate-400 text-center py-4">등록된 로봇 정보가 없습니다.</p>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {cat.devices.map((device) => {
+                                const imgPath = getToiletImage(device.id);
+                                return (
+                                  <div key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
+                                    <div className="p-5 sm:p-6 space-y-6">
+                                      <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                                        {/* Device Image */}
+                                        <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
+                                          <Image
+                                            src={imgPath}
+                                            alt={device.name}
+                                            fill
+                                            className="object-contain p-1"
+                                          />
+                                        </div>
+                                        
+                                        {/* Device Info */}
+                                        <div className="flex-1 space-y-3 text-center sm:text-left">
+                                          <div>
+                                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
+                                              {device.category}
+                                            </span>
+                                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
+                                          </div>
+                                          <p className="text-xs text-slate-400 font-semibold leading-normal">
+                                            <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
+                                            {device.target}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      {/* Description */}
+                                      <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
+                                        {device.description}
+                                      </p>
+
+                                      {/* Pros and Precautions Separated */}
+                                      <div className="grid grid-cols-1 gap-4 pt-2">
+                                        {/* Pros (장점) */}
+                                        <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
+                                          <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase">
+                                            <ThumbsUp className="w-3.5 h-3.5" />
+                                            장점
+                                          </h4>
+                                          <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
+                                            {device.pros.map((pro, idx) => (
+                                              <li key={idx}>{pro}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+
+                                        {/* Precautions (유의사항) */}
+                                        <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
+                                          <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase">
+                                            <AlertTriangle className="w-3.5 h-3.5" />
+                                            유의사항
+                                          </h4>
+                                          <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
+                                            {device.precautions.map((pre, idx) => (
+                                              <li key={idx}>{pre}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
-                            <p className="text-xs text-slate-400 font-semibold leading-normal">
-                              <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
-                              {device.target}
-                            </p>
-                          </div>
+                          )}
                         </div>
-
-                        {/* Description */}
-                        <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
-                          {device.description}
-                        </p>
-
-                        {/* Pros and Precautions Separated */}
-                        <div className="grid grid-cols-1 gap-4 pt-2">
-                          {/* Pros (장점) */}
-                          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
-                            <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase">
-                              <ThumbsUp className="w-3.5 h-3.5" />
-                              장점
-                            </h4>
-                            <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
-                              {device.pros.map((pro, idx) => (
-                                <li key={idx}>{pro}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Precautions (유의사항) */}
-                          <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
-                            <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase">
-                              <AlertTriangle className="w-3.5 h-3.5" />
-                              유의사항
-                            </h4>
-                            <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
-                              {device.precautions.map((pre, idx) => (
-                                <li key={idx}>{pre}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })}
