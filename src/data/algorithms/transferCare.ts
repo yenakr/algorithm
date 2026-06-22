@@ -31,7 +31,7 @@ export const transferCareAlgorithm = {
     q1: {
       id: 'q1',
       title: '자리이동에 어려움이 있나요?',
-      description: '현재 침대, 의자, 휠체어 등으로 자리를 옮길 때 어려움이 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q1_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -55,7 +55,7 @@ export const transferCareAlgorithm = {
     q2: {
       id: 'q2',
       title: '다리 힘으로 체중을 지탱할 수 없는가?',
-      description: '다리 근력을 평가하여 적절한 로봇 유형(기립보조식 vs 전신슬링식)을 결정합니다.',
+      description: '',
       type: 'single',
       options: [
         { id: 'q2_yes', text: '예, 체중을 지탱하기 어렵다', value: 'yes' },
@@ -71,7 +71,7 @@ export const transferCareAlgorithm = {
     q3: {
       id: 'q3',
       title: '사용 환경은 어떤가요?',
-      description: '대상자가 이동할 공간의 환경은 어떤가요? 복수 선택이 가능합니다.',
+      description: '(복수 선택 가능)',
       type: 'multi',
       options: [
         { id: 'q3_ceiling', text: '천장에 장비 설치가 가능하다', value: 'ceiling' },
@@ -116,7 +116,7 @@ export const transferCareAlgorithm = {
     q3_1: {
       id: 'q3_1',
       title: '우선순위가 어떻게 되나요?',
-      description: '여러 장비 설치가 모두 가능한 상황입니다. 가장 중요하게 생각하시는 가치는 무엇인가요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3_1_convenience', text: '설치 후 사용 편의성 및 효율성', value: 'convenience' },
@@ -138,7 +138,7 @@ export const transferCareAlgorithm = {
     q3_2: {
       id: 'q3_2',
       title: '독립 지지대 설치가 가능한가요?',
-      description: '천장이나 벽면 공사는 어렵지만 방안에 자체 지탱이 가능한 독립적인 프레임 설치는 가능합니까?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3_2_yes', text: '가능하다: 이동식 겐트리 및 독립 프레임 설치', value: 'yes' },
@@ -153,7 +153,7 @@ export const transferCareAlgorithm = {
     q4: {
       id: 'q4',
       title: '스스로 상체를 일으킬 수 있나요?',
-      description: '대상자가 스스로 상체를 일으킬 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q4_yes', text: '가능하다', value: 'yes' },

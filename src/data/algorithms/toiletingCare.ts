@@ -8,7 +8,7 @@ export const toiletingCareAlgorithm = {
     q1: {
       id: 'q1',
       title: '배뇨감 및 배변감을 인지하고 조절하는 데 어려움이 있나요?',
-      description: '요의나 변의를 스스로 지각하고 소변/대변을 스스로 제어하는 능력을 평가합니다.',
+      description: '',
       type: 'single',
       options: [
         { id: 'q1_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -27,7 +27,7 @@ export const toiletingCareAlgorithm = {
     q2_a: {
       id: 'q2_a',
       title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
-      description: '침실에서 화장실 변기까지 스스로 걷거나 안전하게 이동하는 능력을 평가합니다.',
+      description: '',
       type: 'single',
       options: [
         { id: 'q2a_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -46,7 +46,7 @@ export const toiletingCareAlgorithm = {
     q3_a1: {
       id: 'q3_a1',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      description: '인지 기능이 양호하고 화장실 이동도 가능한 상태입니다. 세정 및 뒤처리를 스스로 할 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3a1_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -65,7 +65,7 @@ export const toiletingCareAlgorithm = {
     q3_a2: {
       id: 'q3_a2',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      description: '인지 기능은 양호하나 화장실 이동이 어려운 상태입니다. 세정 및 뒤처리를 스스로 할 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3a2_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -84,7 +84,7 @@ export const toiletingCareAlgorithm = {
     q2_b: {
       id: 'q2_b',
       title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
-      description: '배설 인지 기능은 저하된 상태입니다. 화장실 변기까지 스스로 걷거나 안전하게 이동할 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q2b_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -103,7 +103,7 @@ export const toiletingCareAlgorithm = {
     q3_b1: {
       id: 'q3_b1',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      description: '배설 인지 기능은 저하되었으나 이동은 가능한 상태입니다. 세정 및 뒤처리를 스스로 할 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3b1_0', text: '0점: 문제 없음', score: 0, value: '0' },
@@ -122,7 +122,7 @@ export const toiletingCareAlgorithm = {
     q3_b2: {
       id: 'q3_b2',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      description: '배설 인지 및 화장실 이동 능력이 모두 저하된 와상 상태입니다. 세정 및 뒤처리를 스스로 할 수 있나요?',
+      description: '',
       type: 'single',
       options: [
         { id: 'q3b2_0', text: '0점: 문제 없음', score: 0, value: '0' },
