@@ -6,28 +6,28 @@ export default function Home() {
     {
       step: 1,
       title: '교육자료 학습',
-      description: '개념과 평가 기준을 학습합니다.',
+      description: '예시',
       icon: BookOpen,
       color: 'bg-blue-50 text-blue-600 border-blue-100',
     },
     {
       step: 2,
       title: '알고리즘 학습',
-      description: '시뮬레이션을 통해 판별 흐름을 살펴봅니다.',
+      description: '예',
       icon: GitMerge,
       color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     },
     {
       step: 3,
       title: '사례 기반 테스트',
-      description: '퀴즈를 풀며 알고리즘 이해도를 높입니다.',
+      description: '예시',
       icon: HelpCircle,
       color: 'bg-amber-50 text-amber-600 border-amber-100',
     },
     {
       step: 4,
       title: '결과 확인',
-      description: '매칭 결과와 이유를 확인합니다.',
+      description: '예시',
       icon: Trophy,
       color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     },
@@ -51,14 +51,14 @@ export default function Home() {
               href="/transfer"
               className="px-8 py-4 rounded-xl bg-white text-primary hover:bg-slate-100 font-extrabold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              <span>이승돌봄 시작하기</span>
+              <span>이승돌봄</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/toileting"
               className="px-8 py-4 rounded-xl bg-primary-dark/40 text-white hover:bg-primary-dark/60 font-extrabold text-base border border-white/20 hover:border-white/50 backdrop-blur-md transition-all flex items-center justify-center gap-2"
             >
-              <span>배설돌봄 시작하기</span>
+              <span>배설돌봄</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -74,7 +74,7 @@ export default function Home() {
           </h2>
           <div className="h-1.5 w-16 bg-primary rounded" />
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed pt-2 font-medium">
-            이송과 위생 관리를 돕는 돌봄로봇의 특성을 이해하고, 사용자 환경과 신체 기능에 따른 최적의 대안을 확인할 수 있도록 지원합니다.
+            이송과 위생 관리를 돕는 돌봄로봇의 특성을 이해하고, 환경과 대상자의 특성에 따른 최적의 대안을 확인할 수 있도록 지원합니다.
           </p>
         </div>
 
@@ -85,10 +85,10 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-slate-800">이승돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 기기와 로봇을 확인합니다.
+              침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 기기와 로봇
             </p>
             <Link href="/transfer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
-              이승돌봄 교육 및 진단 바로가기 <ArrowRight className="w-4 h-4" />
+              이승돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -98,10 +98,10 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-slate-800">배설돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              배뇨와 배변 등 위생 관리를 돕는 기기와 로봇을 확인합니다.
+              배뇨와 배변 등 위생 관리를 돕는 기기와 로봇
             </p>
             <Link href="/toileting" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
-              배설돌봄 교육 및 진단 바로가기 <ArrowRight className="w-4 h-4" />
+              배설돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

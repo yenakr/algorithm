@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-500 fill-current" />
             <span className="text-white font-bold text-sm tracking-wide">
-              돌봄로봇 교육 및 자가평가 플랫폼
+              돌봄로봇 교육 및 자가평가
             </span>
             <span className="text-xs text-slate-500 border-l border-slate-700 pl-2">
               연구용 MVP
