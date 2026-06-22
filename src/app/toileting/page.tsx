@@ -11,7 +11,6 @@ import { toiletingCases } from '@/data/cases/toiletingCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
-import AlgorithmFlowchart from '@/components/AlgorithmFlowchart';
 
 export default function ToiletingPage() {
   const [activeTab, setActiveTab] = useState<'info' | 'devices' | 'learning' | 'quiz'>('info');
@@ -33,6 +32,24 @@ export default function ToiletingPage() {
 
   const toggleCat = (catName: string) => {
     setOpenCats(prev => ({ ...prev, [catName]: !prev[catName] }));
+  };
+
+  const handleLearnMore = (deviceId: string) => {
+    setActiveTab('devices');
+    const device = toiletingEducationData.devices.list.find(d => d.id === deviceId);
+    if (device) {
+      setOpenCats(prev => ({ ...prev, [device.category]: true }));
+    }
+    setTimeout(() => {
+      const element = document.getElementById(`device-${deviceId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('ring-4', 'ring-primary', 'ring-offset-2');
+        setTimeout(() => {
+          element.classList.remove('ring-4', 'ring-primary', 'ring-offset-2');
+        }, 2000);
+      }
+    }, 150);
   };
 
   const tabs = [
@@ -146,7 +163,7 @@ export default function ToiletingPage() {
                 <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-semibold">
                   {toiletingEducationData.definition.content}
                 </p>
-                <div className="bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-100 space-y-3">
+                <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">배설관리의 5대 핵심 차원</h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
                     {toiletingEducationData.definition.examples.map((ex, idx) => (
@@ -172,18 +189,38 @@ export default function ToiletingPage() {
                 </p>
 
                 {/* Grid representation of scores */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {toiletingEducationData.standards.items.map((item) => (
-                    <div key={item.score} className="p-4 rounded-xl border border-slate-200/60 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col justify-between">
-                      <div>
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-200/80 text-slate-700 inline-block mb-2">
-                          {item.score}
-                        </span>
-                        <h3 className="text-base font-bold text-slate-800 mb-1">{item.label}</h3>
-                        <p className="text-xs text-slate-500 leading-normal font-medium">{item.details}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                  {toiletingEducationData.standards.items.map((item) => {
+                    const scoreVal = parseInt(item.score);
+                    const isHighlight = scoreVal >= 2;
+                    return (
+                      <div 
+                        key={item.score} 
+                        className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
+                          isHighlight 
+                            ? 'border-primary bg-white shadow-md ring-1 ring-primary/20 scale-[1.02]' 
+                            : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
+                              isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              {item.score}
+                            </span>
+                            {isHighlight && (
+                              <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                                로봇 매칭 기준
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-base font-bold text-slate-800 mb-1.5">{item.label}</h3>
+                          <p className="text-xs text-slate-500 leading-relaxed font-semibold">{item.details}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -257,7 +294,7 @@ export default function ToiletingPage() {
                               {cat.devices.map((device) => {
                                 const imgPath = getToiletImage(device.id);
                                 return (
-                                  <div key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
+                                  <div id={`device-${device.id}`} key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200 transition-all">
                                     <div className="p-5 sm:p-6 space-y-6">
                                       <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
                                         {/* Device Image */}
@@ -350,6 +387,7 @@ export default function ToiletingPage() {
                   algorithm={toiletingCareAlgorithm}
                   mode="learning"
                   onPathChange={(path) => setLearningPath(path)}
+                  onLearnMore={handleLearnMore}
                 />
               </div>
             </div>
