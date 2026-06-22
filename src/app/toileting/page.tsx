@@ -268,10 +268,10 @@ export default function ToiletingPage() {
             <div className="space-y-6 animate-fade-in flex-1 flex flex-col">
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">
-                  알고리즘 학습 및 자가평가
+                  알고리즘 학습
                 </h2>
                 <p className="text-sm sm:text-base text-slate-500 leading-relaxed font-semibold">
-                  단계별 평가 문항에 답하면서 현재 돌봄 환경과 환자 상태에 맞는 최적의 돌봄로봇 매칭 결과를 실시간으로 학습합니다.
+                  상태 평가 질문에 답하며 돌봄 로봇 매칭 기준을 확인해보세요.
                 </p>
               </div>
 

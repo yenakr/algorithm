@@ -673,8 +673,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange }: Algor
             {/* Modal Header */}
             <div className="bg-slate-900 text-white px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3 shrink-0">
               <div className="space-y-1">
-                <h3 className="font-extrabold text-sm sm:text-base">자가평가 의사결정 순서도</h3>
-                <p className="text-[10px] text-slate-400">알고리즘 분기 경로와 최종 매칭 위치를 확인합니다.</p>
+                <h3 className="font-extrabold text-sm sm:text-base">의사결정 순서도</h3>
               </div>
               
               {/* Tabs inside modal to switch views */}
