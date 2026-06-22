@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, ChevronRight, ChevronLeft, ThumbsUp, AlertTriangle } from 'lucide-react';
 
 // Data imports
 import { toiletingCareAlgorithm } from '@/data/algorithms/toiletingCare';
@@ -26,7 +26,7 @@ export default function ToiletingPage() {
 
   const tabs = [
     { id: 'info', name: '소개 & 평가기준', icon: BookOpen },
-    { id: 'devices', name: '배설기기 종류', icon: Shield },
+    { id: 'devices', name: '배설로봇 종류', icon: Shield },
     { id: 'learning', name: '알고리즘 학습', icon: GitMerge },
     { id: 'quiz', name: '사례 테스트 (퀴즈)', icon: CheckSquare },
   ] as const;
@@ -81,8 +81,16 @@ export default function ToiletingPage() {
     setQuizFinished(false);
   };
 
+  const getToiletImage = (id: string) => {
+    if (id === 'B-B') return '/images/hygiene_bidet.png';
+    if (id === 'B-C' || id === 'B-D') return '/images/toilet_lift.png';
+    if (id === 'B-G') return '/images/excretion_robot.png';
+    if (id === 'B-H') return '/images/smart_diaper_robot.png';
+    return '/images/excretion_robot.png';
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col w-full max-w-full overflow-x-hidden min-w-0">
       {/* Page Header */}
       <div className="border-b border-slate-200 pb-4 mb-6">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">
@@ -91,7 +99,7 @@ export default function ToiletingPage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex overflow-x-auto gap-2 border-b border-slate-200 pb-px mb-8 scrollbar-none">
+      <div className="flex overflow-x-auto w-full max-w-full gap-2 border-b border-slate-200 pb-px mb-8 scrollbar-none">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -149,7 +157,7 @@ export default function ToiletingPage() {
                   배설 기능평가 독립성 등급 기준
                 </h2>
                 <p className="text-sm sm:text-base text-slate-500 font-semibold">
-                  {toiletingEducationData.standards.description} 요의나 변의 인지, 화장실 이동, 뒤처리 중 어느 하나의 차원이라도 2점 이상이 나타날 경우 맞춤 보조기기가 추천됩니다.
+                  {toiletingEducationData.standards.description} 요의나 변의 인지, 화장실 이동, 뒤처리 중 어느 하나의 차원이라도 2점 이상이 나타날 경우 맞춤 보조로봇이 추천됩니다.
                 </p>
 
                 {/* Grid representation of scores */}
@@ -170,12 +178,12 @@ export default function ToiletingPage() {
             </div>
           )}
 
-          {/* Tab 2: 배설기기 종류 */}
+          {/* Tab 2: 배설로봇 종류 */}
           {activeTab === 'devices' && (
             <div className="space-y-6 animate-fade-in">
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">
-                  배설돌봄 기기 및 로봇 종류
+                  배설돌봄로봇 종류
                 </h2>
                 <p className="text-sm sm:text-base text-slate-500 font-semibold">
                   {toiletingEducationData.devices.description}
@@ -184,11 +192,10 @@ export default function ToiletingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {toiletingEducationData.devices.list.map((device) => {
-                  const isRobot = ['B-G', 'B-H', 'B-E'].includes(device.id);
-                  const imgPath = isRobot ? '/images/excretion_robot.png' : '/images/toilet_lift.png';
+                  const imgPath = getToiletImage(device.id);
                   return (
                     <div key={device.id} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
-                      <div className="p-5 sm:p-6">
+                      <div className="p-5 sm:p-6 space-y-6">
                         <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
                           {/* Device Image - Responsively constrained size */}
                           <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
@@ -203,10 +210,10 @@ export default function ToiletingPage() {
                           {/* Device Info */}
                           <div className="flex-1 space-y-3 text-center sm:text-left">
                             <div>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500 uppercase">
+                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
                                 {device.category}
                               </span>
-                              <h3 className="text-lg font-bold text-slate-800 mt-1 leading-snug">{device.name}</h3>
+                              <h3 className="text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
                             </div>
                             <p className="text-xs text-slate-400 font-semibold leading-normal">
                               <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
@@ -215,16 +222,37 @@ export default function ToiletingPage() {
                           </div>
                         </div>
 
-                        <div className="mt-6 border-t border-slate-100 pt-4">
-                          <p className="text-sm text-slate-600 leading-relaxed font-semibold">
-                            {device.description}
-                          </p>
-                          <div className="mt-4 flex flex-wrap gap-1.5 justify-center sm:justify-start">
-                            {device.features.map((f, idx) => (
-                              <span key={idx} className="text-xs bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-md">
-                                {f}
-                              </span>
-                            ))}
+                        {/* Description */}
+                        <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
+                          {device.description}
+                        </p>
+
+                        {/* Pros and Precautions Separated */}
+                        <div className="grid grid-cols-1 gap-4 pt-2">
+                          {/* Pros (장점) */}
+                          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
+                            <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase">
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                              장점
+                            </h4>
+                            <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
+                              {device.pros.map((pro, idx) => (
+                                <li key={idx}>{pro}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {/* Precautions (유의사항) */}
+                          <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
+                            <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              유의사항
+                            </h4>
+                            <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
+                              {device.precautions.map((pre, idx) => (
+                                <li key={idx}>{pre}</li>
+                              ))}
+                            </ul>
                           </div>
                         </div>
                       </div>
@@ -248,7 +276,7 @@ export default function ToiletingPage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-5">
+                <div className="lg:col-span-5 w-full">
                   <AlgorithmRunner
                     algorithm={toiletingCareAlgorithm}
                     mode="learning"
@@ -256,7 +284,7 @@ export default function ToiletingPage() {
                   />
                 </div>
 
-                <div className="lg:col-span-7">
+                <div className="lg:col-span-7 w-full overflow-x-auto">
                   <AlgorithmFlowchart
                     algorithmId="toileting"
                     activePath={learningPath}
@@ -398,24 +426,24 @@ export default function ToiletingPage() {
         </div>
 
         {/* Tab Left/Right Navigation Arrows */}
-        <div className="flex justify-between items-center border-t border-slate-200 pt-8 mt-12">
+        <div className="flex justify-between items-center border-t border-slate-200 pt-8 mt-12 w-full">
           {currentIdx > 0 ? (
             <button
               onClick={handlePrevTab}
-              className="px-5 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-4 sm:px-5 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm max-w-[48%] truncate"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>이전: {tabs.find(t => t.id === tabOrder[currentIdx - 1])?.name}</span>
+              <ChevronLeft className="w-4 h-4 shrink-0" />
+              <span className="truncate">이전: {tabs.find(t => t.id === tabOrder[currentIdx - 1])?.name}</span>
             </button>
           ) : <div />}
 
           {currentIdx < tabOrder.length - 1 ? (
             <button
               onClick={handleNextTab}
-              className="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-sm flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-4 sm:px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm max-w-[48%] truncate"
             >
-              <span>다음: {tabs.find(t => t.id === tabOrder[currentIdx + 1])?.name}</span>
-              <ChevronRight className="w-4 h-4" />
+              <span className="truncate">다음: {tabs.find(t => t.id === tabOrder[currentIdx + 1])?.name}</span>
+              <ChevronRight className="w-4 h-4 shrink-0" />
             </button>
           ) : <div />}
         </div>
