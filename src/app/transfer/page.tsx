@@ -11,17 +11,74 @@ import { transferCases } from '@/data/cases/transferCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
-import CareMiniIllustration from '@/components/CareMiniIllustration';
 import ScenarioStepList from '@/components/ScenarioStepList';
 import SafetyCheckCard from '@/components/SafetyCheckCard';
 import CareTabs from '@/components/CareTabs';
 import CareSafetyCard from '@/components/CareSafetyCard';
+import RobotStorySection from '@/components/RobotStorySection';
+import { IllustrationType } from '@/components/CareSceneIllustration';
 
 const transferScenarios = [
-  { type: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 앉히는 상황입니다.' },
+  { type: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 안전히 앉히는 상황입니다.' },
   { type: 'wheelchair-to-toilet' as const, title: '휠체어에서 변기로 이동', description: '화장실 이용을 위해 휠체어에서 변기로 옮겨 앉는 상황입니다.' },
   { type: 'wheelchair-to-bed' as const, title: '휠체어에서 침대로 이동', description: '휠체어에 앉아 계신 대상자를 침대로 다시 안전하게 눕히는 상황입니다.' },
   { type: 'bed-to-chair' as const, title: '침대에서 의자로 이동', description: '식사나 휴식을 위해 침대에서 일반 의자로 이동을 돕는 상황입니다.' }
+];
+
+const transferScenariosData = [
+  { illustrationType: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 옮겨 앉기', description: '누워 있는 자세에서 휠체어로 옮겨 앉을 때 힘이 드는 경우입니다.' },
+  { illustrationType: 'wheelchair-to-toilet' as const, title: '변기로 옮겨 앉기', description: '화장실 변기 시트로 옮겨 앉을 때 중심을 잃기 쉽고 미끄러질 수 있습니다.' },
+  { illustrationType: 'caregiver-assist' as const, title: '보호자가 혼자 부축하기 부담스러움', description: '돌보는 사람의 허리나 척추에 큰 물리적 손상을 유발할 수 있습니다.' },
+  { illustrationType: 'move-difficulty' as const, title: '이동 중 넘어질 것 같은 불안함', description: '다리 힘이 갑자기 빠지거나 중심이 흔들려 낙상할 위험이 큽니다.' },
+];
+
+const transferHelpers = [
+  '환자의 몸을 힘들이지 않고 *안전하게 들어 올리거나 지탱*해 줍니다.',
+  '침대, 의자, 휠체어, 변기 사이의 *모든 자리이동 과정을 편안하게* 돕습니다.',
+  '돌보는 보호자의 *허리와 어깨의 물리적 부담을 대폭 감소*시켜 줍니다.',
+  '이동 및 이승 과정 중 발생할 수 있는 *낙상과 미끄러짐 위험을 감소*시킵니다.'
+];
+
+const getSlingImage = (id: string) => {
+  if (id === 'T-B') return '/images/transfer_board.png';
+  if (id === 'T-C') return '/images/standing_aid.png';
+  if (id === 'T-D') return '/images/manual_standing_aid.png';
+  if (id === 'T-E') return '/images/transfer_lift.png';
+  if (id === 'T-F') return '/images/wall_lift.png';
+  if (id === 'T-G') return '/images/mobile_sling_lift.png';
+  if (id === 'T-H') return '/images/gantry_lift.png';
+  return '/images/transfer_lift.png';
+};
+
+const transferStoryRobots = transferEducationData.devices.list.map(d => {
+  let illustrationType: IllustrationType = 'bed-to-wheelchair';
+  if (d.id === 'T-B') illustrationType = 'bed-to-chair';
+  else if (d.id === 'T-D') illustrationType = 'caregiver-prep';
+  else if (d.id === 'T-C') illustrationType = 'bed-to-wheelchair';
+  else if (d.id === 'T-E') illustrationType = 'wheelchair-to-toilet';
+  else if (d.id === 'T-F') illustrationType = 'wheelchair-to-bed';
+  else if (d.id === 'T-G') illustrationType = 'safety-check';
+  else if (d.id === 'T-H') illustrationType = 'move-difficulty';
+  
+  return {
+    id: d.id,
+    name: d.name,
+    category: d.category,
+    description: d.description,
+    whenToUse: d.target,
+    precautions: d.precautions,
+    illustrationType,
+    pros: d.pros,
+    target: d.target,
+    imgPath: getSlingImage(d.id)
+  };
+});
+
+const transferSafetyTips = [
+  '사용 전 휠체어와 침대의 바퀴가 단단히 잠겨 있는지 반드시 확인합니다.',
+  '바닥에 걸려 넘어질 수 있는 전선, 이불, 물건 등을 완벽하게 정리해 둡니다.',
+  '환자가 어지러움을 호소하거나 아프다고 반응하면 즉시 작동을 멈춥니다.',
+  '로봇을 처음 조작할 때는 반드시 보호자나 숙련된 전문가와 함께 작동을 개시합니다.'
 ];
 
 const transferSafetyItems = [
@@ -126,8 +183,8 @@ export default function TransferPage() {
 
   const tabs = [
     { id: 'info', name: uiMode === 'simple' ? '쉽게 알아보기' : '소개 & 평가기준', icon: BookOpen },
-    { id: 'devices', name: uiMode === 'simple' ? '돌봄 기기 살펴보기' : '이승로봇 종류', icon: Shield },
-    { id: 'learning', name: uiMode === 'simple' ? '나에게 맞는 기기 찾기' : '알고리즘 학습', icon: GitMerge },
+    { id: 'devices', name: uiMode === 'simple' ? '돌봄로봇 살펴보기' : '이승로봇 종류', icon: Shield },
+    { id: 'learning', name: uiMode === 'simple' ? '나에게 맞는 돌봄로봇 찾기' : '알고리즘 학습', icon: GitMerge },
     { id: 'quiz', name: uiMode === 'simple' ? '연습해보기' : '사례 테스트 (퀴즈)', icon: CheckSquare },
   ] as const;
 
@@ -183,16 +240,7 @@ export default function TransferPage() {
     setQuizSafetyApproved(false);
   };
 
-  const getSlingImage = (id: string) => {
-    if (id === 'T-B') return '/images/transfer_board.png';
-    if (id === 'T-C') return '/images/standing_aid.png';
-    if (id === 'T-D') return '/images/manual_standing_aid.png';
-    if (id === 'T-E') return '/images/transfer_lift.png';
-    if (id === 'T-F') return '/images/wall_lift.png';
-    if (id === 'T-G') return '/images/mobile_sling_lift.png';
-    if (id === 'T-H') return '/images/gantry_lift.png';
-    return '/images/transfer_lift.png';
-  };
+
 
   const isSimple = uiMode === 'simple';
 
@@ -203,7 +251,7 @@ export default function TransferPage() {
       {/* Page Header */}
       <div className="border-b border-slate-200 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className={`font-extrabold text-slate-800 tracking-tight ${isSimple ? 'text-4xl' : 'text-3xl'}`}>
-          이승돌봄기기
+          이승돌봄로봇
         </h1>
       </div>
 
@@ -383,157 +431,161 @@ export default function TransferPage() {
 
           {/* Tab 2: 이승로봇 종류 */}
           {activeTab === 'devices' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
-                <h2 className={`font-bold text-slate-800 mb-2 ${isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-                  이승돌봄기기 종류
-                </h2>
-                <p className={`text-slate-500 font-semibold leading-relaxed ${isSimple ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
-                  환자분의 신체 조건과 가정 공간 환경에 따라 가장 잘 맞는 장치를 선택합니다. 크게 이승보조도구, 일어서기 보조 전동/수동 리프트, 공중에 매다는 그네식 리프트로 분류됩니다.
-                </p>
-              </div>
+            isSimple ? (
+              <RobotStorySection
+                scenariosTitle="이런 상황에서 필요해요"
+                scenarios={transferScenariosData}
+                helpersTitle="돌봄로봇이 이렇게 도와줘요"
+                helpers={transferHelpers}
+                robots={transferStoryRobots}
+                safetyTips={transferSafetyTips}
+                onCTAChangeTab={() => {
+                  setActiveTab('learning');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            ) : (
+              <div className="space-y-6 animate-fade-in">
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+                  <h2 className="font-bold text-slate-800 mb-2 text-xl sm:text-2xl">
+                    이승돌봄로봇 종류
+                  </h2>
+                  <p className="text-slate-500 font-semibold leading-relaxed text-sm sm:text-base">
+                    환자분의 신체 조건과 가정 공간 환경에 따라 가장 잘 맞는 장치를 선택합니다. 크게 이승보조도구, 일어서기 보조 전동/수동 리프트, 공중에 매다는 그네식 리프트로 분류됩니다.
+                  </p>
+                </div>
 
-              {/* Collapsible Categories Accordion */}
-              <div className="space-y-6">
-                {[
-                  {
-                    name: '이승보조장비',
-                    description: '자리이동 기능에 가벼운 어려움이 있어 간단한 도구를 활용해 신체 마찰과 보호자의 신체 부담을 줄여주는 장비군입니다.',
-                    targetLevel: '자리이동 가벼운 어려움 (MMT Grade IV ~ V)',
-                    simpleDescription: '자리이동이 어느 정도 스스로 가능하지만 가끔 보충 지탱이 필요할 때 마찰을 줄여 옮겨주는 가벼운 판이나 부축 벨트입니다.',
-                    devices: transferEducationData.devices.list.filter(d => d.category === '이승보조장비'),
-                    actionBadge: '옮겨 앉기',
-                  },
-                  {
-                    name: '기립보조리프트 / 스탠딩리프트',
-                    description: '다리 근력이 약해 스스로 지탱하여 일어서기는 어려우나, 상체 조절이 가능하여 보호자나 전동 로봇의 힘을 빌려 일어서고 앉을 수 있는 장비군입니다.',
-                    targetLevel: '하지 지지 어려움 (Grade III 이하) & 상체 가누기 가능',
-                    simpleDescription: '다리 힘이 약해 일어서기 곤란하지만 스스로 상체를 가누고 손을 잡고 버틸 수 있을 때, 기계 힘으로 세워주는 장치입니다.',
-                    devices: transferEducationData.devices.list.filter(d => d.category === '기립보조리프트 / 스탠딩리프트'),
-                    actionBadge: '일어서기',
-                  },
-                  {
-                    name: '전신슬링 리프트',
-                    description: '다리 지지와 상체 조절이 모두 불가능한 와상/중증 상태의 환자를 전용 슬링 시트로 완전히 공중에 매달아 이동시키는 안전한 리프트 장비군입니다.',
-                    targetLevel: '하지 지지 및 상체 가누기 불가 (Grade III 이하)',
-                    simpleDescription: '다리와 허리 힘이 전혀 없어 스스로 자세를 유지할 수 없는 분을 그네식 전용 시트(슬링)로 감싸 완전히 들어 올려 옮겨주는 기기입니다.',
-                    devices: transferEducationData.devices.list.filter(d => d.category === '전신슬링 리프트'),
-                    actionBadge: '공중 들어올리기',
-                  },
-                ].map((cat) => {
-                  const isOpen = openCats[cat.name];
-                  return (
-                    <div key={cat.name} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
-                      {/* Accordion Header */}
-                      <button
-                        onClick={() => toggleCat(cat.name)}
-                        className="w-full text-left p-6 bg-slate-50/70 hover:bg-slate-100/80 transition-all flex justify-between items-start gap-4 border-b border-slate-200/60 cursor-pointer"
-                      >
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-lg font-bold text-slate-800">{cat.name}</h3>
-                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                              {cat.targetLevel}
-                            </span>
-                            {isSimple && (
-                              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
-                                핵심 동작: {cat.actionBadge}
+                {/* Collapsible Categories Accordion */}
+                <div className="space-y-6">
+                  {[
+                    {
+                      name: '이승보조장비',
+                      description: '자리이동 기능에 가벼운 어려움이 있어 간단한 도구를 활용해 신체 마찰과 보호자의 신체 부담을 줄여주는 장비군입니다.',
+                      targetLevel: '자리이동 가벼운 어려움 (MMT Grade IV ~ V)',
+                      devices: transferEducationData.devices.list.filter(d => d.category === '이승보조장비'),
+                    },
+                    {
+                      name: '기립보조리프트 / 스탠딩리프트',
+                      description: '다리 근력이 약해 스스로 지탱하여 일어서기는 어려우나, 상체 조절이 가능하여 보호자나 전동 로봇의 힘을 빌려 일어서고 앉을 수 있는 장비군입니다.',
+                      targetLevel: '하지 지지 어려움 (Grade III 이하) & 상체 가누기 가능',
+                      devices: transferEducationData.devices.list.filter(d => d.category === '기립보조리프트 / 스탠딩리프트'),
+                    },
+                    {
+                      name: '전신슬링 리프트',
+                      description: '다리 지지와 상체 조절이 모두 불가능한 와상/중증 상태의 환자를 전용 슬링 시트로 완전히 공중에 매달아 이동시키는 안전한 리프트 장비군입니다.',
+                      targetLevel: '하지 지지 및 상체 가누기 불가 (Grade III 이하)',
+                      devices: transferEducationData.devices.list.filter(d => d.category === '전신슬링 리프트'),
+                    },
+                  ].map((cat) => {
+                    const isOpen = openCats[cat.name];
+                    return (
+                      <div key={cat.name} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                        {/* Accordion Header */}
+                        <button
+                          onClick={() => toggleCat(cat.name)}
+                          className="w-full text-left p-6 bg-slate-50/70 hover:bg-slate-100/80 transition-all flex justify-between items-start gap-4 border-b border-slate-200/60 cursor-pointer"
+                        >
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-lg font-bold text-slate-800">{cat.name}</h3>
+                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                                {cat.targetLevel}
                               </span>
-                            )}
+                            </div>
+                            <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
+                              {cat.description}
+                            </p>
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
-                            {isSimple ? cat.simpleDescription : cat.description}
-                          </p>
-                        </div>
-                        <div className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-500 shrink-0 mt-1">
-                          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </div>
-                      </button>
+                          <div className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-500 shrink-0 mt-1">
+                            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </div>
+                        </button>
 
-                      {/* Accordion Content */}
-                      {isOpen && (
-                        <div className="p-6 bg-slate-50/20">
-                          {cat.devices.length === 0 ? (
-                            <p className="text-sm text-slate-400 text-center py-4">등록된 로봇 정보가 없습니다.</p>
-                          ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {cat.devices.map((device) => {
-                                const imgPath = getSlingImage(device.id);
-                                return (
-                                  <div id={`device-${device.id}`} key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200 transition-all">
-                                    <div className="p-5 sm:p-6 space-y-6">
-                                      <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                                        {/* Device Image */}
-                                        <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
-                                          <Image
-                                            src={imgPath}
-                                            alt={device.name}
-                                            fill
-                                            className="object-contain p-1"
-                                          />
-                                        </div>
-                                        
-                                        {/* Device Info */}
-                                        <div className="flex-1 space-y-3 text-center sm:text-left">
-                                          <div>
-                                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
-                                              {device.category}
-                                            </span>
-                                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
+                        {/* Accordion Content */}
+                        {isOpen && (
+                          <div className="p-6 bg-slate-50/20">
+                            {cat.devices.length === 0 ? (
+                              <p className="text-sm text-slate-400 text-center py-4">등록된 로봇 정보가 없습니다.</p>
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {cat.devices.map((device) => {
+                                  const imgPath = getSlingImage(device.id);
+                                  return (
+                                    <div id={`device-${device.id}`} key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200 transition-all">
+                                      <div className="p-5 sm:p-6 space-y-6">
+                                        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                                          {/* Device Image */}
+                                          <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
+                                            <Image
+                                              src={imgPath}
+                                              alt={device.name}
+                                              fill
+                                              className="object-contain p-1"
+                                            />
                                           </div>
-                                          <p className="text-xs text-slate-400 font-semibold leading-normal">
-                                            <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
-                                            {device.target}
-                                          </p>
-                                        </div>
-                                      </div>
-
-                                      {/* Description */}
-                                      <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
-                                        {device.description}
-                                      </p>
-
-                                      {/* Pros and Precautions */}
-                                      <div className="grid grid-cols-1 gap-4 pt-2">
-                                        {/* Pros */}
-                                        <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
-                                          <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase font-extrabold">
-                                            <ThumbsUp className="w-3.5 h-3.5" />
-                                            장점
-                                          </h4>
-                                          <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
-                                            {device.pros.map((pro, idx) => (
-                                              <li key={idx}>{pro}</li>
-                                            ))}
-                                          </ul>
+                                          
+                                          {/* Device Info */}
+                                          <div className="flex-1 space-y-3 text-center sm:text-left">
+                                            <div>
+                                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
+                                                {device.category}
+                                              </span>
+                                              <h3 className="text-base sm:text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
+                                            </div>
+                                            <p className="text-xs text-slate-400 font-semibold leading-normal">
+                                              <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
+                                              {device.target}
+                                            </p>
+                                          </div>
                                         </div>
 
-                                        {/* Precautions */}
-                                        <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
-                                          <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase font-extrabold">
-                                            <AlertTriangle className="w-3.5 h-3.5" />
-                                            유의사항
-                                          </h4>
-                                          <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
-                                            {device.precautions.map((pre, idx) => (
-                                              <li key={idx}>{pre}</li>
-                                            ))}
-                                          </ul>
+                                        {/* Description */}
+                                        <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
+                                          {device.description}
+                                        </p>
+
+                                        {/* Pros and Precautions */}
+                                        <div className="grid grid-cols-1 gap-4 pt-2">
+                                          {/* Pros */}
+                                          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
+                                            <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase font-extrabold">
+                                              <ThumbsUp className="w-3.5 h-3.5" />
+                                              장점
+                                            </h4>
+                                            <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
+                                              {device.pros.map((pro, idx) => (
+                                                <li key={idx}>{pro}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
+
+                                          {/* Precautions */}
+                                          <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
+                                            <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase font-extrabold">
+                                              <AlertTriangle className="w-3.5 h-3.5" />
+                                              유의사항
+                                            </h4>
+                                            <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
+                                              {device.precautions.map((pre, idx) => (
+                                                <li key={idx}>{pre}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )
           )}
 
           {/* Tab 3: 알고리즘 학습 */}
@@ -541,7 +593,7 @@ export default function TransferPage() {
             <div className="space-y-6 animate-fade-in flex-1 flex flex-col">
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
                 <h2 className={`font-bold text-slate-800 mb-2 ${isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-                  {isSimple ? '나에게 맞는 기기 찾기' : '알고리즘 학습'}
+                  {isSimple ? '나에게 맞는 돌봄로봇 찾기' : '알고리즘 학습'}
                 </h2>
                 <p className={`text-slate-500 leading-relaxed font-semibold ${isSimple ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
                   {isSimple 

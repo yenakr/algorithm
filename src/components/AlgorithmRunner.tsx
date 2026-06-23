@@ -9,6 +9,7 @@ import {
 import Image from 'next/image';
 import { Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import SimpleResultCard from './SimpleResultCard';
 
 const simpleIconMap: Record<string, React.ReactNode> = {
   transfer: <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm"><Bed className="w-8 h-8" /></div>,
@@ -373,14 +374,14 @@ const transferNodes: Record<string, { x: number; y: number; label: string; isRes
   q3: { x: 2075, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
   q3_1: { x: 2075, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
   q3_2: { x: 2645, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
-  'T-A': { x: 0, y: 1000, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
-  'T-B': { x: 420, y: 1000, label: "이승보조장비", isResult: true, typeLabel: "기기 추천" },
-  'T-C': { x: 840, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-D': { x: 1260, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "기기 추천" },
-  'T-E': { x: 1680, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-F': { x: 2100, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-H': { x: 2520, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-G': { x: 2940, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "기기 추천" },
+  'T-A': { x: 0, y: 1000, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-B': { x: 420, y: 1000, label: "이승보조장비", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-C': { x: 840, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-D': { x: 1260, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-E': { x: 1680, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-F': { x: 2100, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-H': { x: 2520, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-G': { x: 2940, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
@@ -391,14 +392,14 @@ const toiletingNodes: Record<string, { x: number; y: number; label: string; isRe
   q3_a2: { x: 965, y: 400, label: "스스로 뒤처리를 할 수 있나요? (A2)", typeLabel: "뒤처리 평가" },
   q3_b1: { x: 1805, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B1)", typeLabel: "뒤처리 평가" },
   q3_b2: { x: 2645, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B2)", typeLabel: "뒤처리 평가" },
-  'B-A': { x: 0, y: 600, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
-  'B-B': { x: 420, y: 600, label: "비데", isResult: true, typeLabel: "기기 추천" },
-  'B-C': { x: 840, y: 600, label: "변기 리프트", isResult: true, typeLabel: "기기 추천" },
-  'B-D': { x: 1260, y: 600, label: "이동 변기", isResult: true, typeLabel: "기기 추천" },
-  'B-E': { x: 1680, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "기기 추천" },
-  'B-F': { x: 2100, y: 600, label: "배설 프로그램 + 비데", isResult: true, typeLabel: "기기 추천" },
-  'B-G': { x: 2520, y: 600, label: "자동배설로봇 (간헐)", isResult: true, typeLabel: "기기 추천" },
-  'B-H': { x: 2940, y: 600, label: "스마트 기저귀 로봇", isResult: true, typeLabel: "기기 추천" },
+  'B-A': { x: 0, y: 600, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-B': { x: 420, y: 600, label: "비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-C': { x: 840, y: 600, label: "변기 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-D': { x: 1260, y: 600, label: "이동 변기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-E': { x: 1680, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-F': { x: 2100, y: 600, label: "배설 프로그램 + 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-G': { x: 2520, y: 600, label: "자동배설로봇 (간헐)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-H': { x: 2940, y: 600, label: "스마트 기저귀 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const transferEdges = [
@@ -903,101 +904,42 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         {/* Wizard Main Card */}
         {resultId ? (
           // Matched Recommendation screen in Simple Mode
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col">
-            <div className="p-6 sm:p-8 space-y-6">
-              {/* Result Title */}
-              <div className="text-center pb-5 border-b border-slate-100 space-y-2">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 mx-auto mb-2">
-                  {getResultIcon(resultId)}
-                </div>
-                <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                  추천 결과
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
-                  {getDisplayText(algorithm.results[resultId], 'title', uiMode)}
-                </h2>
-                {resultDetails[resultId]?.deviceName && (
-                  <span className="text-sm font-semibold text-slate-450 block pt-1">
-                    ({resultDetails[resultId]?.deviceName})
-                  </span>
-                )}
-              </div>
+          <div className="space-y-8 animate-fade-in w-full max-w-2xl mx-auto">
+            {/* Header: 추천 결과 안내 */}
+            <div className="text-center space-y-2 pb-4 border-b border-slate-100">
+              <span className="text-xs font-black text-indigo-700 bg-indigo-50 border border-indigo-150 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+                나에게 맞는 돌봄로봇 추천 결과
+              </span>
+              <h2 className="text-3xl font-black text-slate-800 pt-2 leading-snug">
+                진단 결과가 나왔습니다
+              </h2>
+            </div>
 
-              {/* Device Image */}
-              {resultDetails[resultId]?.image ? (
-                <div className="relative mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
-                  <Image
-                    src={resultDetails[resultId].image}
-                    alt={resultDetails[resultId].deviceName}
-                    fill
-                    className="object-contain p-2"
-                    priority
-                  />
-                </div>
-              ) : (
-                <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-sm">
-                  이미지 준비 중
-                </div>
-              )}
+            {/* Simple Result Card */}
+            <SimpleResultCard
+              recommendation={algorithm.results[resultId]?.simpleRecommendation || algorithm.results[resultId]?.recommendation}
+              reason={algorithm.results[resultId]?.simpleReason || algorithm.results[resultId]?.reason}
+              whenToUse={algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
+              precautions={algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions}
+            />
 
-              {/* Three Cards for Recommendations */}
-              <div className="grid grid-cols-1 gap-5 text-left">
-                {/* Card 1: 추천 결과 */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-                  <h4 className="text-sm font-black text-slate-800 flex items-center gap-1.5 font-semibold">
-                    <Trophy className="w-4 h-4 text-emerald-500 shrink-0" />
-                    추천 결과
-                  </h4>
-                  <p className="text-slate-600 font-extrabold leading-relaxed text-sm sm:text-base">
-                    {algorithm.results[resultId]?.simpleRecommendation || algorithm.results[resultId]?.recommendation}
-                  </p>
-                </div>
-
-                {/* Card 2: 언제 필요할까요? */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-                  <h4 className="text-sm font-black text-slate-800 flex items-center gap-1.5 font-semibold">
-                    <HelpCircle className="w-4 h-4 text-primary shrink-0" />
-                    언제 필요할까요?
-                  </h4>
-                  <p className="text-slate-750 font-bold leading-relaxed text-sm sm:text-base">
-                    {algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
-                  </p>
-                </div>
-
-                {/* Card 3: 주의할 점 */}
-                {(algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions) && (
-                  <div className="bg-amber-50/50 border border-amber-205 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-sm font-black text-amber-850 flex items-center gap-1.5">
-                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      주의할 점
-                    </h4>
-                    <ul className="space-y-2 text-slate-850 font-bold text-sm sm:text-base list-disc pl-5 leading-relaxed">
-                      {(algorithm.results[resultId]?.simpleTips || resultDetails[resultId].precautions).map((tip, idx) => (
-                        <li key={idx}>{tip}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-100">
-                {onLearnMore && (
-                  <button
-                    onClick={() => onLearnMore(resultId)}
-                    className="flex-1 py-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg cursor-pointer"
-                  >
-                    <span>상세 기기 정보 더 알아보기</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-250">
+              {onLearnMore && (
                 <button
-                  onClick={handleReset}
-                  className="py-3.5 px-6 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-sm transition-colors cursor-pointer"
+                  onClick={() => onLearnMore(resultId)}
+                  className="flex-1 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg cursor-pointer"
                 >
-                  처음부터 다시 진단하기
+                  <span>상세 돌봄로봇 정보 더 알아보기</span>
+                  <ArrowRight className="w-5 h-5" />
                 </button>
-              </div>
+              )}
+              <button
+                onClick={handleReset}
+                className="py-4 px-8 rounded-2xl border border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-850 font-bold text-base transition-colors cursor-pointer"
+              >
+                처음부터 다시 진단하기
+              </button>
             </div>
           </div>
         ) : (
@@ -1414,7 +1356,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 {/* Result Title */}
                 <div className="text-center pb-5 border-b border-slate-100 space-y-2">
                   <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                    최적 추천 기기
+                    최적 추천 돌봄로봇
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
                     {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
@@ -1505,7 +1447,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       onClick={() => onLearnMore(resultId)}
                       className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg scale-[1.01] cursor-pointer"
                     >
-                      <span>상세 기기 정보 더 알아보기</span>
+                      <span>상세 돌봄로봇 정보 더 알아보기</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   )}

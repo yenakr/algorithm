@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import CareMiniIllustration, { IllustrationType } from './CareMiniIllustration';
+import CareSceneIllustration, { IllustrationType } from './CareSceneIllustration';
 
 export interface SafetyItem {
   id: string;
@@ -44,7 +44,7 @@ export default function CareSafetyCard({ items, checkedItems, onToggle }: CareSa
             {/* Illustration and text info */}
             <div className="space-y-4">
               <div className="pointer-events-none">
-                <CareMiniIllustration
+                <CareSceneIllustration
                   type={item.illustrationType}
                   size="sm"
                 />

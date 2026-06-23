@@ -1,6 +1,6 @@
 import React from 'react';
 import ScenarioStepItem from './ScenarioStepItem';
-import { IllustrationType } from './CareMiniIllustration';
+import { IllustrationType } from './CareSceneIllustration';
 
 export interface StepScenario {
   type: IllustrationType;

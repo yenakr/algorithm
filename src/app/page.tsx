@@ -60,7 +60,7 @@ export default function Home() {
             돌봄로봇 교육 및 자가평가
           </h1>
           <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-100/90 leading-relaxed font-semibold">
-            이승돌봄과 배설돌봄 상황에 맞는 돌봄기기와 돌봄로봇을 이해하고, 나에게 필요한 유형을 확인해보세요.
+            이승돌봄과 배설돌봄 상황에 맞는 돌봄로봇을 이해하고, 나에게 필요한 유형을 확인해보세요.
           </p>
 
           {/* Mode Selection Area */}
@@ -187,20 +187,20 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-slate-800">이승돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 기기와 로봇
+              침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 돌봄로봇
             </p>
             <Link href={`/transfer?mode=${mode}`} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               이승돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-
+ 
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow duration-200 space-y-4">
             <div className="bg-primary/5 text-primary p-3 rounded-xl w-fit">
               <FileCheckIcon className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-lg font-bold text-slate-800">배설돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              배뇨와 배변 등 위생 관리를 돕는 기기와 로봇
+              배뇨와 배변 등 위생 관리를 돕는 돌봄로봇
             </p>
             <Link href={`/toileting?mode=${mode}`} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               배설돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />

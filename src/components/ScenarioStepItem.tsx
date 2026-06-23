@@ -1,5 +1,5 @@
 import React from 'react';
-import CareMiniIllustration, { IllustrationType } from './CareMiniIllustration';
+import CareSceneIllustration, { IllustrationType } from './CareSceneIllustration';
 
 interface ScenarioStepItemProps {
   number: number;
@@ -23,7 +23,7 @@ export default function ScenarioStepItem({ number, type, title, description }: S
 
         {/* Visual Illustration */}
         <div className="w-full">
-          <CareMiniIllustration type={type} size="sm" />
+          <CareSceneIllustration type={type} size="sm" />
         </div>
       </div>
 
