@@ -905,19 +905,11 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         {resultId ? (
           // Matched Recommendation screen in Simple Mode
           <div className="space-y-8 animate-fade-in w-full max-w-2xl mx-auto">
-            {/* Header: 추천 결과 안내 */}
-            <div className="text-center space-y-2 pb-4 border-b border-slate-100">
-              <span className="text-xs font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
-                나에게 맞는 돌봄로봇 추천 결과
-              </span>
-              <h2 className="text-3xl font-black text-slate-800 pt-2 leading-snug">
-                진단 결과가 나왔습니다
-              </h2>
-            </div>
 
             {/* Simple Result Card */}
             <SimpleResultCard
-              recommendation={algorithm.results[resultId]?.simpleRecommendation || algorithm.results[resultId]?.recommendation}
+              robotName={algorithm.results[resultId]?.simpleTitle || algorithm.results[resultId]?.title}
+              shortDescription={algorithm.results[resultId]?.simpleDescription || algorithm.results[resultId]?.description}
               reason={algorithm.results[resultId]?.simpleReason || algorithm.results[resultId]?.reason}
               whenToUse={algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
               precautions={algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions}
