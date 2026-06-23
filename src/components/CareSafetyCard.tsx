@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import CareIllustrationCard, { IllustrationType } from './CareIllustrationCard';
+import CareMiniIllustration, { IllustrationType } from './CareMiniIllustration';
 
 export interface SafetyItem {
   id: string;
@@ -41,15 +41,17 @@ export default function CareSafetyCard({ items, checkedItems, onToggle }: CareSa
               </div>
             </div>
 
-            {/* Illustration Card wrapper (renders without description text, just graphic + title) */}
+            {/* Illustration and text info */}
             <div className="space-y-4">
               <div className="pointer-events-none">
-                <CareIllustrationCard
+                <CareMiniIllustration
                   type={item.illustrationType}
-                  title={item.title}
-                  description={item.description}
                   size="sm"
                 />
+              </div>
+              <div className="text-left space-y-1">
+                <h4 className="text-sm font-extrabold text-slate-800 leading-snug">{item.title}</h4>
+                <p className="text-xs text-slate-500 leading-relaxed font-semibold">{item.description}</p>
               </div>
             </div>
           </div>
@@ -58,3 +60,4 @@ export default function CareSafetyCard({ items, checkedItems, onToggle }: CareSa
     </div>
   );
 }
+

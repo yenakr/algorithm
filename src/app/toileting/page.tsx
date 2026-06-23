@@ -11,8 +11,10 @@ import { toiletingCases } from '@/data/cases/toiletingCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
-import CareIllustrationCard from '@/components/CareIllustrationCard';
-import CareScenarioGrid from '@/components/CareScenarioGrid';
+import CareMiniIllustration from '@/components/CareMiniIllustration';
+import ScenarioStepList from '@/components/ScenarioStepList';
+import SafetyCheckCard from '@/components/SafetyCheckCard';
+import CareTabs from '@/components/CareTabs';
 import CareSafetyCard from '@/components/CareSafetyCard';
 
 const toiletingScenarios = [
@@ -28,6 +30,12 @@ const toiletingSafetyItems = [
   { id: 't-s3', title: '이동로 장애물 제거', description: '바닥의 물기나 미끄러운 신발, 걸려 넘어질 물건을 모두 치웁니다.', illustrationType: 'move-difficulty' as const },
   { id: 't-s4', title: '도움 과정 미리 알리기', description: '갑자기 몸을 만지기 전에 진행하려는 과정을 대상자에게 먼저 상냥히 설명합니다.', illustrationType: 'caregiver-prep' as const },
   { id: 't-s5', title: '철저한 소독 및 위생', description: '배설 즉시 소독 및 환기를 진행하고 용기 수거 등 위생을 정돈합니다.', illustrationType: 'hygiene-manage' as const },
+];
+
+const toiletingSafetyCheckItems = [
+  { id: 'ts-c1', title: '개인 프라이버시 보호', description: '수치심을 느끼지 않도록 커튼이나 스크린으로 사생활 공간을 보호해 주세요.', type: 'privacy' as const },
+  { id: 'ts-c2', title: '변기/바퀴 고정 확인', description: '간이 변기나 휠체어의 바퀴가 안전하게 고정되어 있고 수평인지 확인하세요.', type: 'lock' as const },
+  { id: 'ts-c3', title: '주변 장애물 제거', description: '낙상 예방을 위해 화장실 바닥의 물기나 문턱의 미끄러운 신발 등을 정돈하세요.', type: 'obstacle' as const },
 ];
 
 export default function ToiletingPage() {
@@ -196,138 +204,80 @@ export default function ToiletingPage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex overflow-x-auto w-full max-w-full gap-2 border-b border-slate-200 pb-px mb-8 scrollbar-none">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3 border-b-2 font-bold whitespace-nowrap transition-all cursor-pointer ${
-                isSimple ? 'text-base sm:text-lg' : 'text-sm'
-              } ${
-                isActive
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.name}</span>
-            </button>
-          );
-        })}
-      </div>
+      <CareTabs 
+        tabs={tabs} 
+        activeTab={activeTab} 
+        onChange={setActiveTab} 
+        isSimple={isSimple} 
+      />
 
       {/* Tab Content */}
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex-1">
           {/* Tab 1: 소개 & 평가기준 */}
           {activeTab === 'info' && (
-            <div className="space-y-10 animate-fade-in">
-              {/* Definition Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-4">
-                <h2 className={`font-bold text-slate-800 flex items-center gap-2 ${
-                  isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-                }`}>
-                  <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                  {isSimple ? '배설돌봄(화장실 및 위생)이란?' : toiletingEducationData.definition.title}
-                </h2>
-                <p className={`text-slate-600 leading-relaxed font-semibold ${
-                  isSimple ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
-                }`}>
-                  {isSimple 
-                    ? '배설돌봄은 환자분이 안전하고 청결하게 소변과 대변을 해결할 수 있도록 화장실 이동, 자세 유지, 용변 후 뒤처리 및 기저귀 위생 등을 도와주는 일을 말합니다.' 
-                    : toiletingEducationData.definition.content
-                  }
-                </p>
-                {isSimple ? (
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">배설 영역 주요 4가지 관리 단계</h3>
-                    <CareScenarioGrid scenarios={toiletingScenarios} />
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">배설 영역 주요 5가지 관리 단계</h3>
-                    <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
-                      isSimple ? 'text-base sm:text-lg' : 'text-sm'
-                    }`}>
-                      {toiletingEducationData.definition.examples.map((ex, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          <span>{ex}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Standards Section */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
-                <h2 className={`font-bold text-slate-800 flex items-center gap-2 ${
-                  isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-                }`}>
-                  <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                  {isSimple ? '기기 선택 전 확인해 볼 핵심 항목' : '배설 영역 기능평가 기준'}
-                </h2>
-                
-                {isSimple ? (
-                  // Simple layout for caregivers
-                  <div className="space-y-4">
-                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-semibold">
-                      환자분에게 딱 맞는 배설 보조기나 기저귀 로봇을 찾으려면 다음 세 가지 자립 능력을 먼저 확인해 보셔야 합니다.
+            <div className="space-y-10 animate-fade-in text-left">
+              {isSimple ? (
+                <>
+                  {/* Definition Card */}
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-indigo-600 rounded-full inline-block" />
+                      배설돌봄(화장실 및 위생)이란?
+                    </h2>
+                    <p className="text-base sm:text-lg text-slate-650 leading-relaxed font-semibold">
+                      스스로 화장실을 이용하거나 대소변 후 청결을 유지하기 어려운 대상자를 위해 이동, 자세 유지, 용변 후 뒤처리 및 기저귀 위생 등을 돕는 돌봄입니다.
                     </p>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
-                      <CareIllustrationCard
-                        type="express-need"
-                        title="1. 대소변 신호(인지력)"
-                        description="스스로 소변이나 대변을 보고 싶다는 감각을 인지하고 조절할 수 있는지 확인합니다."
-                        size="sm"
-                      />
-                      <CareIllustrationCard
-                        type="move-difficulty"
-                        title="2. 화장실 이동 능력"
-                        description="침대에서 일어나 화장실 변기까지 스스로 걷거나 안전하게 진입할 수 있는지 확인합니다."
-                        size="sm"
-                      />
-                      <CareIllustrationCard
-                        type="clean-after"
-                        title="3. 위생 뒤처리 능력"
-                        description="용변 후 스스로 휴지로 닦아내거나 바지를 내리고 올리는 신체 조절력을 확인합니다."
-                        size="sm"
-                      />
-                    </div>
+                  </div>
 
-                    {/* Collapsible detailed standards */}
-                    <div className="border-t border-slate-200 pt-6 mt-4">
-                      <button
-                        onClick={() => setShowDetailedStandards(!showDetailedStandards)}
-                        className="w-full py-3.5 px-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 font-bold text-sm text-slate-700 flex justify-between items-center transition-all cursor-pointer shadow-sm"
-                      >
-                        <span>자세한 기준 보기 (0~4점 배설 영역 상세 기준표)</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDetailedStandards ? 'rotate-180' : ''}`} />
-                      </button>
+                  {/* Scenarios Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-5 bg-indigo-600 rounded inline-block" />
+                      주로 이런 상황에서 필요합니다
+                    </h3>
+                    <ScenarioStepList scenarios={toiletingScenarios} />
+                  </div>
 
-                      {showDetailedStandards && (
-                        <div className="mt-4 p-5 rounded-xl border border-slate-200 bg-white space-y-4 animate-fade-in text-sm">
-                          <h4 className="font-bold text-slate-800">배설 영역 기능평가 세부 기준</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-                            {toiletingEducationData.standards.items.map((item) => (
-                              <div key={item.score} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-                                <span className="font-bold text-primary block mb-1">{item.score} ({item.label})</span>
-                                <span className="text-slate-500 font-medium">{item.details}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                  {/* Safety Precautions Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-5 bg-amber-500 rounded inline-block" />
+                      사용 전 확인하세요 (핵심 주의사항)
+                    </h3>
+                    <SafetyCheckCard items={toiletingSafetyCheckItems} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Definition Card */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
+                      {toiletingEducationData.definition.title}
+                    </h2>
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-semibold">
+                      {toiletingEducationData.definition.content}
+                    </p>
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">배설 영역 주요 5가지 관리 단계</h3>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 text-sm">
+                        {toiletingEducationData.definition.examples.map((ex, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <span>{ex}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                ) : (
-                  // Detail layout (original)
-                  <>
+
+                  {/* Standards Section */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
+                      배설 영역 기능평가 기준
+                    </h2>
                     <p className="text-sm sm:text-base text-slate-500 font-semibold">
                       {toiletingEducationData.standards.description} 2점 이상부터는 돌봄 로봇이나 위생 보조기기의 개입이 적극 장려됩니다.
                     </p>
@@ -349,7 +299,7 @@ export default function ToiletingPage() {
                             <div>
                               <div className="flex justify-between items-center mb-3">
                                 <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-                                  isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'
+                                  isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-650'
                                 }`}>
                                   {item.score}
                                 </span>
@@ -366,9 +316,9 @@ export default function ToiletingPage() {
                         );
                       })}
                     </div>
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 

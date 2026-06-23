@@ -11,15 +11,17 @@ import { transferCases } from '@/data/cases/transferCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
-import CareIllustrationCard from '@/components/CareIllustrationCard';
-import CareScenarioGrid from '@/components/CareScenarioGrid';
+import CareMiniIllustration from '@/components/CareMiniIllustration';
+import ScenarioStepList from '@/components/ScenarioStepList';
+import SafetyCheckCard from '@/components/SafetyCheckCard';
+import CareTabs from '@/components/CareTabs';
 import CareSafetyCard from '@/components/CareSafetyCard';
 
 const transferScenarios = [
-  { type: 'bed-to-wheelchair' as const, title: '침대 ↔ 휠체어 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 태우거나 침대로 이동시킵니다.' },
-  { type: 'wheelchair-to-bed' as const, title: '휠체어 ↔ 침대 이동', description: '휠체어에 앉아 계신 대상자를 침대로 다시 안전하게 눕힙니다.' },
-  { type: 'wheelchair-to-toilet' as const, title: '휠체어 ↔ 변기 이동', description: '화장실 변기나 간이 변기로 자리를 옮겨 배설을 돕습니다.' },
-  { type: 'bed-to-chair' as const, title: '침대 ↔ 의자 이동', description: '식사나 휴식을 위해 침대에서 의자나 다른 앉을 곳으로 이동을 지원합니다.' }
+  { type: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 앉히는 상황입니다.' },
+  { type: 'wheelchair-to-toilet' as const, title: '휠체어에서 변기로 이동', description: '화장실 이용을 위해 휠체어에서 변기로 옮겨 앉는 상황입니다.' },
+  { type: 'wheelchair-to-bed' as const, title: '휠체어에서 침대로 이동', description: '휠체어에 앉아 계신 대상자를 침대로 다시 안전하게 눕히는 상황입니다.' },
+  { type: 'bed-to-chair' as const, title: '침대에서 의자로 이동', description: '식사나 휴식을 위해 침대에서 일반 의자로 이동을 돕는 상황입니다.' }
 ];
 
 const transferSafetyItems = [
@@ -28,6 +30,12 @@ const transferSafetyItems = [
   { id: 't-s3', title: '진행 절차 미리 알리기', description: '대상자에게 옮겨 앉을 방향과 방법을 충분히 설명해 안심을 드립니다.', illustrationType: 'caregiver-assist' as const },
   { id: 't-s4', title: '천천히 조작하기', description: '급하게 움직이지 않고 대상자의 몸 상태를 보며 천천히 안전하게 진행합니다.', illustrationType: 'bed-to-wheelchair' as const },
   { id: 't-s5', title: '어지러움/통증 수시 확인', description: '이동 도중이나 이동 직후에 머리가 아프거나 어지러운지 대상자 상태를 확인합니다.', illustrationType: 'dizzy-warning' as const },
+];
+
+const transferSafetyCheckItems = [
+  { id: 'ts-c1', title: '바퀴 고정 확인', description: '이승하기 전 침대와 휠체어 바퀴의 잠금장치를 반드시 잠갔는지 확인하세요.', type: 'lock' as const },
+  { id: 'ts-c2', title: '주변 장애물 제거', description: '발에 걸리거나 휠체어 이동을 방해하는 주변 장애물을 깨끗이 치워주세요.', type: 'obstacle' as const },
+  { id: 'ts-c3', title: '어지러움 시 즉시 중단', description: '환자가 어지러움, 통증 등을 호소하면 즉시 이동을 멈추고 안정을 유도하세요.', type: 'warning' as const },
 ];
 
 
@@ -200,160 +208,80 @@ export default function TransferPage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex overflow-x-auto w-full max-w-full gap-2 border-b border-slate-200 pb-px mb-8 scrollbar-none">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3 border-b-2 font-bold whitespace-nowrap transition-all cursor-pointer ${
-                isSimple ? 'text-base sm:text-lg' : 'text-sm'
-              } ${
-                isActive
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.name}</span>
-            </button>
-          );
-        })}
-      </div>
+      <CareTabs 
+        tabs={tabs} 
+        activeTab={activeTab} 
+        onChange={setActiveTab} 
+        isSimple={isSimple} 
+      />
 
       {/* Tab Content */}
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex-1">
           {/* Tab 1: 소개 & 평가기준 */}
           {activeTab === 'info' && (
-            <div className="space-y-10 animate-fade-in">
-              {/* Definition Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-4">
-                <h2 className={`font-bold text-slate-800 flex items-center gap-2 ${
-                  isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-                }`}>
-                  <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                  {isSimple ? '자리이동(이승) 돌봄이란?' : transferEducationData.definition.title}
-                </h2>
-                <p className={`text-slate-600 leading-relaxed font-semibold ${
-                  isSimple ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
-                }`}>
-                  {isSimple 
-                    ? '이승돌봄은 환자분이 스스로 다른 자리로 옮겨 앉지 못할 때 침대, 의자, 휠체어, 변기 등으로 자리를 안전하게 옮겨 태워주는 도움을 말합니다.' 
-                    : transferEducationData.definition.content
-                  }
-                </p>
-                {isSimple ? (
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
-                    <CareScenarioGrid scenarios={transferScenarios} />
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
-                    <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
-                      isSimple ? 'text-base sm:text-lg' : 'text-sm'
-                    }`}>
-                      {transferEducationData.definition.examples.map((ex, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          <span>{ex}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Standards Section */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
-                <h2 className={`font-bold text-slate-800 flex items-center gap-2 ${
-                  isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-                }`}>
-                  <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                  {isSimple ? '기기 선택 전 확인해 볼 핵심 항목' : '자리이동 기능평가'}
-                </h2>
-                
-                {isSimple ? (
-                  // Simple layout for caregivers
-                  <div className="space-y-4">
-                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-semibold">
-                      환자분의 상태와 집안 환경에 꼭 맞는 이승 보조 기기를 찾기 위해 다음 두 가지를 중점적으로 체크해 보세요.
+            <div className="space-y-10 animate-fade-in text-left">
+              {isSimple ? (
+                <>
+                  {/* Definition Card */}
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-indigo-600 rounded-full inline-block" />
+                      자리이동(이승) 돌봄이란?
+                    </h2>
+                    <p className="text-base sm:text-lg text-slate-650 leading-relaxed font-semibold">
+                      스스로 다른 자리로 옮겨 앉기 어려울 때, 침대·의자·휠체어·변기 등으로 안전하게 이동하도록 돕는 돌봄입니다.
                     </p>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                      <CareIllustrationCard
-                        type="move-difficulty"
-                        title="1. 스스로 자리이동이 가능한가요?"
-                        description="침대에서 휠체어로 스스로 넘어갈 수 있는지, 아니면 상당한 신체 지탱이나 전적인 기계 도움(리프트)이 요구되는지 살펴봅니다."
-                        size="sm"
-                      />
-                      <CareIllustrationCard
-                        type="caregiver-assist"
-                        title="2. 본인의 다리 힘으로 서 있을 수 있나요?"
-                        description="보호자가 겨드랑이를 지탱해주었을 때, 환자 본인의 다리 힘으로 체중을 지탱하고 일어설 수 있는지 확인합니다."
-                        size="sm"
-                      />
-                    </div>
+                  </div>
 
-                    {/* Collapsible detailed standards */}
-                    <div className="border-t border-slate-200 pt-6 mt-4">
-                      <button
-                        onClick={() => setShowDetailedStandards(!showDetailedStandards)}
-                        className="w-full py-3.5 px-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 font-bold text-sm text-slate-700 flex justify-between items-center transition-all cursor-pointer shadow-sm"
-                      >
-                        <span>자세한 기준 보기 (FIM 점수 및 의학적 MMT 등급 기준표)</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDetailedStandards ? 'rotate-180' : ''}`} />
-                      </button>
+                  {/* Scenarios Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-5 bg-indigo-600 rounded inline-block" />
+                      주로 이런 상황에서 필요합니다
+                    </h3>
+                    <ScenarioStepList scenarios={transferScenarios} />
+                  </div>
 
-                      {showDetailedStandards && (
-                        <div className="mt-4 p-5 rounded-xl border border-slate-200 bg-white space-y-6 animate-fade-in text-sm">
-                          <div className="space-y-4">
-                            <h4 className="font-bold text-slate-800">자리이동 기능평가 점수 기준</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-                              {transferEducationData.standards.items.map((item) => (
-                                <div key={item.score} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-                                  <span className="font-bold text-primary block mb-1">{item.score} ({item.label})</span>
-                                  <span className="text-slate-500 font-medium">{item.details}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          {transferEducationData.standards.subSection && (
-                            <div className="space-y-4 pt-4 border-t border-slate-100">
-                              <h4 className="font-bold text-slate-800">하지 근력 (MMT) 등급 상세</h4>
-                              <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-                                <table className="min-w-full text-xs text-left">
-                                  <thead className="bg-slate-50 font-bold text-slate-700">
-                                    <tr>
-                                      <th className="p-3">근력 레벨</th>
-                                      <th className="p-3">상태 구분</th>
-                                      <th className="p-3">임상 판정 기준</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody className="divide-y divide-slate-100 bg-white font-medium text-slate-500">
-                                    {transferEducationData.standards.subSection.items.map((subItem) => (
-                                      <tr key={subItem.grade}>
-                                        <td className="p-3 font-bold text-slate-700">{subItem.grade}</td>
-                                        <td className="p-3">{subItem.label}</td>
-                                        <td className="p-3">{subItem.criteria}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                  {/* Safety Precautions Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-5 bg-amber-500 rounded inline-block" />
+                      사용 전 확인하세요 (핵심 주의사항)
+                    </h3>
+                    <SafetyCheckCard items={transferSafetyCheckItems} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Definition Card */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
+                      {transferEducationData.definition.title}
+                    </h2>
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-semibold">
+                      {transferEducationData.definition.content}
+                    </p>
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 text-sm">
+                        {transferEducationData.definition.examples.map((ex, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <span>{ex}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                ) : (
-                  // Detail layout (original)
-                  <>
+
+                  {/* Standards Section */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
+                      자리이동 기능평가
+                    </h2>
                     <p className="text-sm sm:text-base text-slate-500 font-semibold">
                       {transferEducationData.standards.description} 2점 이상부터 이승돌봄로봇의 적극적 개입이 요구됩니다.
                     </p>
@@ -375,7 +303,7 @@ export default function TransferPage() {
                             <div>
                               <div className="flex justify-between items-center mb-3">
                                 <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-                                  isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'
+                                  isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-650'
                                 }`}>
                                   {item.score}
                                 </span>
@@ -447,9 +375,9 @@ export default function TransferPage() {
                         </div>
                       </div>
                     )}
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
