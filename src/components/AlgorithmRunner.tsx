@@ -1,15 +1,49 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { RotateCcw, Check, Info, HelpCircle, AlertTriangle, ThumbsUp, ArrowRight, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { 
+  RotateCcw, Check, Info, HelpCircle, AlertTriangle, ThumbsUp, ArrowRight, 
+  ChevronRight, ChevronLeft, ChevronDown, Move, Footprints, Scale, 
+  Accessibility, Users, Bot, Shield, Trophy, GitMerge, Maximize2, Bed, Heart 
+} from 'lucide-react';
 import Image from 'next/image';
 import { Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
+const simpleIconMap: Record<string, React.ReactNode> = {
+  transfer: <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm"><Bed className="w-8 h-8" /></div>,
+  walking: <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm"><Footprints className="w-8 h-8" /></div>,
+  balance: <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shadow-sm"><Scale className="w-8 h-8" /></div>,
+  toilet: <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shadow-sm"><Accessibility className="w-8 h-8" /></div>,
+  caregiver: <div className="w-16 h-16 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm"><Users className="w-8 h-8" /></div>,
+  robot: <div className="w-16 h-16 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-sm"><Bot className="w-8 h-8" /></div>,
+  safety: <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-sm"><Shield className="w-8 h-8" /></div>
+};
+
+const getResultIcon = (resultId: string) => {
+  if (resultId === 'T-A' || resultId === 'B-A') {
+    return <ThumbsUp className="w-8 h-8 text-emerald-600" />;
+  }
+  if (resultId.startsWith('T-')) {
+    if (['T-B', 'T-C', 'T-D'].includes(resultId)) {
+      return <Move className="w-8 h-8 text-blue-600" />;
+    }
+    return <Bot className="w-8 h-8 text-sky-600" />;
+  }
+  if (resultId.startsWith('B-')) {
+    if (['B-B', 'B-C', 'B-D'].includes(resultId)) {
+      return <Accessibility className="w-8 h-8 text-purple-600" />;
+    }
+    return <Bot className="w-8 h-8 text-sky-600" />;
+  }
+  return <Bot className="w-8 h-8 text-sky-600" />;
+};
 
 interface Option {
   id: string;
   text: string;
   simpleText?: string;
+  simpleLabel?: string;
   score?: number;
   value: string;
 }
@@ -20,6 +54,8 @@ interface Question {
   simpleTitle?: string;
   description?: string;
   simpleDescription?: string;
+  simpleLabel?: string;
+  iconType?: 'transfer' | 'walking' | 'balance' | 'toilet' | 'caregiver' | 'robot' | 'safety';
   type: 'single' | 'multi';
   options: Option[];
   nextQuestionId?: string | ((answers: Record<string, any>) => string | null);
@@ -32,6 +68,7 @@ interface Result {
   simpleTitle?: string;
   description: string;
   simpleDescription?: string;
+  simpleLabel?: string;
   recommendation: string;
   simpleRecommendation?: string;
   reason: string;
@@ -594,6 +631,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const [selectedGuideQuestionId, setSelectedGuideQuestionId] = useState<string | null>(algorithm.startQuestionId);
   const [tempMultiSelect, setTempMultiSelect] = useState<string[]>([]);
 
+  // Detailed mode map collapsible & zoom states
+  const [showDecisionMap, setShowDecisionMap] = useState(false);
+  const [zoom, setZoom] = useState(0.3);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleFitView = () => {
+    if (wrapperRef.current) {
+      const wrapperWidth = wrapperRef.current.clientWidth;
+      const logicalWidth = 3110;
+      const fitScale = Math.max(0.15, Math.min(wrapperWidth / logicalWidth, 1.0));
+      setZoom(fitScale);
+    }
+  };
+
+  useEffect(() => {
+    if (showDecisionMap) {
+      setTimeout(handleFitView, 100);
+    }
+  }, [showDecisionMap]);
+
   const isTransfer = algorithm.id === 'transfer';
   const nodes = isTransfer ? transferNodes : toiletingNodes;
   const edges = isTransfer ? transferEdges : toiletingEdges;
@@ -844,11 +902,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       <div className="w-full max-w-2xl mx-auto space-y-6">
         {/* Wizard Main Card */}
         {resultId ? (
-          // Matched Recommendation screen
+          // Matched Recommendation screen in Simple Mode
           <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col">
             <div className="p-6 sm:p-8 space-y-6">
               {/* Result Title */}
               <div className="text-center pb-5 border-b border-slate-100 space-y-2">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 mx-auto mb-2">
+                  {getResultIcon(resultId)}
+                </div>
                 <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                   추천 결과
                 </span>
@@ -856,7 +917,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   {getDisplayText(algorithm.results[resultId], 'title', uiMode)}
                 </h2>
                 {resultDetails[resultId]?.deviceName && (
-                  <span className="text-sm font-semibold text-slate-400 block pt-1">
+                  <span className="text-sm font-semibold text-slate-450 block pt-1">
                     ({resultDetails[resultId]?.deviceName})
                   </span>
                 )}
@@ -874,38 +935,44 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   />
                 </div>
               ) : (
-                <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 text-sm">
+                <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-sm">
                   이미지 준비 중
                 </div>
               )}
 
-              {/* Simple summary & description */}
-              <div className="space-y-6 text-left">
-                <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
-                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">쉽게 보는 추천 이유</h4>
-                  <p className="text-slate-700 font-extrabold leading-relaxed text-base sm:text-lg">
+              {/* Three Cards for Recommendations */}
+              <div className="grid grid-cols-1 gap-5 text-left">
+                {/* Card 1: 추천 결과 */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
+                  <h4 className="text-sm font-black text-slate-800 flex items-center gap-1.5 font-semibold">
+                    <Trophy className="w-4 h-4 text-emerald-500 shrink-0" />
+                    추천 결과
+                  </h4>
+                  <p className="text-slate-600 font-extrabold leading-relaxed text-sm sm:text-base">
+                    {algorithm.results[resultId]?.simpleRecommendation || algorithm.results[resultId]?.recommendation}
+                  </p>
+                </div>
+
+                {/* Card 2: 언제 필요할까요? */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
+                  <h4 className="text-sm font-black text-slate-800 flex items-center gap-1.5 font-semibold">
+                    <HelpCircle className="w-4 h-4 text-primary shrink-0" />
+                    언제 필요할까요?
+                  </h4>
+                  <p className="text-slate-750 font-bold leading-relaxed text-sm sm:text-base">
                     {algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
                   </p>
                 </div>
 
-                {algorithm.results[resultId]?.simpleRecommendation && (
-                  <div className="bg-blue-50/40 p-4 sm:p-5 rounded-2xl border border-blue-200/50">
-                    <h4 className="text-xs font-black text-blue-500 uppercase tracking-wider block mb-2">추천 활용 방향</h4>
-                    <p className="text-slate-700 font-bold leading-relaxed text-sm sm:text-base">
-                      {algorithm.results[resultId]?.simpleRecommendation}
-                    </p>
-                  </div>
-                )}
-
-                {/* simpleTips warning list */}
-                {algorithm.results[resultId]?.simpleTips && (
-                  <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-sm font-black text-amber-800 flex items-center gap-1.5 uppercase">
+                {/* Card 3: 주의할 점 */}
+                {(algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions) && (
+                  <div className="bg-amber-50/50 border border-amber-205 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-sm font-black text-amber-850 flex items-center gap-1.5">
                       <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      이것만은 꼭 알아두세요! (기기 특징 및 주의사항)
+                      주의할 점
                     </h4>
-                    <ul className="space-y-2 text-slate-800 font-bold text-sm sm:text-base list-disc pl-5 leading-relaxed">
-                      {algorithm.results[resultId].simpleTips.map((tip, idx) => (
+                    <ul className="space-y-2 text-slate-850 font-bold text-sm sm:text-base list-disc pl-5 leading-relaxed">
+                      {(algorithm.results[resultId]?.simpleTips || resultDetails[resultId].precautions).map((tip, idx) => (
                         <li key={idx}>{tip}</li>
                       ))}
                     </ul>
@@ -934,7 +1001,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             </div>
           </div>
         ) : (
-          // Question card
+          // Question card in Simple Mode
           currentQuestion && (
             <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-fade-in flex flex-col text-left">
               {/* Progress Bar & indicator */}
@@ -950,42 +1017,46 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 </span>
               </div>
 
-              {/* Question title & description */}
-              <div className="space-y-3">
-                <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-snug">
+              {/* Question title & description with circular illustration icon */}
+              <div className="space-y-4 text-center sm:text-left">
+                {currentQuestion.iconType && simpleIconMap[currentQuestion.iconType] && (
+                  <div className="flex justify-center sm:justify-start mb-2">
+                    {simpleIconMap[currentQuestion.iconType]}
+                  </div>
+                )}
+                <h3 className="text-2xl sm:text-3xl font-black text-slate-800 leading-snug">
                   {getDisplayText(currentQuestion, 'title', uiMode)}
                 </h3>
                 {getDisplayText(currentQuestion, 'description', uiMode) && (
-                  <p className="text-sm sm:text-base text-slate-500 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100/60">
+                  <p className="text-sm sm:text-base text-slate-550 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100/60 text-left">
                     💡 {getDisplayText(currentQuestion, 'description', uiMode)}
                   </p>
                 )}
               </div>
 
-              {/* Render Options */}
+              {/* Render Options as Large Button Cards */}
               {currentQuestion.type === 'single' ? (
                 <div className="space-y-3">
                   {currentQuestion.options.map((opt) => {
-                    const detailText = optionDetails[opt.id];
+                    const isSelected = answers[currentQuestion.id] === opt.value;
                     return (
                       <button
                         key={opt.id}
                         onClick={() => handleSingleSelect(currentQuestion.id, opt.value)}
-                        className="w-full text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-200 hover:border-primary hover:bg-primary/5 transition-all flex flex-col justify-between items-start group font-bold text-slate-800 cursor-pointer shadow-sm animate-fade-in"
+                        className={`w-full text-left p-5 sm:p-6 rounded-2xl border-2 transition-all flex items-center justify-between font-extrabold shadow-sm cursor-pointer ${
+                          isSelected
+                            ? 'border-primary bg-primary/5 text-primary scale-[1.01]'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-355 hover:bg-slate-50/50'
+                        }`}
                       >
-                        <div className="flex w-full justify-between items-center gap-2">
-                          <span className="text-base sm:text-lg">
-                            {getDisplayText(opt, 'text', uiMode)}
-                          </span>
-                          <div className="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-primary group-hover:bg-primary transition-all shrink-0">
-                            <div className="w-2.5 h-2.5 rounded-full bg-white scale-0 group-hover:scale-100 transition-transform" />
-                          </div>
+                        <span className="text-lg sm:text-xl">
+                          {getDisplayText(opt, 'text', uiMode)}
+                        </span>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          isSelected ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                        }`}>
+                          {isSelected && <Check className="w-3.5 h-3.5 stroke-[3.5]" />}
                         </div>
-                        {detailText && (
-                          <span className="text-xs sm:text-sm text-slate-400 font-medium leading-normal pt-1.5 group-hover:text-primary/70 transition-colors">
-                            {detailText}
-                          </span>
-                        )}
                       </button>
                     );
                   })}
@@ -995,36 +1066,24 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   <div className="grid grid-cols-1 gap-3">
                     {currentQuestion.options.map((opt) => {
                       const isChecked = tempMultiSelect.includes(opt.value);
-                      const detailText = optionDetails[opt.id];
                       return (
                         <button
                           key={opt.id}
                           onClick={() => handleMultiToggle(opt.value)}
-                          className={`text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex flex-col justify-between items-start font-bold cursor-pointer shadow-sm ${
+                          className={`text-left p-5 sm:p-6 rounded-2xl border-2 transition-all flex items-center justify-between font-extrabold shadow-sm cursor-pointer ${
                             isChecked
-                              ? 'border-primary bg-primary/5 text-primary'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300'
+                              ? 'border-primary bg-primary/5 text-primary scale-[1.01]'
+                              : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/50'
                           }`}
                         >
-                          <div className="flex w-full justify-between items-center gap-2">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all shrink-0 ${
-                                isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
-                              }`}>
-                                {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                              </div>
-                              <span className="text-base sm:text-lg leading-snug">
-                                {getDisplayText(opt, 'text', uiMode)}
-                              </span>
-                            </div>
+                          <span className="text-lg sm:text-xl">
+                            {getDisplayText(opt, 'text', uiMode)}
+                          </span>
+                          <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all shrink-0 ${
+                            isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                          }`}>
+                            {isChecked && <Check className="w-3.5 h-3.5 stroke-[3.5]" />}
                           </div>
-                          {detailText && (
-                            <span className={`text-xs sm:text-sm font-medium leading-normal pt-1.5 pl-8 ${
-                              isChecked ? 'text-primary/70' : 'text-slate-400'
-                            }`}>
-                              {detailText}
-                            </span>
-                          )}
                         </button>
                       );
                     })}
@@ -1032,10 +1091,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   <button
                     onClick={() => handleMultiSubmit(currentQuestion.id)}
                     disabled={tempMultiSelect.length === 0}
-                    className="w-full py-3.5 rounded-xl bg-primary text-white font-extrabold text-sm hover:bg-primary-dark transition-all flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full py-4 rounded-xl bg-primary text-white font-extrabold text-base hover:bg-primary-dark transition-all flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <span>선택 완료하고 다음 질문으로</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>선택 완료</span>
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
               )}
@@ -1045,18 +1104,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 {history.length > 0 ? (
                   <button
                     onClick={handlePrevQuestion}
-                    className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 transition-colors font-medium text-xs cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-650 transition-colors font-bold text-sm cursor-pointer flex items-center gap-1"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <ChevronLeft className="w-4 h-4" />
                     <span>이전 질문</span>
                   </button>
                 ) : <div />}
                 
                 <button
                   onClick={handleReset}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 hover:text-red-600 text-slate-400 hover:border-red-100 transition-colors font-medium text-xs cursor-pointer flex items-center gap-1"
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-red-50 hover:text-red-650 text-slate-400 hover:border-red-100 transition-colors font-bold text-sm cursor-pointer flex items-center gap-1"
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                   <span>처음부터 다시</span>
                 </button>
               </div>
@@ -1075,7 +1134,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm gap-4">
         <div className="text-left">
           <span className="text-xs font-black text-primary uppercase tracking-wider block mb-0.5">자가 진단 및 흐름 학습</span>
-          <h3 className="text-sm font-bold text-slate-700 leading-snug">아래 지도의 카드들을 클릭하며 분기를 직접 탐색해 보세요.</h3>
+          <h3 className="text-sm font-bold text-slate-700 leading-snug">아래의 상세 단계를 따라 진단을 진행하고 평가 기준을 학습해 보세요.</h3>
         </div>
         <button
           onClick={handleReset}
@@ -1086,241 +1145,285 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         </button>
       </div>
 
-      {/* Main 2-Column Responsive Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Left Column: Interactive SVG Flowchart Canvas */}
-        <div className="lg:col-span-8 w-full border border-slate-200 bg-white rounded-3xl shadow-sm overflow-hidden flex flex-col">
-          <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center px-6 shrink-0">
-            <span className="text-xs font-bold text-slate-400">의사결정 지도</span>
-            <span className="text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
-              드래그/스크롤하여 전체 탐색
-            </span>
-          </div>
+      {/* Collapsible Decision Map Section */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <button
+          onClick={() => setShowDecisionMap(!showDecisionMap)}
+          className="w-full py-4 px-6 bg-slate-50/70 hover:bg-slate-100/80 transition-all font-bold text-sm text-slate-700 flex justify-between items-center cursor-pointer border-b border-slate-200/60"
+        >
+          <span className="flex items-center gap-2">
+            <GitMerge className="w-4 h-4 text-primary animate-pulse" />
+            <span>의사결정 지도 보기</span>
+          </span>
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDecisionMap ? 'rotate-180' : ''}`} />
+        </button>
 
-          <div className="w-full overflow-x-auto p-6 scrollbar-thin scrollbar-thumb-slate-200">
-            {/* Scrollable grid matching coordinates */}
+        {showDecisionMap && (
+          <div className="w-full border-t border-slate-100 flex flex-col bg-slate-50/30">
+            <div className="p-3 bg-slate-100/50 border-b border-slate-200 flex justify-between items-center px-6 shrink-0 text-xs">
+              <div className="text-left">
+                <span className="font-extrabold text-slate-700">의사결정 지도</span>
+                <p className="text-[10px] text-slate-400 mt-0.5">지도의 카드를 클릭하여 단계를 확인해 보세요.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setZoom(z => Math.max(0.15, z - 0.1))} 
+                  className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+                >
+                  -
+                </button>
+                <span className="text-[10px] font-bold text-slate-400 min-w-10 text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button 
+                  onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} 
+                  className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+                >
+                  +
+                </button>
+                <button 
+                  onClick={handleFitView} 
+                  className="p-1 px-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer flex items-center gap-1"
+                >
+                  <Maximize2 className="w-3 h-3" />
+                  <span>화면맞춤</span>
+                </button>
+              </div>
+            </div>
+
             <div 
-              className="relative mx-auto select-none"
-              style={{ 
-                width: '1000px', 
-                height: isTransfer ? '920px' : '600px' 
-              }}
+              ref={wrapperRef}
+              className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
+              style={{ maxHeight: '550px' }}
             >
-              {/* SVG Layer for Drawing Bezier Curves */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-                {edges.map((edge, idx) => {
-                  const fromNode = nodes[edge.from];
-                  const toNode = nodes[edge.to];
-                  if (!fromNode || !toNode) return null;
+              <div 
+                ref={containerRef}
+                className="relative select-none origin-top-left"
+                style={{ 
+                  width: '3110px', 
+                  height: isTransfer ? '1100px' : '700px',
+                  transform: `scale(${zoom})`,
+                  transition: 'transform 0.15s ease-out'
+                }}
+              >
+                {/* SVG Layer for Drawing Bezier Curves */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                  {edges.map((edge, idx) => {
+                    const fromNode = nodes[edge.from];
+                    const toNode = nodes[edge.to];
+                    if (!fromNode || !toNode) return null;
 
-                  const parentW = getNodeWidth(edge.from);
-                  const parentH = getNodeHeight(edge.from);
-                  const childW = getNodeWidth(edge.to);
+                    const parentW = getNodeWidth(edge.from);
+                    const parentH = getNodeHeight(edge.from);
+                    const childW = getNodeWidth(edge.to);
 
-                  // Port coordinates (Bottom Center to Top Center)
-                  const startX = fromNode.x + parentW / 2;
-                  const startY = fromNode.y + parentH;
-                  const endX = toNode.x + childW / 2;
-                  const endY = toNode.y;
+                    // Port coordinates (Bottom Center to Top Center)
+                    const startX = fromNode.x + parentW / 2;
+                    const startY = fromNode.y + parentH;
+                    const endX = toNode.x + childW / 2;
+                    const endY = toNode.y;
 
-                  const active = isEdgeActive(edge);
+                    const active = isEdgeActive(edge);
 
-                  return (
-                    <g key={`${edge.from}-${edge.to}-${idx}`}>
-                      {/* Connection Line */}
-                      <path
-                        d={getBezierPath(startX, startY, endX, endY)}
-                        fill="none"
-                        stroke={active ? '#0E4A84' : '#E2E8F0'}
-                        strokeWidth={active ? 3.5 : 1.5}
-                        className="transition-all duration-300"
-                      />
-                    </g>
-                  );
-                })}
+                    return (
+                      <g key={`${edge.from}-${edge.to}-${idx}`}>
+                        {/* Connection Line */}
+                        <path
+                          d={getBezierPath(startX, startY, endX, endY)}
+                          fill="none"
+                          stroke={active ? '#2563EB' : '#E2E8F0'}
+                          strokeWidth={active ? 4.0 : 1.5}
+                          className="transition-all duration-300"
+                        />
+                      </g>
+                    );
+                  })}
 
-                {/* SVG Middle-Labels for conditions */}
-                {edges.map((edge, idx) => {
-                  const fromNode = nodes[edge.from];
-                  const toNode = nodes[edge.to];
-                  if (!fromNode || !toNode) return null;
+                  {/* SVG Middle-Labels for conditions */}
+                  {edges.map((edge, idx) => {
+                    const fromNode = nodes[edge.from];
+                    const toNode = nodes[edge.to];
+                    if (!fromNode || !toNode) return null;
 
-                  const parentW = getNodeWidth(edge.from);
-                  const parentH = getNodeHeight(edge.from);
-                  const childW = getNodeWidth(edge.to);
+                    const parentW = getNodeWidth(edge.from);
+                    const parentH = getNodeHeight(edge.from);
+                    const childW = getNodeWidth(edge.to);
 
-                  const startX = fromNode.x + parentW / 2;
-                  const startY = fromNode.y + parentH;
-                  const endX = toNode.x + childW / 2;
-                  const endY = toNode.y;
+                    const startX = fromNode.x + parentW / 2;
+                    const startY = fromNode.y + parentH;
+                    const endX = toNode.x + childW / 2;
+                    const endY = toNode.y;
 
-                  const active = isEdgeActive(edge);
+                    const active = isEdgeActive(edge);
 
-                  // Midpoint of Bezier curve
-                  const midX = (startX + endX) / 2;
-                  const midY = (startY + endY) / 2;
+                    // Midpoint of Bezier curve
+                    const midX = (startX + endX) / 2;
+                    const midY = (startY + endY) / 2;
 
-                  return (
-                    <foreignObject
-                      key={`label-${edge.from}-${edge.to}-${idx}`}
-                      x={midX - 50}
-                      y={midY - 12}
-                      width={100}
-                      height={24}
-                      className="foreign-object overflow-visible pointer-events-none"
-                    >
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight transition-all duration-300 ${
-                          active 
-                            ? 'bg-primary text-white border-primary scale-105 shadow-sm' 
-                            : 'bg-white text-slate-400 border-slate-200'
-                        }`}>
-                          {edge.label}
-                        </span>
-                      </div>
-                    </foreignObject>
-                  );
-                })}
-              </svg>
-
-              {/* HTML Absolute Nodes Layer */}
-              <div className="absolute inset-0 z-10 pointer-events-none">
-                {Object.entries(nodes).map(([id, node]) => {
-                  const status = getNodeStatus(id);
-                  const nodeW = getNodeWidth(id);
-                  const nodeH = getNodeHeight(id);
-
-                  const isActive = status === 'active';
-                  const isCompleted = status === 'completed';
-                  const isResult = node.isResult;
-                  const isHighlightedResult = status === 'result-active';
-
-                  return (
-                    <div
-                      key={id}
-                      onClick={() => handleNodeClick(id)}
-                      className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
-                        isHighlightedResult
-                          ? 'border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default'
-                          : isActive
-                            ? 'border-primary bg-white shadow-md ring-2 ring-primary/10 z-20 cursor-default scale-[1.02]'
-                            : isCompleted
-                              ? 'border-slate-300 bg-white hover:border-primary/50 shadow-sm cursor-pointer hover:shadow'
-                              : 'border-slate-100 bg-white opacity-40 grayscale pointer-events-none'
-                      }`}
-                      style={{
-                        left: `${node.x}px`,
-                        top: `${node.y}px`,
-                        width: `${nodeW}px`,
-                        height: `${nodeH}px`,
-                      }}
-                    >
-                      <div className="space-y-1">
-                        {/* Card Top Label */}
-                        <div className="flex justify-between items-center w-full">
-                          <span className={`text-[8px] font-black uppercase tracking-wider ${
-                            isHighlightedResult ? 'text-white/80' : isActive ? 'text-primary' : 'text-slate-400'
+                    return (
+                      <foreignObject
+                        key={`label-${edge.from}-${edge.to}-${idx}`}
+                        x={midX - 50}
+                        y={midY - 12}
+                        width={100}
+                        height={24}
+                        className="foreign-object overflow-visible pointer-events-none"
+                      >
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight transition-all duration-300 ${
+                            active 
+                              ? 'bg-primary text-white border-primary scale-105 shadow-sm' 
+                              : 'bg-white text-slate-400 border-slate-200'
                           }`}>
-                            {node.typeLabel}
+                            {edge.label}
                           </span>
-                          
-                          {/* Completed checkmark */}
-                          {isCompleted && (
-                            <span className="text-emerald-500 bg-emerald-50 w-3.5 h-3.5 rounded-full flex items-center justify-center border border-emerald-200">
-                              <Check className="w-2.5 h-2.5 stroke-[4]" />
+                        </div>
+                      </foreignObject>
+                    );
+                  })}
+                </svg>
+
+                {/* HTML Absolute Nodes Layer */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                  {Object.entries(nodes).map(([id, node]) => {
+                    const status = getNodeStatus(id);
+                    const nodeW = getNodeWidth(id);
+                    const nodeH = getNodeHeight(id);
+
+                    const isActive = status === 'active';
+                    const isCompleted = status === 'completed';
+                    const isResult = node.isResult;
+                    const isHighlightedResult = status === 'result-active';
+
+                    return (
+                      <div
+                        key={id}
+                        onClick={() => handleNodeClick(id)}
+                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
+                          isHighlightedResult
+                            ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
+                            : isActive
+                              ? 'border-2 border-primary bg-primary/5 shadow-md ring-4 ring-primary/20 scale-[1.02] z-20 cursor-default'
+                              : isCompleted
+                                ? 'border-sky-300 bg-sky-50 text-slate-800 shadow-sm cursor-pointer hover:shadow-md hover:border-sky-400'
+                                : 'border-slate-200 bg-slate-100 text-slate-400 opacity-75 cursor-not-allowed pointer-events-none'
+                        }`}
+                        style={{
+                          left: `${node.x}px`,
+                          top: `${node.y}px`,
+                          width: `${nodeW}px`,
+                          height: `${nodeH}px`,
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {/* Card Top Label */}
+                          <div className="flex justify-between items-center w-full">
+                            <span className={`text-[8px] font-black uppercase tracking-wider ${
+                              isHighlightedResult ? 'text-white/80' : isActive ? 'text-primary' : 'text-slate-400'
+                            }`}>
+                              {node.typeLabel}
                             </span>
-                          )}
+                            
+                            {/* Completed checkmark */}
+                            {isCompleted && (
+                              <span className="text-emerald-500 bg-emerald-50 w-3.5 h-3.5 rounded-full flex items-center justify-center border border-emerald-200">
+                                <Check className="w-2.5 h-2.5 stroke-[4]" />
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Title */}
+                          <h4 className={`text-xs leading-snug font-bold text-left ${
+                            isHighlightedResult ? 'text-white' : 'text-slate-800'
+                          }`}>
+                            {node.label}
+                          </h4>
                         </div>
 
-                        {/* Title */}
-                        <h4 className={`text-xs leading-snug font-bold text-left ${
-                          isHighlightedResult ? 'text-white' : 'text-slate-800'
-                        }`}>
-                          {node.label}
-                        </h4>
-                      </div>
-
-                      {/* Card Bottom Quick Action Interface */}
-                      {isActive && !isResult && (
-                        <div className="pt-2 flex flex-wrap gap-1 border-t border-slate-100 mt-1 shrink-0">
-                          {algorithm.questions[id]?.type === 'single' ? (
-                            algorithm.questions[id].options.map((opt) => (
+                        {/* Card Bottom Quick Action Interface */}
+                        {isActive && !isResult && (
+                          <div className="pt-2 flex flex-wrap gap-1 border-t border-slate-100 mt-1 shrink-0">
+                            {algorithm.questions[id]?.type === 'single' ? (
+                              algorithm.questions[id].options.map((opt) => (
+                                <button
+                                  key={opt.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSingleSelect(id, opt.value);
+                                  }}
+                                  className="flex-1 text-[8px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-center whitespace-nowrap cursor-pointer"
+                                >
+                                  {getShortOptionText(opt.text)}
+                                </button>
+                              ))
+                            ) : (
                               <button
-                                key={opt.id}
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSingleSelect(id, opt.value);
+                                    e.stopPropagation();
+                                    setSelectedGuideQuestionId(id);
                                 }}
-                                className="flex-1 text-[8px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-center whitespace-nowrap cursor-pointer"
+                                className="w-full text-[8px] sm:text-[9px] font-extrabold py-0.5 rounded bg-primary text-white text-center hover:bg-primary-dark transition-colors cursor-pointer"
                               >
-                                {getShortOptionText(opt.text)}
+                                조건 입력
                               </button>
-                            ))
-                          ) : (
-                            <button
-                              onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedGuideQuestionId(id);
-                              }}
-                              className="w-full text-[8px] sm:text-[9px] font-extrabold py-0.5 rounded bg-primary text-white text-center hover:bg-primary-dark transition-colors cursor-pointer"
-                            >
-                              오른쪽 패널에서 조건 입력
-                            </button>
-                          )}
-                        </div>
-                      )}
+                            )}
+                          </div>
+                        )}
 
-                      {/* Selected result/badge for completed questions */}
-                      {isCompleted && !isResult && (
-                        <div className="text-[9px] text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10 mt-1 truncate font-bold text-center">
-                          {(() => {
-                            const ans = answers[id];
-                            const q = algorithm.questions[id];
-                            if (!q) return '';
-                            if (q.type === 'single') {
-                              const matchedOpt = q.options.find(o => o.value === ans);
-                              return matchedOpt ? getShortOptionText(matchedOpt.text) : '';
-                            } else if (Array.isArray(ans)) {
-                              return `${ans.length}개 조건 선택됨`;
-                            }
-                            return '';
-                          })()}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        {/* Selected result/badge for completed questions */}
+                        {isCompleted && !isResult && (
+                          <div className="text-[9px] text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10 mt-1 truncate font-bold text-center">
+                            {(() => {
+                              const ans = answers[id];
+                              const q = algorithm.questions[id];
+                              if (!q) return '';
+                              if (q.type === 'single') {
+                                const matchedOpt = q.options.find(o => o.value === ans);
+                                return matchedOpt ? getShortOptionText(matchedOpt.text) : '';
+                              } else if (Array.isArray(ans)) {
+                                return `${ans.length}개 조건`;
+                              }
+                              return '';
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Right Column: Dynamic Detail Panel or Enhanced Result Details */}
-        <div className="lg:col-span-4 w-full lg:sticky lg:top-6 space-y-6">
-          
-          {/* Active Result screen (Shown when resultId exists) */}
+      {/* Main 2-Column Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Left Column: Active Question / Result Details & Path History */}
+        <div className="lg:col-span-8 w-full space-y-6">
           {resultId ? (
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col">
+            /* Result Details Card in Detailed Mode */
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col text-left">
               <div className="bg-primary px-6 py-4 text-white">
                 <span className="text-[10px] font-black text-white/80 uppercase tracking-widest block">자가 진단 최종 매칭</span>
                 <h3 className="font-extrabold text-sm sm:text-base leading-tight">자가평가 결과</h3>
               </div>
 
-              <div className="p-6 space-y-6 flex-1 text-left">
+              <div className="p-6 space-y-6 flex-1">
                 {/* Result Title */}
                 <div className="text-center pb-5 border-b border-slate-100 space-y-2">
                   <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                     최적 추천 기기
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
                     {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
                   </h2>
                 </div>
 
                 {/* Device representative Image */}
                 {resultDetails[resultId]?.image ? (
-                  <div className="relative mx-auto w-40 h-40 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
+                  <div className="relative mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
                     <Image
                       src={resultDetails[resultId].image}
                       alt={resultDetails[resultId].deviceName}
@@ -1330,88 +1433,85 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     />
                   </div>
                 ) : (
-                  <div className="mx-auto w-40 h-40 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 text-xs">
+                  <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-xs">
                     이미지 준비 중
                   </div>
                 )}
 
-                {/* Rich Details List */}
-                <div className="space-y-5 text-xs leading-normal">
+                {/* Details layout: grid of 3 key cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   {/* When to use */}
-                  <div className="space-y-1">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">언제 사용하는가?</h5>
-                    <p className="text-slate-700 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2 col-span-2">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">사용 조건 / 상황</h5>
+                    <p className="text-slate-700 font-semibold leading-relaxed text-sm">
                       {resultDetails[resultId]?.whenToUse}
                     </p>
                   </div>
 
-                  {/* Recommendation Reason */}
-                  <div className="space-y-1.5 border-t border-slate-100 pt-4">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px] flex items-center gap-1">
-                      <HelpCircle className="w-3.5 h-3.5 text-primary" />
-                      추천 이유
-                    </h5>
-                    <p className="text-slate-600 font-semibold leading-relaxed">
+                  {/* Pros */}
+                  {resultDetails[resultId]?.pros && (
+                    <div className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 space-y-2">
+                      <h5 className="font-bold text-emerald-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                        <ThumbsUp className="w-3.5 h-3.5" />
+                        주요 장점
+                      </h5>
+                      <ul className="space-y-1 text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
+                        {resultDetails[resultId].pros.map((pro, idx) => (
+                          <li key={idx}>{pro}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Precautions */}
+                  {resultDetails[resultId]?.precautions && (
+                    <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-2">
+                      <h5 className="font-bold text-amber-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        사용 시 유의사항
+                      </h5>
+                      <ul className="space-y-1 text-amber-850 font-semibold list-disc pl-4 leading-relaxed">
+                        {resultDetails[resultId].precautions.map((pre, idx) => (
+                          <li key={idx}>{pre}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Additional Clinical details */}
+                <div className="space-y-4 border-t border-slate-100 pt-6 text-xs leading-normal">
+                  <div className="space-y-1">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">매칭 매커니즘 / 임상 근거</h5>
+                    <p className="text-slate-650 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                       {resultDetails[resultId]?.reason || algorithm.results[resultId]?.reason}
                     </p>
                   </div>
 
-                  {/* Pros & Precautions */}
-                  {resultDetails[resultId]?.pros && (
-                    <div className="grid grid-cols-1 gap-3 border-t border-slate-100 pt-4">
-                      {/* Pros */}
-                      <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3.5 space-y-1.5">
-                        <h6 className="text-[10px] font-bold text-emerald-700 flex items-center gap-1.5 uppercase font-black">
-                          <ThumbsUp className="w-3 h-3" />
-                          장점
-                        </h6>
-                        <ul className="space-y-1 text-[11px] text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
-                          {resultDetails[resultId].pros.map((pro, idx) => (
-                            <li key={idx}>{pro}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Precautions */}
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3.5 space-y-1.5">
-                        <h6 className="text-[10px] font-bold text-amber-700 flex items-center gap-1.5 uppercase font-black">
-                          <AlertTriangle className="w-3 h-3" />
-                          주의사항
-                        </h6>
-                        <ul className="space-y-1 text-[11px] text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
-                          {resultDetails[resultId].precautions.map((pre, idx) => (
-                            <li key={idx}>{pre}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Installation Environment */}
                   {resultDetails[resultId]?.environment && (
-                    <div className="space-y-1 border-t border-slate-100 pt-4">
-                      <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">설치 권장 환경</h5>
-                      <p className="text-slate-600 font-bold leading-relaxed text-slate-800">
+                    <div className="space-y-1">
+                      <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">설치 및 권장 주거 환경</h5>
+                      <p className="text-slate-750 font-extrabold">
                         ✓ {resultDetails[resultId].environment}
                       </p>
                     </div>
                   )}
                 </div>
 
-                {/* More Details Redirect Button & Reset */}
-                <div className="space-y-3 pt-4 border-t border-slate-100 mt-4 shrink-0">
+                {/* Action buttons */}
+                <div className="space-y-3 pt-6 border-t border-slate-100 mt-6 shrink-0">
                   {onLearnMore && (
                     <button
                       onClick={() => onLearnMore(resultId)}
-                      className="w-full py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg scale-[1.01] cursor-pointer"
+                      className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg scale-[1.01] cursor-pointer"
                     >
                       <span>상세 기기 정보 더 알아보기</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   )}
                   <button
                     onClick={handleReset}
-                    className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                    className="w-full py-3 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-sm transition-colors cursor-pointer"
                   >
                     새로운 진단 시작하기
                   </button>
@@ -1419,105 +1519,166 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               </div>
             </div>
           ) : (
-            /* Question/Guide Detail Panel (Shown during traversal) */
-            <div className="space-y-6 text-left">
-              {/* Question panel with selection list */}
-              {currentQuestion && (
-                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-5 animate-fade-in">
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-black text-primary uppercase bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 inline-block">
-                      STEP {history.length + 1}
-                    </span>
-                    <h3 className="text-base sm:text-lg font-bold text-slate-800 leading-snug">
-                      {currentQuestion.title}
-                    </h3>
-                  </div>
+            /* Active Question Card in Detailed Mode */
+            currentQuestion && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-fade-in flex flex-col text-left">
+                {/* Header indicators */}
+                <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 inline-block shrink-0">
+                    STEP {history.length + 1}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">
+                    평가 세부 문항
+                  </span>
+                </div>
 
-                  {/* Render Options inside Side Panel */}
-                  {currentQuestion.type === 'single' ? (
-                    <div className="space-y-2">
-                      {currentQuestion.options.map((opt) => (
-                        <button
-                          key={opt.id}
-                          onClick={() => handleSingleSelect(currentQuestion.id, opt.value)}
-                          className="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all flex justify-between items-center group font-bold text-slate-700 text-xs bg-white cursor-pointer"
-                        >
-                          <span>{opt.text}</span>
-                          <div className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center group-hover:border-primary group-hover:bg-primary transition-all shrink-0">
-                            <div className="w-2 h-2 rounded-full bg-white scale-0 group-hover:scale-100 transition-transform" />
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 gap-2">
-                        {currentQuestion.options.map((opt) => {
-                          const isChecked = tempMultiSelect.includes(opt.value);
-                          return (
-                            <button
-                              key={opt.id}
-                              onClick={() => handleMultiToggle(opt.value)}
-                              className={`text-left p-3 rounded-xl border transition-all flex items-center gap-3 font-bold text-xs cursor-pointer ${
-                                isChecked
-                                  ? 'border-primary bg-primary/5 text-primary font-black'
-                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                              }`}
-                            >
-                              <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all shrink-0 ${
-                                isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
-                              }`}>
-                                {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                              </div>
-                              <span className="leading-snug">{opt.text}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <button
-                        onClick={() => handleMultiSubmit(currentQuestion.id)}
-                        disabled={tempMultiSelect.length === 0}
-                        className="w-full py-2.5 rounded-xl bg-primary text-white font-extrabold text-xs hover:bg-primary-dark transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        <span>선택 완료</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                {/* Question title & description */}
+                <div className="space-y-3">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-snug">
+                    {getDisplayText(currentQuestion, 'title', uiMode)}
+                  </h3>
+                  {getDisplayText(currentQuestion, 'description', uiMode) && (
+                    <p className="text-sm text-slate-550 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100/60">
+                      💡 {getDisplayText(currentQuestion, 'description', uiMode)}
+                    </p>
                   )}
                 </div>
-              )}
 
-              {/* Detailed Explanation Panel for current clicked guide */}
-              {selectedGuide ? (
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 animate-fade-in">
-                  <div className="flex items-center gap-1.5 text-primary">
-                    <Info className="w-4 h-4 shrink-0" />
-                    <h4 className="font-extrabold text-sm leading-tight">
-                      {selectedGuide.title}
-                    </h4>
-                  </div>
-                  
-                  <p className="text-xs text-slate-600 leading-relaxed font-semibold">
-                    {selectedGuide.content}
-                  </p>
-
-                  <div className="border-t border-slate-100 pt-3 space-y-2">
-                    {selectedGuide.details.map((detail, idx) => (
-                      <div key={idx} className="text-[11px] leading-relaxed font-medium">
-                        <strong className="text-slate-700 block mb-0.5">{detail.key}</strong>
-                        <span className="text-slate-400 block">{detail.val}</span>
-                      </div>
+                {/* Options list inside main area */}
+                {currentQuestion.type === 'single' ? (
+                  <div className="space-y-2.5">
+                    {currentQuestion.options.map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleSingleSelect(currentQuestion.id, opt.value)}
+                        className="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all flex justify-between items-center group font-bold text-slate-755 text-sm bg-white cursor-pointer shadow-sm hover:shadow"
+                      >
+                        <span>{opt.text}</span>
+                        <div className="w-5 h-5 rounded-full border-slate-300 border-2 flex items-center justify-center group-hover:border-primary group-hover:bg-primary transition-all shrink-0">
+                          <div className="w-2.5 h-2.5 rounded-full bg-white scale-0 group-hover:scale-100 transition-transform" />
+                        </div>
+                      </button>
                     ))}
                   </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {currentQuestion.options.map((opt) => {
+                        const isChecked = tempMultiSelect.includes(opt.value);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => handleMultiToggle(opt.value)}
+                            className={`text-left p-4 rounded-xl border transition-all flex items-center gap-3 font-bold text-sm cursor-pointer shadow-sm ${
+                              isChecked
+                                ? 'border-primary bg-primary/5 text-primary font-black'
+                                : 'border-slate-200 bg-white text-slate-650 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all shrink-0 ${
+                              isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                            }`}>
+                              {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                            </div>
+                            <span className="leading-snug">{opt.text}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => handleMultiSubmit(currentQuestion.id)}
+                      disabled={tempMultiSelect.length === 0}
+                      className="w-full py-3.5 rounded-xl bg-primary text-white font-extrabold text-sm hover:bg-primary-dark transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <span>선택 완료</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Back / Reset Controls */}
+                <div className="flex justify-between items-center pt-4 border-t border-slate-100 text-xs">
+                  {history.length > 0 ? (
+                    <button
+                      onClick={handlePrevQuestion}
+                      className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>이전 단계</span>
+                    </button>
+                  ) : <div />}
+                  <button
+                    onClick={handleReset}
+                    className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all font-bold cursor-pointer"
+                  >
+                    처음부터 다시 진단하기
+                  </button>
                 </div>
-              ) : (
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-sm">
-                  <p className="text-xs text-slate-400 font-semibold">알고리즘 단계를 선택하시면 임상 평가 기준과 설명이 여기에 표시됩니다.</p>
-                </div>
-              )}
+              </div>
+            )
+          )}
+
+          {/* Current Path Timeline (History list) */}
+          {history.length > 0 && (
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm space-y-3 text-left">
+              <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">자가진단 진행 과정</h4>
+              <div className="relative border-l border-slate-200 ml-2.5 pl-4 space-y-4 py-2">
+                {history.map((histId, index) => {
+                  const q = algorithm.questions[histId];
+                  if (!q) return null;
+                  const ansVal = answers[histId];
+                  const matchedOpt = q.options.find(o => o.value === ansVal);
+                  return (
+                    <div key={histId} className="relative text-xs">
+                      {/* Node point marker */}
+                      <span className="absolute -left-[21px] top-0.5 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white ring-2 ring-primary/20 inline-block" />
+                      <div className="text-slate-600 font-bold leading-normal">
+                        <span className="text-slate-400 mr-1.5 font-black">STEP {index + 1}:</span>
+                        <span className="text-slate-800">{q.title}</span>
+                        <div className="mt-1 text-primary font-black flex items-center gap-1">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                          <span>선택한 답변: {matchedOpt ? matchedOpt.text : (Array.isArray(ansVal) ? `${ansVal.length}개 조건` : '')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
+
+        {/* Right Column: Dynamic Detail Panel (Guide info) */}
+        <div className="lg:col-span-4 w-full lg:sticky lg:top-6 space-y-6">
+          {selectedGuide ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 animate-fade-in text-left">
+              <div className="flex items-center gap-1.5 text-primary">
+                <Info className="w-4 h-4 shrink-0" />
+                <h4 className="font-extrabold text-sm leading-tight">
+                  {selectedGuide.title}
+                </h4>
+              </div>
+              
+              <p className="text-xs text-slate-600 leading-relaxed font-semibold">
+                {selectedGuide.content}
+              </p>
+
+              <div className="border-t border-slate-100 pt-3 space-y-2">
+                {selectedGuide.details.map((detail, idx) => (
+                  <div key={idx} className="text-[11px] leading-relaxed font-medium">
+                    <strong className="text-slate-700 block mb-0.5">{detail.key}</strong>
+                    <span className="text-slate-400 block">{detail.val}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm">
+              <p className="text-xs text-slate-400 font-semibold">알고리즘 단계를 선택하시면 임상 평가 기준과 설명이 여기에 표시됩니다.</p>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

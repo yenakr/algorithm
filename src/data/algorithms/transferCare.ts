@@ -2,6 +2,7 @@ export interface Option {
   id: string;
   text: string;
   simpleText?: string;
+  simpleLabel?: string;
   score?: number;
   value: string;
 }
@@ -12,6 +13,8 @@ export interface Question {
   simpleTitle?: string;
   description?: string;
   simpleDescription?: string;
+  simpleLabel?: string;
+  iconType?: 'transfer' | 'walking' | 'balance' | 'toilet' | 'caregiver' | 'robot' | 'safety';
   type: 'single' | 'multi';
   options: Option[];
   nextQuestionId?: string | ((answers: Record<string, any>) => string | null);
@@ -24,6 +27,7 @@ export interface Result {
   simpleTitle?: string;
   description: string;
   simpleDescription?: string;
+  simpleLabel?: string;
   recommendation: string;
   simpleRecommendation?: string;
   reason: string;
@@ -40,9 +44,10 @@ export const transferCareAlgorithm = {
     q1: {
       id: 'q1',
       title: '자리이동에 어려움이 있나요?',
-      simpleTitle: '자세를 바꾸거나 자리를 옮길 때 도움이 필요한가요?',
+      simpleTitle: '침대에서 일어나거나 의자로 옮겨 앉을 때 도움이 필요한가요?',
       description: '',
-      simpleDescription: '침대에서 휠체어로 옮겨 타거나 스스로 몸을 움직여 자리를 바꾸는 일이 얼마나 어려운지 체크해 보세요.',
+      simpleDescription: '혼자 몸을 일으키거나 앉는 자세로 바꾸기 어려운지 확인합니다.',
+      iconType: 'transfer',
       type: 'single',
       options: [
         { id: 'q1_0', text: '0점: 문제 없음', simpleText: '아니요, 혼자서 아주 잘해요', score: 0, value: '0' },
@@ -69,6 +74,7 @@ export const transferCareAlgorithm = {
       simpleTitle: '보호자가 부축해 주었을 때, 환자분이 본인의 다리 힘으로 서 계실 수 있나요?',
       description: '',
       simpleDescription: '보호자가 양손으로 부축하여 서 있게 도울 때, 다리로 버텨 지탱할 수 있는지 판단해 주세요.',
+      iconType: 'balance',
       type: 'single',
       options: [
         { id: 'q2_yes', text: '예, 체중을 지탱하기 어렵다', simpleText: '아니요, 다리 힘이 없어 서지 못해요', value: 'yes' },
@@ -87,6 +93,7 @@ export const transferCareAlgorithm = {
       simpleTitle: '장비를 설치하고 작동할 공간의 상태는 어떤가요?',
       description: '(복수 선택 가능)',
       simpleDescription: '방이나 거실, 천장 구조에 해당하는 내용을 모두 선택해 주세요.',
+      iconType: 'safety',
       type: 'multi',
       options: [
         { id: 'q3_ceiling', text: '천장에 장비 설치가 가능하다', simpleText: '천장에 장비를 달기 위한 공사를 할 수 있어요', value: 'ceiling' },
@@ -134,6 +141,7 @@ export const transferCareAlgorithm = {
       simpleTitle: '장비를 설치할 때 가장 중요하게 고려하시는 가치는 무엇인가요?',
       description: '',
       simpleDescription: '설치 시 편리함과 사용 편의성, 혹은 초기 비용 등 우선적으로 고려할 가치를 선택해 주세요.',
+      iconType: 'caregiver',
       type: 'single',
       options: [
         { id: 'q3_1_convenience', text: '설치 후 사용 편의성 및 효율성', simpleText: '쓰기 편리하고 힘이 적게 드는 것', value: 'convenience' },
@@ -158,6 +166,7 @@ export const transferCareAlgorithm = {
       simpleTitle: '벽이나 천장 공사는 어렵지만, 침실 바닥에 문 모양의 큰 조립 지지대를 세워둘 공간이 있나요?',
       description: '',
       simpleDescription: '바닥 공간 여유를 파악하여 A자형 철제 프레임 기둥을 배치할 수 있는지 여부를 선택합니다.',
+      iconType: 'safety',
       type: 'single',
       options: [
         { id: 'q3_2_yes', text: '가능하다: 이동식 겐트리 및 독립 프레임 설치', simpleText: '네, 프레임 기둥을 조립해 세워둘 공간이 있어요', value: 'yes' },
@@ -175,6 +184,7 @@ export const transferCareAlgorithm = {
       simpleTitle: '환자분이 앉은 상태에서 스스로 상체(허리와 목)를 세우거나 손잡이를 꽉 잡을 수 있나요?',
       description: '',
       simpleDescription: '기립 시 스스로 앉은 자세를 유지하고 손으로 당겨 지지할 수 있는지 판단해 주세요.',
+      iconType: 'balance',
       type: 'single',
       options: [
         { id: 'q4_yes', text: '예, 상체를 일으킬 수 없음', simpleText: '아니요, 상체 힘이 없어 버티거나 잡기 힘들어요', value: 'yes' },

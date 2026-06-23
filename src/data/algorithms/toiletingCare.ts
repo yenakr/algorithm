@@ -8,9 +8,10 @@ export const toiletingCareAlgorithm = {
     q1: {
       id: 'q1',
       title: '배뇨감 및 배변감을 인지하고 조절하는 데 어려움이 있나요?',
-      simpleTitle: '스스로 대소변이 마렵다는 느낌(요의, 변의)을 잘 느끼고 조절하실 수 있나요?',
+      simpleTitle: '화장실에 가고 싶다는 느낌을 잘 알 수 있나요?',
       description: '',
-      simpleDescription: '환자분이 요의나 변의 신호를 느끼고 참거나 의사 표현을 잘 하시는지 체크해 보세요.',
+      simpleDescription: '소변이나 대변이 마려운 느낌을 알고, 화장실에 갈 때까지 어느 정도 참을 수 있는지 확인합니다.',
+      iconType: 'toilet',
       type: 'single',
       options: [
         { id: 'q1_0', text: '0점: 문제 없음', simpleText: '네, 대소변 신호를 알고 잘 조절해요', score: 0, value: '0' },
@@ -32,6 +33,7 @@ export const toiletingCareAlgorithm = {
       simpleTitle: '스스로 침실방에서 화장실 변기까지 안전하게 이동하실 수 있나요?',
       description: '',
       simpleDescription: '화장실까지 걸어가거나 휠체어로 안전하게 이동이 가능하신지 체크합니다.',
+      iconType: 'walking',
       type: 'single',
       options: [
         { id: 'q2a_0', text: '0점: 문제 없음', simpleText: '네, 혼자 걸어가실 수 있어요', score: 0, value: '0' },
@@ -50,9 +52,10 @@ export const toiletingCareAlgorithm = {
     q3_a1: {
       id: 'q3_a1',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      simpleTitle: '볼일을 다 보신 후에 스스로 휴지로 닦거나 옷을 정리할 수 있나요?',
+      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
       description: '',
-      simpleDescription: '용변 뒤처리(세정)를 하고 바지를 온전히 올려 입을 수 있는지 체크합니다.',
+      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
+      iconType: 'caregiver',
       type: 'single',
       options: [
         { id: 'q3a1_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
@@ -71,9 +74,10 @@ export const toiletingCareAlgorithm = {
     q3_a2: {
       id: 'q3_a2',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      simpleTitle: '볼일을 다 보신 후에 스스로 휴지로 닦거나 옷을 정리할 수 있나요?',
+      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
       description: '',
-      simpleDescription: '용변 뒤처리(세정)를 하고 바지를 온전히 올려 입을 수 있는지 체크합니다.',
+      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
+      iconType: 'caregiver',
       type: 'single',
       options: [
         { id: 'q3a2_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
@@ -95,6 +99,7 @@ export const toiletingCareAlgorithm = {
       simpleTitle: '스스로 침실방에서 화장실 변기까지 안전하게 이동하실 수 있나요?',
       description: '',
       simpleDescription: '대소변 실수가 다소 잦은 상황에서, 화장실 변기까지 걸어갈 수 있는 능력을 확인합니다.',
+      iconType: 'walking',
       type: 'single',
       options: [
         { id: 'q2b_0', text: '0점: 문제 없음', simpleText: '네, 혼자 걸어가실 수 있어요', score: 0, value: '0' },
@@ -113,9 +118,10 @@ export const toiletingCareAlgorithm = {
     q3_b1: {
       id: 'q3_b1',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      simpleTitle: '볼일을 다 보신 후에 스스로 휴지로 닦거나 옷을 정리할 수 있나요?',
+      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
       description: '',
-      simpleDescription: '용변 뒤처리(세정)를 하고 바지를 온전히 올려 입을 수 있는지 체크합니다.',
+      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
+      iconType: 'caregiver',
       type: 'single',
       options: [
         { id: 'q3b1_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
@@ -134,9 +140,10 @@ export const toiletingCareAlgorithm = {
     q3_b2: {
       id: 'q3_b2',
       title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
-      simpleTitle: '볼일을 다 보신 후에 스스로 휴지로 닦거나 옷을 정리할 수 있나요?',
+      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
       description: '',
-      simpleDescription: '용변 뒤처리(세정)를 하고 바지를 온전히 올려 입을 수 있는지 체크합니다.',
+      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
+      iconType: 'caregiver',
       type: 'single',
       options: [
         { id: 'q3b2_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
