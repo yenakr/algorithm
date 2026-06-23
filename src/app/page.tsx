@@ -1,7 +1,24 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, GitMerge, HelpCircle, Trophy } from 'lucide-react';
+import { ArrowRight, BookOpen, GitMerge, HelpCircle, Trophy, Check, Info } from 'lucide-react';
 
 export default function Home() {
+  const [mode, setMode] = useState<'detail' | 'simple'>('detail');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('care-mode');
+    if (saved === 'simple' || saved === 'detail') {
+      setMode(saved);
+    }
+  }, []);
+
+  const selectMode = (newMode: 'detail' | 'simple') => {
+    setMode(newMode);
+    localStorage.setItem('care-mode', newMode);
+  };
+
   const steps = [
     {
       step: 1,
@@ -36,31 +53,116 @@ export default function Home() {
   return (
     <div className="flex-1 flex flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-secondary text-white py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-secondary text-white py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none">
-            돌봄로봇
+            돌봄로봇 교육 및 자가평가
           </h1>
-          <p className="max-w-3xl mx-auto text-base sm:text-lg lg:text-xl text-slate-100/90 leading-relaxed font-medium">
+          <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-100/90 leading-relaxed font-semibold">
             이승돌봄과 배설돌봄 상황에 맞는 돌봄기기와 돌봄로봇을 이해하고, 나에게 필요한 유형을 확인해보세요.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-6 max-w-md mx-auto sm:max-w-none">
-            <Link
-              href="/transfer"
-              className="px-8 py-4 rounded-xl bg-white text-primary hover:bg-slate-100 font-extrabold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-            >
-              <span>이승돌봄</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/toileting"
-              className="px-8 py-4 rounded-xl bg-primary-dark/40 text-white hover:bg-primary-dark/60 font-extrabold text-base border border-white/20 hover:border-white/50 backdrop-blur-md transition-all flex items-center justify-center gap-2"
-            >
-              <span>배설돌봄</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+          {/* Mode Selection Area */}
+          <div className="max-w-3xl mx-auto mt-8 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl space-y-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center justify-center gap-2">
+              <span className="bg-white/20 p-1.5 rounded-lg text-white">
+                <Info className="w-5 h-5" />
+              </span>
+              어떤 방식으로 보시겠습니까?
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Card 1: 자세히 알아보기 */}
+              <div
+                onClick={() => selectMode('detail')}
+                className={`cursor-pointer p-5 rounded-xl border-2 text-left transition-all duration-300 relative group flex flex-col justify-between ${
+                  mode === 'detail'
+                    ? 'border-white bg-white text-slate-800 shadow-lg scale-[1.01]'
+                    : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
+                }`}
+              >
+                {mode === 'detail' && (
+                  <div className="absolute top-4 right-4 bg-primary text-white p-1 rounded-full">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </div>
+                )}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      mode === 'detail' ? 'bg-primary/10 text-primary' : 'bg-white/10 text-white/90'
+                    }`}>
+                      전문가 대상
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black tracking-tight mb-2">자세히 알아보기</h3>
+                  <p className={`text-xs leading-relaxed font-semibold ${
+                    mode === 'detail' ? 'text-slate-600' : 'text-slate-200'
+                  }`}>
+                    평가 기준, 알고리즘 흐름, 추천 이유를 함께 확인합니다.
+                  </p>
+                </div>
+                <div className={`text-[10px] mt-4 font-bold ${
+                  mode === 'detail' ? 'text-slate-400' : 'text-white/50'
+                }`}>
+                  대상: 간호학생, 연구자, 교육자, 종사자 등
+                </div>
+              </div>
+
+              {/* Card 2: 간단히 알아보기 */}
+              <div
+                onClick={() => selectMode('simple')}
+                className={`cursor-pointer p-5 rounded-xl border-2 text-left transition-all duration-300 relative group flex flex-col justify-between ${
+                  mode === 'simple'
+                    ? 'border-white bg-white text-slate-800 shadow-lg scale-[1.01]'
+                    : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
+                }`}
+              >
+                {mode === 'simple' && (
+                  <div className="absolute top-4 right-4 bg-primary text-white p-1 rounded-full">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </div>
+                )}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      mode === 'simple' ? 'bg-primary/10 text-primary' : 'bg-white/10 text-white/90'
+                    }`}>
+                      돌봄제공자 대상
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black tracking-tight mb-2">간단히 알아보기</h3>
+                  <p className={`text-xs leading-relaxed font-semibold ${
+                    mode === 'simple' ? 'text-slate-600' : 'text-slate-200'
+                  }`}>
+                    큰 글씨와 쉬운 설명 중심으로 필요한 내용만 간단히 확인합니다.
+                  </p>
+                </div>
+                <div className={`text-[10px] mt-4 font-bold ${
+                  mode === 'simple' ? 'text-slate-400' : 'text-white/50'
+                }`}>
+                  대상: 가족 보호자, 요양보호사, 고령 돌봄 제공자 등
+                </div>
+              </div>
+            </div>
+
+            {/* Category Entry Buttons */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 max-w-md mx-auto sm:max-w-none">
+              <Link
+                href={`/transfer?mode=${mode}`}
+                className="px-8 py-4 rounded-xl bg-white text-primary hover:bg-slate-100 font-extrabold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+              >
+                <span>이승돌봄 바로가기</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href={`/toileting?mode=${mode}`}
+                className="px-8 py-4 rounded-xl bg-primary-dark/40 text-white hover:bg-primary-dark/60 font-extrabold text-base border border-white/20 hover:border-white/50 backdrop-blur-md transition-all flex items-center justify-center gap-2"
+              >
+                <span>배설돌봄 바로가기</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -87,7 +189,7 @@ export default function Home() {
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
               침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 기기와 로봇
             </p>
-            <Link href="/transfer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
+            <Link href={`/transfer?mode=${mode}`} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               이승돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -100,7 +202,7 @@ export default function Home() {
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
               배뇨와 배변 등 위생 관리를 돕는 기기와 로봇
             </p>
-            <Link href="/toileting" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
+            <Link href={`/toileting?mode=${mode}`} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               배설돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -144,7 +246,6 @@ export default function Home() {
   );
 }
 
-// Simple local FileCheckIcon component
 function FileCheckIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg

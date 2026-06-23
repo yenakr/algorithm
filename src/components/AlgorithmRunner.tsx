@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, RotateCcw, Check, Info, HelpCircle, AlertTriangle, ThumbsUp, ArrowRight } from 'lucide-react';
+import { RotateCcw, Check, Info, HelpCircle, AlertTriangle, ThumbsUp, ArrowRight, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
+import { Handle, Position } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
 interface Option {
   id: string;
@@ -15,6 +17,7 @@ interface Question {
   id: string;
   title: string;
   description?: string;
+  simpleDescription?: string;
   type: 'single' | 'multi';
   options: Option[];
   nextQuestionId?: string | ((answers: Record<string, any>) => string | null);
@@ -27,6 +30,8 @@ interface Result {
   description: string;
   recommendation: string;
   reason: string;
+  simpleResultSummary?: string;
+  simpleTips?: string[];
 }
 
 interface Algorithm {
@@ -40,6 +45,7 @@ interface Algorithm {
 interface AlgorithmRunnerProps {
   algorithm: Algorithm;
   mode: 'learning';
+  uiMode?: 'simple' | 'detail';
   onPathChange?: (path: string[]) => void;
   onLearnMore?: (deviceId: string) => void;
 }
@@ -95,210 +101,207 @@ const resultDetails: Record<string, {
     deviceName: '천장 고정형 리프트',
     image: '/images/transfer_lift.png',
     whenToUse: '하지 근력 및 상체 지지력이 모두 불가능하며, 주택 천장에 레일 공사가 가능한 와상 고령자',
-    pros: ['바닥 공간을 전혀 차지하지 않아 통로가 좁은 방이나 화장실 입구에서도 이송이 편리함', '천장 레일 모터를 통해 보호자 단 한 명으로도 대상자를 안전하게 들어 올려 공중 이동 가능'],
-    precautions: ['리프트 하중을 버틸 수 있도록 건물 천장 옹벽의 보강 공사가 필수적으로 수반됩니다.', '레일이 고정되어 있어 레일 경로를 벗어난 다른 방으로의 이동은 불가능합니다.'],
-    environment: '천장 구조물 보강이 가능한 콘크리트 슬라브 가옥',
-    reason: '천장 레일 시공이 가능하며, 하지와 상체 근력이 모두 저하되어 전신을 매달아야 하므로 바닥 차지가 없는 가장 편리한 천장 고정형이 추천됩니다.'
+    pros: ['바닥 공간을 전혀 차지하지 않아 협소한 방에서도 사용 가능', '보호자 한 명만으로도 근골격계 부담 없이 완벽한 이송 가능'],
+    precautions: ['건물 천장 구조물의 내하중 보강 공사가 필수적임', '초기 설치 비용이 비교적 높음'],
+    environment: '천장 레일 매립/노출 주행이 확보되는 공간 및 침대 주변',
+    reason: '다리에 전혀 힘이 들어가지 않아 스스로 서거나 일어설 수 없으며, 벽체 타공 대신 천장 지지 공간을 안전하게 마련할 수 있는 가정에 가장 이상적입니다.'
   },
   'T-F': {
     deviceName: '벽 고정형 리프트',
     image: '/images/wall_lift.png',
-    whenToUse: '천장 레일 공사는 불가능하지만 침대 옆에 단단한 콘크리트 옹벽이 존재하는 경우',
-    pros: ['천장에 구멍을 뚫지 않고도 침대 인근의 단단한 벽면 기둥 고정만으로 리프트 설치 가능', '사용하지 않을 때는 벽면 방향으로 스윙 암을 깔끔하게 접어둘 수 있어 공간 효율성 우수'],
-    precautions: ['벽체가 옹벽(내력벽)이 아닌 석고보드나 가벽일 경우 기둥이 이탈할 수 있으니 사전 진단 필수', '벽면 암의 회전 반경 내로만 이동 범위가 제한됨'],
-    environment: '콘크리트 옹벽이 배치된 침실 벽면',
-    reason: '천장 공사는 곤란하지만 단단한 옹벽이 옆에 위치하여, 벽면 스윙 암 방식으로 환자를 공중 이송하는 리프트입니다.'
+    whenToUse: '하지 근력 및 상체 지지력이 불가하고 천장 공사는 지지 하중 등의 이유로 제한되나, 튼튼한 옹벽이 존재하는 장소',
+    pros: ['천장 지지가 부실하더라도 옹벽에 강력 고정하여 낙상 없이 사용', '관절식 회전 암 구조로 침대 주변 등 좁은 영역 내에서 빠르게 휠체어 탑승을 지원함'],
+    precautions: ['장비 지지용 콘크리트 내력벽 확인이 필수적이며 벽면 상태에 따라 장착 보강이 수반되어야 합니다.', '벽면 암의 작동 반경을 벗어난 장소로의 직접적인 이동은 불가합니다.'],
+    environment: '리프트 회전이 자유롭고 단단한 콘크리트 내력벽이 존재하는 침실',
+    reason: '천장 보강 공사가 불가능해 슬링 리프트를 설치할 차선책이 필요하나, 침대 주변의 옹벽을 이용해 그네 리프트를 안전히 작동시켜 이송을 돕는 합리적인 기기입니다.'
   },
   'T-G': {
-    deviceName: '이동식 리프트 (바퀴식 슬링 리프트)',
+    deviceName: '이동식 리프트 (슬링 없음, 슬링 자동 삽입, 슬링 수동 체결)',
     image: '/images/mobile_sling_lift.png',
-    whenToUse: '천장이나 벽 타공 공사가 일절 불가하며, 여러 방과 거실 등을 자유롭게 이동해야 하는 경우',
-    pros: ['고정식 시공 공사가 불필요하여 즉시 도입이 가능하고 세입자 가구에 최적화됨', '바퀴식 프레임을 밀고 이동하므로 거실, 방, 부엌 등 가옥 내 여러 장소를 자유롭게 전환 가능'],
-    precautions: ['바닥에 문턱이나 단차가 있을 경우 바퀴 주행이 멈추거나 흔들려 낙상 위험이 생길 수 있습니다.', '리프트 하부 프레임이 침대 밑이나 휠체어 아래로 들어갈 수 있는 공간적 틈새가 필요합니다.'],
-    environment: '바닥 문턱이 없고 침대 밑 공간이 확보된 가옥',
-    reason: '가옥 훼손 공사가 절대 불가능한 세입자 환경이거나 여러 방으로 이동하며 사용해야 하므로, 바퀴식 프레임을 지탱하는 이동형 슬링 리프트가 가장 적절합니다.'
+    whenToUse: '벽/천장 공사가 완전히 금지되는 주거 환경이거나, 거실과 안방 등 여러 장소로 굴려서 이송해야 하는 와상 사용자',
+    pros: ['별도의 영구 설치 공사나 가옥 훼손 없이 즉각적 조립 사용이 가능', '바퀴 이동식으로 설계되어 욕실, 거실, 침실 등 전 공간 이동성 지원'],
+    precautions: ['바닥에 단차가 있거나 문턱이 있으면 이동이 제한되므로 턱 제거 시공이 우선입니다.', '침대 밑에 리프트의 하부 프레임(다리 부분)이 들어갈 수 있는 빈 틈새(높이 10~12cm)가 필수입니다.'],
+    environment: '바닥 문턱이 없고 평평하며 침대 하단 틈새가 열려있는 주거 공간',
+    reason: '공사가 절대 불가해 고정식 레일을 달 수 없지만, 바닥이 평평하고 문턱이 없어 부드러운 바퀴 주행이 가능한 방과 거실에서 전신 슬링을 체결하여 옮기기에 가장 훌륭한 바퀴형 이동 리프트입니다.'
   },
   'T-H': {
-    deviceName: '이동식 겐트리 리프트 (독립 프레임 리프트)',
+    deviceName: '이동식 겐트리 리프트',
     image: '/images/gantry_lift.png',
-    whenToUse: '천장/벽 타공 훼손은 불가하지만 침대 위에 독립적인 조립식 레일 프레임 설치 공간이 있는 고령자',
-    pros: ['벽면이나 천장 훼손이 전혀 없어 주택 손상 없이 수직 리프트의 안전성 확보', '조립형 독립 프레임 형태로 이전 설치 및 해체가 간편함'],
-    precautions: ['침대 주위에 기둥 프레임을 설치할 넓은 침실 공간이 필요합니다.', '기둥 연결부가 느슨해지지 않도록 정기적인 조임 상태를 점검해야 합니다.'],
-    environment: '침대 주위에 가로 2m, 세로 2.5m 이상의 충분한 설치 공간 확보',
-    reason: '벽이나 천장 공사가 일절 불가능하지만 독립적인 문형(겐트리) 프레임을 침대 위에 조립해 수직 이송하는 슬링 리프트입니다.'
+    whenToUse: '천장/벽 손상 공사가 불가능하며, 침대 주변 공간이 넓고 수직 리프팅의 강한 하중 안정성을 선호하는 와상 사용자',
+    pros: ['천장/벽 훼손 없이 튼튼한 문 모양 철제 독립 프레임을 세워 안정적으로 공중 이송', '조립형 구조로 임대 주택 거주자도 추후 이사 시 쉽게 분해 및 이전 설치가 용이함'],
+    precautions: ['침대 좌우 및 상단으로 큰 겐트리 지지 기둥이 세워지므로 가구 배치 공간 확보가 먼저 요구됩니다.', '프레임의 수평 유지 및 연결 볼트의 견고한 고정 상태를 정기적으로 관리해야 합니다.'],
+    environment: '철제 겐트리 지지 프레임을 침대 위에 충분히 둘러서 세울 수 있는 넓은 침실 공간',
+    reason: '벽이나 천장 타공 등 가옥 훼손은 일절 불가능하지만, 침실 침대 사방으로 튼튼한 A자형 철제 프레임 기둥을 조립 배치하여 안정적으로 환자를 공중에 띄워 옮길 수 있습니다.'
   },
 
   // 배설돌봄 결과 기기 상세
   'B-A': {
-    deviceName: '도움 불필요 (일반 배설 자립)',
+    deviceName: '도움 불필요 (위생 자립)',
     image: '',
-    whenToUse: '인지, 화장실 이동, 용변 후 뒤처리 동작을 모두 아무 도움 없이 완수할 수 있는 상태',
-    pros: ['스스로 배설을 통제하여 일상 근골격 기능 및 심리적 존엄성을 지속적으로 보존', '돌봄 제공자의 신체적 노동이 일절 발생하지 않음'],
-    precautions: ['야간 화장실 이동 시 안전을 위해 센서등을 켜고 변기 옆 안전 바를 설치하는 편이 좋습니다.', '정기적인 건강 검진을 통해 실금 징후나 관절 염증 상태를 정기 검진하세요.'],
-    environment: '일반 가정 화장실 및 주거 환경',
-    reason: '배설과 관련된 모든 단계(요변의 인지, 화장실 보행, 위생 처리)에서 지장이 없는 건강한 상태입니다.'
+    whenToUse: '용변 요의/변의 인지, 화장실 보행 이동, 스스로 닦기 및 의복 조절이 원활히 가능한 자력 해결 상태',
+    pros: ['환자 본인의 신체 잔존 역량 및 독립적 자조 능력을 최대한 유지', '보호자의 배설 돌봄 물리적 개입이 불필요하여 삶의 피로도 최하 유지'],
+    precautions: ['화장실 바닥 물기로 인한 낙상을 예방하기 위해 미끄럼방지 테이프를 붙여두세요.', '인지 및 다리 근력 등의 퇴행 변화가 일어나는지 주기적 자가점검이 권장됩니다.'],
+    environment: '일반 가정 화장실 및 욕실 주거 공간',
+    reason: '배뇨/배변 인지 조절, 이동, 청결 전 과정에서 기능 제한이 거의 존재하지 않는 완전 자립 상태이므로 기기 지원이 필요하지 않습니다.'
   },
   'B-B': {
-    deviceName: '비데 (자동 세정 양변기 시트)',
+    deviceName: '온수 세정 자동 비데',
     image: '/images/hygiene_bidet.png',
-    whenToUse: '생리적 인지와 화장실 이동은 스스로 하나, 손 관절염이나 오십견 등으로 항문 뒤처리가 힘든 고령자',
-    pros: ['휴지 사용 대비 위생적이며 항문 주위 피부 쓸림 및 미세 상처 방지', '온수 세정과 온풍 건조 자동 구동을 통해 항문 및 요로 감염 질환을 예방함'],
-    precautions: ['사용자가 변기 조작판의 작동 순서를 명확하게 인지하고 누를 수 있어야 합니다.', '노즐 세척과 필터 교체 등 세균 번식 방지를 위한 정기적인 위생 세척이 요구됩니다.'],
-    environment: '일반 가정 내 화장실 양변기 공간',
-    reason: '용변 인지와 보행력은 우수하여 변기 착석은 원활하지만, 위생 뒤처리를 독자적으로 완수하기 어렵기 때문에 자동 온수 비데 시트가 가장 추천됩니다.'
+    whenToUse: '화장실 이동과 기본적인 앉기/일어서기는 양호하지만 관절 손상이나 근육 마비로 용변 후 휴지로 깔끔히 닦아내지 못하는 사용자',
+    pros: ['화장지 문지름에 따르는 노령 피부의 마찰 손상 및 통증 완화', '노즐 자동 온수 스프레이와 바람 건조로 청결한 항문 위생 조력 및 요로감염 예방'],
+    precautions: ['컨트롤러 패널을 사용자가 보고 직접 누를 수 있는 인지력이 유지되어야 합니다.', '정기적인 비데 필터 교환 및 세정 노즐 청결 소독이 필요합니다.'],
+    environment: '양변기 주변에 방수 플러그 전기 공급 및 급수 배관이 연결 가능한 화장실',
+    reason: '배뇨 배변감 인지와 화장실 이동 능력은 양호하지만, 류마티스 관절염이나 어깨 및 허리 회전 가동 범위 제한으로 휴지를 써서 깨끗이 닦아내기 힘드므로 자동 세정 비데가 가장 적합합니다.'
   },
   'B-C': {
-    deviceName: '화장실 이동 보조 및 변기 리프트',
+    deviceName: '화장실 전동 변기 리프트',
     image: '/images/toilet_lift.png',
-    whenToUse: '의사와 뒤처리 능력은 충분하나, 하체 힘 약화로 변기에 착석/기립 시 낙상 우려가 큰 고령자',
-    pros: ['변기 착석 및 일어서기 동작 시 하체 관절 압박 최소화 및 낙상 예방', '보호자의 부축 없이 독립적인 용변 기회 제공으로 심리적 만족 증대'],
-    precautions: ['사용 중인 일반 양변기 외형 규격과 리프트 고정 장치와의 연결 호환성을 확인해야 합니다.', '기기 작동 시 갑작스러운 각도 상승에 놀라지 않도록 리프트 조작법 안내가 수반되어야 합니다.'],
-    environment: '전원 연결 콘센트가 있고 리프트 프레임 장착이 가능한 화장실',
-    reason: '배설 인지와 위생 뒤처리는 가능하지만, 기립 및 착석 단계에서 낙상 위험이 높아 관절을 전동으로 지지해주는 양변기 리프트가 필요합니다.'
+    whenToUse: '배뇨/배변 신호를 스스로 인지하고 뒤처리 능력도 있지만, 무릎 고관절 연골 마모로 쪼그려 앉고 일어설 때 통증이 심하고 낙상 우려가 높은 사용자',
+    pros: ['시트 자체의 높낮이와 각도를 유압 전동식으로 조절해 안전하게 일어서도록 유도', '무릎 관절에 체중 부담을 거의 주지 않고 편안한 용변 시작과 일어서기 퇴거를 보장함'],
+    precautions: ['일반 변기 위에 결합하므로 도기 모양 규격을 체크하고 전기 전원 연결 유무를 보십시오.', '전동 시트가 회전해 올라올 때 균형을 잃고 쏠리지 않도록 속도에 익숙해지는 연습이 필요합니다.'],
+    environment: '전동 변기 리프트를 지탱하고 안착할 수 있는 여유 면적의 화장실 양변기 주변',
+    reason: '용변 신호를 잘 알고 뒤처리도 자력 해결하지만, 다리 힘과 고관절 약화로 변기에 완전히 착석하고 일어나 서는 과정에서 낙상 및 근골격계 손상이 우려되어 전동 보조 변기 리프트가 필요합니다.'
   },
   'B-D': {
-    deviceName: '이동 변기 (가구형 침상 변기)',
-    image: '/images/toilet_lift.png',
-    whenToUse: '요의/변의를 명확히 인지하고 뒤처리 능력도 일부 있으나, 보행 장애로 화장실 이동 자체가 불가한 경우',
-    pros: ['침대 측면에 밀착 배치하여 침상 밖 보행 이동 시 일어나는 낙상 및 중간 실금 방지', '안전 손잡이와 바퀴가 내장되어 보호자의 도움으로 휠체어에서 스무스하게 슬라이딩 이승 가능'],
-    precautions: ['용변 후 보호자가 바스켓의 오물을 바로 비워내고 위생 소독해야 하는 관리 부담이 존재합니다.', '실내 악취 확산을 억제하기 위해 밀폐 뚜껑 닫기 및 냄새 탈취 필터 관리가 필요합니다.'],
-    environment: '침대 바로 옆 안방 공간',
-    reason: '대소변 감각은 인지하지만 화장실 이동 및 옷 정리/뒤처리 능력에 전적인 장애가 있어, 침대 바로 옆에서 즉시 해결 가능한 이동 변기 솔루션이 권장됩니다.'
+    deviceName: '가구형 침상 이동 변기',
+    image: '/images/toilet_lift.png', // Fallback
+    whenToUse: '용변을 보고 싶은 신호는 정확히 느끼나, 화장실 문턱을 넘어가거나 먼 거리를 보행해 이동할 수 없는 사용자',
+    pros: ['침실 침대 곁에 바로 닿게 설치해 실금과 낙상을 동시에 차단', '스윙식 안전 팔걸이 조절로 휠체어에서 변기로 미끄러지듯 바로 이동 승차 가능'],
+    precautions: ['사용 후 오물 버킷을 즉시 비우고 전용 세정제로 씻어주지 않으면 악취가 날 수 있습니다.', '안정성을 위해 환자가 착석했을 때 고정 바퀴가 확실하게 잠겨서 뒤로 밀리지 않도록 고정해야 합니다.'],
+    environment: '침대 바로 옆에 이동 변기를 배치할 여유 영역이 확보되는 침실 공간',
+    reason: '소대변 감각 인지와 뒤처리는 보존되거나 보조가 가능하지만, 하반신 보행 장애로 인해 방 밖 화장실 변기까지 움직일 수 없으므로 침대 바로 옆 가구형 이동 변기가 필수적입니다.'
   },
   'B-E': {
-    deviceName: '시간에 맞춘 배설 유도 프로그램',
+    deviceName: '시간에 맞춘 예약 배설 유도 프로그램 (배뇨 예측 센서 활용)',
     image: '/images/excretion_robot.png',
-    whenToUse: '화장실로 걷고 뒤처리는 할 수 있지만, 인지 기능 저하로 요의를 못 느껴 상습적으로 실금하는 고령자',
-    pros: ['일정한 시간 간격 유도로 실금율을 줄이고 방광 훈련 병행', '실금 방지를 통한 위생적인 피부 보호 및 보호자 의류 세탁 부담 경감'],
-    precautions: ['환자의 하루 평균 배설 빈도를 측정하여 알림 주기를 꼼꼼히 관리해야 합니다.', '화장실 거부 행동 발생 시 강요하지 않고 정서적 유도를 통한 접근이 요구됩니다.'],
-    environment: '화장실로 안전하게 이동할 수 있는 장애물 없는 주거 환경',
-    reason: '화장실 이동력은 정상이지만, 인지 능력 저하로 배설 의사소통이 되지 않아 시간 알림을 통한 화장실 유도가 적절합니다.'
+    whenToUse: '다리 거동 및 위생 뒤처리는 자력 완수가 가능하나, 치매 또는 인지저하로 방광에 오물이 차오르는 것을 자각하지 못해 실금이 빈번한 사용자',
+    pros: ['스마트 센서가 방광 팽창도를 직접 추적하여 제시간에 소변을 해결하게 알림', '불필요한 기저귀 착용을 원천 차단하고 스스로의 신체 배설 능력을 마지막까지 보존 지원'],
+    precautions: ['아랫배에 부착하는 젤 전도체 센서 스티커가 흔들림 없이 고정되도록 파지해야 합니다.', '알람 수신 시 보호자가 귀찮아하지 않고 정해진 시간에 동행하는 관리가 지속되어야 합니다.'],
+    environment: '센서 수신용 스마트폰 연동 환경 및 자력 보행 화장실',
+    reason: '신체적 화장실 이동과 세정 능력은 양호하지만, 인지 왜곡으로 배뇨 감각을 차단 인지하여 제때 용변을 보지 못하므로 초음파 배뇨 예측 센서로 때맞춰 화장실로 이끄는 훈련이 효과적입니다.'
   },
   'B-F': {
-    deviceName: '시간에 맞춘 배설 프로그램 및 비데 결합 적용',
-    image: '/images/hygiene_bidet.png',
-    whenToUse: '이동은 가능하나 배설 시기를 잘 인지하지 못하고 용변 후 잔여 위생 처리가 불가능한 고령자',
-    pros: ['규칙적인 배설 유도로 실금을 방지하며, 비데를 통해 뒤처리 청결 보완', '화장실 보행 잔존 능력을 최대한 살리는 인지/위생 동시 보조'],
-    precautions: ['스마트 센서 알림 시간에 맞춰 안전하게 화장실로 동반 이동', '비데 자동 조작 패널을 보호자가 대행하거나 자동 세정 모드 세팅 필요'],
-    environment: '자동 물 내림 및 비데 장치가 연동될 수 있는 안전한 화장실',
-    reason: '배설 인지 및 뒤처리 자립도가 모두 상실되었지만 화장실 이동 보행력은 남아있어, 시간 안내와 비데 자동 세정을 병합 제공합니다.'
+    deviceName: '시간에 맞춘 배설 유도 및 양변기 비데 연동 프로그램',
+    image: '/images/hygiene_bidet.png', // Fallback
+    whenToUse: '배설 요의/변의를 지각하지 못하고, 손의 움직임도 무뎌 항문 위생을 닦지 못하지만 부축하면 변기까지 걸어갈 수 있는 상태',
+    pros: ['보호자의 정기적 화장실 유도로 침상 실금을 원천 방지', '항문 청소는 비데가 물로 알아서 세정 건조하므로 보호자의 뒤처리 노고가 크게 줄어듦'],
+    precautions: ['기계의 물살 자극에 환자가 놀라거나 벌떡 일어서는 사고를 예방하도록 곁에서 지탱하세요.', '방광 팽만 센서 신호에 맞추어 즉시 이송 유도가 지켜져야 효과가 큽니다.'],
+    environment: '자동 비데가 구축된 거주지 안 화장실 공간',
+    reason: '인지 왜곡으로 배뇨 신호를 차단하며 손을 돌리는 청결 세정도 불완전하지만, 다행히 부축해 화장실까지 걸어갈 힘은 유지되므로 예약 유도와 자동 비데 세정을 결합하는 것이 효율적입니다.'
   },
   'B-G': {
-    deviceName: '자동배설로봇 (간헐적 침상 연결)',
+    deviceName: '자동배설처리로봇 (간헐적 이용)',
     image: '/images/excretion_robot.png',
-    whenToUse: '배설감을 못 느끼고 전혀 걸을 수 없는 와상 환자로, 야간이나 특정 시간대에 기저귀 대신 자동 처리를 원하는 고령자',
-    pros: ['대소변 발생 즉시 음압 흡입, 온수 정밀 세정, 온풍 건조가 냄새 없이 자동 대행됨', '보호자의 야간 오물 청소 횟수를 비약적으로 줄여 수면의 질 개선'],
-    precautions: ['흡입 패드 컵이 환자의 은밀한 부위에 정확히 밀착 조준 부착되어야 오물 누수가 없음', '주기적으로 정수통 채우기 및 오물 회수통 비우기 필요'],
-    environment: '상시 전원 공급 및 침대 등받이 각도 조절이 편한 침상 환경',
-    reason: '소변 감각 지각 및 화장실 보행이 모두 불가한 침상 와상 상태에서, 오물 감지 즉시 음압 진공으로 엉덩이를 씻겨주는 로봇을 배치하는 것이 타당합니다.'
+    whenToUse: '배설 신호를 자각하지 못하고 화장실로 걸어갈 수도 없어 24시간 침대에 누워 지내지만, 주로 밤 시간대 위주로 뒤처리를 기계가 대행하기를 바랄 때',
+    pros: ['소대변 감지 즉시 음압 진공으로 분뇨를 빨아들이고 온수로 중요부위를 자동 씻겨줌', '주요 오물 감지 시에만 노즐 패드를 착용해 피부 통풍 제한을 경감함'],
+    precautions: ['오물 흡입 컵 부착 시 환자의 피부 밀착 상태가 부정확하면 소변이 이불로 유출될 수 있습니다.', '주기적으로 기계 정수통의 온수를 리필하고 오물 분뇨 보틀을 위생적으로 버려야 합니다.'],
+    environment: '배설로봇 기계를 침대 옆에 바퀴로 거치할 수 있는 침실 환경',
+    reason: '스스로 용변 신호를 못 느끼며 보행 이동도 불가능해 주로 침상에 누워 계시지만, 기저귀 짓무름을 예방하기 위해 밤이나 특정 시간대에 부착해 오물을 수거하는 탈착식 배설 로봇이 알맞습니다.'
   },
   'B-H': {
-    deviceName: '흡인형 스마트 기저귀 로봇시스템 (24시간 지속 케어)',
+    deviceName: '흡인형 스마트 기저귀 로봇시스템 (지속적 이용)',
     image: '/images/smart_diaper_robot.png',
-    whenToUse: '24시간 침상에 완전히 누워 지내며 인지/이동/자조 능력을 모두 상실한 고령자',
-    pros: ['기저귀 내부의 실시간 음압 수거 모듈이 대소변 즉시 감지하여 외부에 전혀 냄새를 유출하지 않고 청결 흡수', '엉덩이에 습기가 찰 틈 없이 지속적인 공기 순환 및 살균 건조로 욕창 예방 효과 극대화'],
-    precautions: ['피부에 밀착되는 일회용 스마트 기저귀 패드 커버의 정기적인 소모품 교체 예산 필요', '대소변 수거 호스가 꺾이거나 환자의 몸에 눌리지 않도록 위치 점검'],
-    environment: '24시간 돌봄 요양 병실 또는 요양 케어 가정 침실',
-    reason: '배설 인지, 화장실 이동, 용변 후 청결 전 평가 영역에서 가장 중증인 극심한 어려움 상태를 보이고 있습니다.'
+    whenToUse: '24시간 침상에 누워 지내며 자력 배뇨감 인지 및 화장실 거동이 일절 불가하고, 보호자의 잦은 수동 기저귀 교체가 극도로 고된 중증 환자',
+    pros: ['대소변이 나오자마자 1초 만에 로봇이 진공 흡입하여 실내 오물 냄새 차단 및 유출 방지', '물 세정부터 온풍 드라이까지 손 하나 안 대고 케어하므로 침상 피부 청결의 완벽 유지'],
+    precautions: ['로봇 커버 컵이 신체 틈새로 접혀 짓눌리거나 흡입 호스가 꺾여 음압이 떨어지지 않도록 확인이 필요합니다.', '밀착 고무 패드 부분의 피부에 기계식 눌림 상처(욕창 등)가 생기지 않는지 주기적으로 점검하세요.'],
+    environment: '스마트 기저귀 호스 주행 및 오물 흡입 본체가 안전하게 밀착 거치될 수 있는 침상 침실',
+    reason: '배설 인지, 거동 이동, 위생 뒤처리 전 영역에서 완전한 자립 불가능(극심한 어려움) 판정을 받은 전형적인 침상 누움 환자로, 24시간 자동으로 대소변을 진공 흡입하고 세정하는 최첨단 스마트 기저귀 로봇 시스템이 적합합니다.'
   }
 };
 
-// Learning guides dictionary to explain the meaning/criteria of each step
+// Learning/Detail Guide details mapping
 const learningGuides: Record<string, { title: string; content: string; details: { key: string; val: string }[] }> = {
   q1: {
-    title: '자리이동 기능평가 기준',
-    content: '침대, 의자, 휠체어 등으로 자리를 옮길 때 환자의 자립 수준을 평가합니다. 어려움 지표가 중간 정도 이상(2점 이상)일 경우 로봇 이송 지원이 적극 요구됩니다.',
+    title: '자리이동하기 기능평가',
+    content: '자리이동 평가는 스스로 자세를 완전히 바꾸지 않고 침대 등 한 면에서 휠체어와 같은 다른 면으로 공간적 위치를 이동하는 모든 행위를 포함합니다. (ADL 항목 중 침대-휠체어 이승 평가 기준)',
     details: [
-      { key: '0점 (문제 없음)', val: '아무런 보조 없이 안전하게 이동 가능 (로봇 비대상)' },
-      { key: '1점 (가벼운 어려움)', val: '가벼운 피로가 있으나 자력 수행 가능 (단순 보조장비 적합)' },
-      { key: '2점 (중간 정도)', val: '안전을 위해 부축이나 로봇 기립 보조 필요' },
-      { key: '3점 (심한 어려움)', val: '상당 부분의 물리적 부축 및 지지가 필요함' },
-      { key: '4점 (극심한 어려움)', val: '환자의 협조 불가로 전동식 슬링 리프트 필수' }
+      { key: '0점 (문제 없음)', val: '혼자서 아무런 도구와 도움 없이 침대와 휠체어 등을 안전하게 오갈 수 있는 수준' },
+      { key: '1점 (가벼운 어려움)', val: '이동 시 가벼운 균형 불안정이나 피로감이 있으나 스스로 조절하고 극복할 수 있는 상태' },
+      { key: '2점 (중간 정도)', val: '일상생활에 일부 지장을 초래하며 안전을 위해 보조 기구나 타인의 가벼운 밀착 도움이 요구되는 수준' },
+      { key: '3점 (심한 어려움)', val: '스스로의 힘으로는 거의 이동이 불가하여 신체적 지탱과 부분적인 완전 보조가 수시로 필요한 수준' },
+      { key: '4점 (극심한 어려움)', val: '자리이동을 위한 어떠한 신체 협조도 불가능하여 전적인 기계장치나 다수 제공자의 도움이 필수적인 수준' }
     ]
   },
   q2: {
-    title: '하지 근력 및 체중 지지',
-    content: '다리 근력이 스스로 체중을 지지하고 서있을 수 있는지 판단합니다. 이에 따라 리프트(슬링 매달기)형과 기립보조(일으켜 세우기)형이 구분됩니다.',
+    title: '체중 지탱(다리 근력) 평가',
+    content: '의료진이 사용하는 MMT(Manual Muscle Test) 등급을 기반으로 판단하며, 다리 근력이 Grade IV 이상(약간의 저항을 극복하고 서서 버틸 수 있는 단계)이면 체중 지지가 가능하다고 평가하여 기립보조리프트를 추천 대상에 올립니다. Grade III 이하(중력은 극복해 다리를 수직으로 들지만 외부 저항을 전혀 버티지 못해 스스로 설 수 없는 단계)는 지탱 불가능으로 봅니다.',
     details: [
-      { key: '예, 체중을 지탱하기 어렵다', val: '다리 힘으로 지탱이 불가하여 안전하게 전신을 감싸 띄우는 전신슬링 리프트 적합' },
-      { key: '아니오, 체중을 지탱할 수 있다', val: '상체 힘이 남아있고 기립 협조가 가능하여 일으켜 세우는 기립보조리프트/스탠딩리프트 적합' }
+      { key: '체중 지탱 가능 (MMT IV~V)', val: '다리에 스스로 힘을 주어 버틸 수 있으므로 기립보조리프트(T-C, T-D)로 유도가 원활합니다.' },
+      { key: '체중 지탱 불가 (MMT 0~III)', val: '스스로 지탱하여 일어설 수 없으므로 전신을 그네 시트로 띄우는 전신슬링 리프트(T-E, T-F, T-G, T-H) 계열이 안전합니다.' }
     ]
   },
   q3: {
-    title: '사용 환경 평가',
-    content: '천장이나 벽의 구조, 방의 크기에 따라 고정형 또는 이동형 리프트를 선별합니다.',
+    title: '사용자 주거 및 시설 환경 평가',
+    content: '전신슬링 리프트는 종류에 따라 가옥 내부에 하중 지지 공사(천장 보강 공사, 옹벽 앵커 설치 등)를 동반해야 하는 경우가 많습니다. 공사가 가능한지, 불가능하여 이동식(바퀴형)이나 독립 조립 프레임(겐트리)을 세워야 하는지에 따라 최종 로봇 세부 추천이 결정됩니다.',
     details: [
-      { key: '천장 설치 가능', val: '천장 옹벽 보강 후 레일 모터 장착 (바닥 차지 없음)' },
-      { key: '벽면 설치 가능', val: '천장 공사가 불가할 때 튼튼한 옆 벽에 회전 암 장착' },
-      { key: '이동식 리프트', val: '고정 공사 없이 바퀴 달린 프레임으로 다목적 이송' },
-      { key: '이동식 겐트리', val: '천장 손상 없이 침대 주위에 독립 지지대 조립' }
+      { key: '천장 고정 (T-E)', val: '천장에 단단히 레일을 매립/설치할 수 있어 공간 낭비가 전혀 없습니다.' },
+      { key: '벽 고정 (T-F)', val: '콘크리트 옹벽면에 스윙 관절 암 타입으로 고정하여 회전 반경 내에서만 이동시킵니다.' },
+      { key: '이동식 (T-G)', val: '가구 훼손이나 공사가 전면 불가할 때 바퀴로 끄는 형태이나 문턱 제거가 요구됩니다.' },
+      { key: '이동식 겐트리 (T-H)', val: '공사는 어렵지만 침대 주변에 A자형 독립 프레임 철제 기둥 구조물을 단독 조립할 공간이 나올 때 훌륭한 대안입니다.' }
     ]
   },
   q3_1: {
-    title: '우선순위 가치 선별',
-    content: '주거 환경상 여러 로봇 설치가 가능한 경우 사용 편의성, 설치비용, 공사 최소화 중 선호하는 가치를 판별합니다.',
+    title: '우선순위 및 가치 판단',
+    content: '천장이나 벽 설치가 둘 다 가능한 경우 또는 환경 제약이 적을 때 사용자의 선호 가치(사용 편의성 향상 vs 초기 비용 아끼기)를 선별합니다.',
     details: [
-      { key: '사용 편의성', val: '가장 편안하고 바닥 차지가 없는 천장 고정식 추천' },
-      { key: '설치비용 절감', val: '공사 효율이 좋은 벽면 고정식 리프트 추천' },
-      { key: '공사 최소화', val: '설치 훼손이 없는 이동식/겐트리 조립식 추천' }
+      { key: '사용 편의성 우선', val: '천장 주행 모터를 매달아 힘이 전혀 들지 않고 즉시 거실/침실 이동이 가능한 천장 고정형(T-E) 추천' },
+      { key: '설치 비용 절감 우선', val: '옹벽 고정 암만 설치해 설치비를 줄이고 방 내부에서 부드럽게 사용하는 벽 고정형(T-F) 추천' }
     ]
   },
   q3_2: {
-    title: '독립 지지대 프레임 조립 여부',
-    content: '천장 타공이나 벽면 훼손 공사가 어려운 상황에서 침대 주변에 지지대 구조물을 독립적으로 배치할 공간과 여건이 되는지 확인합니다.',
+    title: '조립식 겐트리 지지대 배치 공간',
+    content: '주택 손상이 불가해 공사는 거부하지만, 침대 위에 커다란 독립 지지 프레임을 세울 공간(침대 좌우 20cm 이상 빈 여유 공간)이 있는지 평가합니다.',
     details: [
-      { key: '가능하다', val: '수직 이동 안전성이 좋은 독립 겐트리 리프트 추천' },
-      { key: '어렵다', val: '프레임 배치 없이 바퀴로만 끄는 순수 이동식 리프트 추천' }
+      { key: '겐트리 프레임 가능 (T-H)', val: '방 공간이 충분하여 단독 지지 프레임을 세워 안정적으로 리프팅 주행 가능' },
+      { key: '순수 이동식 필요 (T-G)', val: '방이 좁아 기둥 세우기가 곤란하여 바퀴로 굴리는 이동식 프레임을 사용하고, 침대 밑에 하부 바퀴가 들어갈 틈새를 둡니다.' }
     ]
   },
   q4: {
-    title: '상체 조절 능력 평가',
-    content: '다리 지지는 힘드나 상체 잔존 근력이 있어 등받이 벨트를 파지하고 로봇과 협조하여 상체를 버틸 수 있는지 확인합니다.',
+    title: '상체 조절 및 협조 능력 평가',
+    content: '다리 힘은 지탱하기 어렵지만 환자가 앉은 상태에서 스스로 등받이 없이 허리와 고개를 세우고 버티며, 리프트 앞의 보조 손잡이를 꽉 쥘 수 있는 잔존 기능이 살아있는지 검사합니다.',
     details: [
-      { key: '예, 상체를 일으킬 수 없음', val: '스스로 잡고 일어서는 속도를 돕는 전동형 기립보조리프트 추천' },
-      { key: '아니오, 상체를 일으킬 수 있음', val: '더 많은 신체 고정과 보조가 이루어지는 비전동형 기립보조기기 추천' }
+      { key: '상체 조절 가능 (T-C)', val: '전동 버튼 조작으로 벨트를 등뒤에 걸어 자연스럽게 세워 이송하는 전동형 기립보조리프트가 효율적입니다.' },
+      { key: '상체 조절 불가 (T-D)', val: '손잡이를 잡고 버틸 능력이 부족하여 무릎 패드와 가슴 고정 밴드로 신체를 다중 밀착해 억지로 일으켜주는 탑승식 수동 기립보조기기가 안전합니다.' }
     ]
   },
-  
-  // 배설돌봄 가이드
   toileting_q1: {
-    title: '배설 인지 조절 능력',
-    content: '스스로 요의와 변의를 지각하고 배뇨/배변 타이밍을 컨트롤할 수 있는지 평가합니다. 인지 장애가 있을 경우 시간 맞춤형 알림 및 기저귀 흡인 로봇 개입이 요구됩니다.',
+    title: '생리적 배설 인지 능력 평가',
+    content: '소변과 대변이 마렵다는 신호(요의 및 변의)를 환자 본인의 신경계가 명확히 인지하고, 마려울 때 괄약근을 의식적으로 조절해 참거나 화장실 가기를 표현할 수 있는지 확인합니다.',
     details: [
-      { key: '0~1점 (양호)', val: '배설 의사를 스스로 지각하고 제어 가능' },
-      { key: '2~4점 (장해)', val: '배설 시기를 모르거나 실금이 있어 주기적 돌봄 필요' }
+      { key: '인지 능력 양호 (0~1점)', val: '배설 신호를 제때 자각하므로 화장실 이동이나 뒤처리 세정이 양호하면 비데나 리프트로 쉽게 자립 유도가 가능합니다.' },
+      { key: '인지 능력 저하 (2~4점)', val: '요의/변의를 지각하지 못해 실금이 잦으므로, 제시간에 맞춰 배설을 유도하는 프로그램이나 기저귀를 자동으로 세정 진공 수거하는 배설로봇(B-G, B-H) 케어가 권장됩니다.' }
     ]
   },
   toileting_q2_a: {
-    title: '물리적 화장실 이동 능력',
-    content: '침실에서 화장실 변기 앞까지 자력으로 걸어가 안전하게 착석할 수 있는지 판단합니다. 보행 장해가 클 경우 침상 변기 또는 이동식 휠체어 보조가 연동됩니다.',
+    title: '화장실 이동 능력 평가 (배설 인지 양호 시)',
+    content: '배뇨와 배변 신호를 잘 인지하고 있을 때, 침대에서 일어나 화장실 도기 변기 위까지 안전하게 이동할 수 있는지 다리 거동과 균형을 채점합니다.',
     details: [
-      { key: '0~1점 (양호)', val: '부축 없이 화장실로 스스로 안전하게 이동' },
-      { key: '2~4점 (장해)', val: '낙상 위험으로 화장실 이동이 불가하거나 부축 필수' }
+      { key: '이동 능력 양호 (0~1점)', val: '화장실까지 자력 보행이 되므로, 항문 위생 청결 상태만 보고 비데(B-B) 여부를 검토합니다.' },
+      { key: '이동 능력 저하 (2~4점)', val: '낙상 불안이 크거나 걷지 못해 침대 근처에서 변기 리프트(B-C)를 대거나 침실 옆 가구형 이동 변기(B-D)를 이용해야 합니다.' }
     ]
   },
   toileting_q2_b: {
-    title: '물리적 화장실 이동 능력',
-    content: '배설 신호 지각은 어려우나 신체적으로 화장실까지 갈 수 있는지 평가합니다. 이동이 가능하다면 시간 맞춤 이동을, 불가능하다면 침상 자동배설로봇을 선택합니다.',
+    title: '화장실 이동 능력 평가 (배설 인지 저하 시)',
+    content: '배뇨와 배변 신호를 스스로 인지하지 못해 실금이 빈번한 와중에도, 부축을 받거나 자력으로 화장실 변기 앞까지 움직여 갈 수 있는 신체적 보행력 자체는 유지되고 있는지 판단합니다.',
     details: [
-      { key: '0~1점 (양호)', val: '유도를 통해 화장실 변기까지 이동 가능' },
-      { key: '2~4점 (장해)', val: '침상에서 와상 상태로 기계식 배설 관리가 요구됨' }
+      { key: '이동 능력 유지 (0~1점)', val: '실금 위험이 크지만 신체 이동은 되므로, 시간마다 화장실로 이송을 유도(B-E, B-F)하여 기저귀 사용을 억제합니다.' },
+      { key: '이동 능력 손상 (2~4점)', val: '인지 및 이동이 모두 불가능한 와상 단계이므로, 침상에 누운 채 자동으로 대소변을 처리해주는 배설처리로봇(B-G, B-H) 기기를 대항 구축합니다.' }
     ]
   },
   toileting_q3_a1: {
     title: '용변 후 청결 마무리',
-    content: '용변을 마친 후 스스로 옷을 입고 항문 주변을 깨끗하게 닦아내 뒤처리를 끝마칠 수 있는지 측정합니다.',
+    content: '화장실까지 갈 수 있고 인지도 양호할 때, 용변 후 스스로 항문을 화장지로 닦아내고 바지와 속옷을 올바르게 제 위치로 정리할 수 있는지 손가락 미세 가동 능력과 관절의 꼬임 능력을 봅니다.',
     details: [
-      { key: '0~1점 (양호)', val: '자력 위생 뒤처리 완수 가능' },
-      { key: '2~4점 (장해)', val: '비데 세정 시스템이나 세정 보조 장치 필수' }
+      { key: '0~1점 (양호)', val: '위생 처리를 온전히 혼자서 하여 기기 도움 불필요 (B-A)' },
+      { key: '2~4점 (장해)', val: '어깨 결림이나 관절염 등으로 뒤처리가 힘들어 양변기 자동 온수 세정 비데(B-B) 도입 필요' }
     ]
   },
   toileting_q3_a2: {
     title: '용변 후 청결 마무리',
-    content: '화장실 이동은 불가해 침상 변기를 이용하는 상황에서 엉덩이 청결 닦기를 환자 스스로 수행할 수 있는지 평가합니다.',
+    content: '인지 지각은 양호하나 화장실까지 걸어가지 못할 때, 변기 착석을 도우면서 용변 처리를 완수할 수 있도록 뒤처리와 기립을 보완하는 단계를 결정합니다.',
     details: [
-      { key: '0~1점 (양호)', val: '침상 변기 이용 후 스스로 위생 뒤처리 가능' },
-      { key: '2~4점 (장해)', val: '침상 변기 및 보호자의 뒤처리 부축 연동' }
+      { key: '0~1점 (양호)', val: '변기 시트를 높이고 손잡이로 일어서기만 도우면 혼자 닦을 수 있어 양변기 전동 변기 리프트(B-C) 도입' },
+      { key: '2~4점 (장해)', val: '화장실 이동도 어렵고 용변 후 닦아줄 사람도 필요해 침대 옆에서 해결하는 이동 변기(B-D) 도입' }
     ]
   },
   toileting_q3_b1: {
@@ -319,40 +322,40 @@ const learningGuides: Record<string, { title: string; content: string; details: 
   }
 };
 
-// Node positioning and styling configurations
+// Node positioning and styling configurations (Detail Mode React Flow coordinates)
 const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 415, y: 20, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
-  'T-A': { x: 20, y: 180, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
-  'T-B': { x: 210, y: 180, label: "이승보조장비", isResult: true, typeLabel: "기기 추천" },
-  q2: { x: 620, y: 180, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
-  q4: { x: 420, y: 340, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
-  q3: { x: 780, y: 340, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
-  'T-C': { x: 320, y: 500, label: "전동형 기립보조리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-D': { x: 520, y: 500, label: "비전동형 기립보조기기", isResult: true, typeLabel: "기기 추천" },
-  q3_1: { x: 780, y: 500, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
-  q3_2: { x: 420, y: 660, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
-  'T-E': { x: 620, y: 660, label: "천장 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-F': { x: 810, y: 660, label: "벽 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-G': { x: 320, y: 820, label: "이동식 리프트", isResult: true, typeLabel: "기기 추천" },
-  'T-H': { x: 520, y: 820, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "기기 추천" },
+  q1: { x: 760, y: 0, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
+  q2: { x: 1520, y: 200, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
+  q4: { x: 965, y: 400, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
+  q3: { x: 2075, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
+  q3_1: { x: 2075, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
+  q3_2: { x: 2645, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
+  'T-A': { x: 0, y: 1000, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
+  'T-B': { x: 420, y: 1000, label: "이승보조장비", isResult: true, typeLabel: "기기 추천" },
+  'T-C': { x: 840, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "기기 추천" },
+  'T-D': { x: 1260, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "기기 추천" },
+  'T-E': { x: 1680, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
+  'T-F': { x: 2100, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "기기 추천" },
+  'T-H': { x: 2520, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "기기 추천" },
+  'T-G': { x: 2940, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "기기 추천" },
 };
 
 const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 415, y: 20, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
-  q2_a: { x: 200, y: 180, label: "화장실 이동에 어려움이 있나요? (A)", typeLabel: "이동 평가" },
-  q2_b: { x: 630, y: 180, label: "화장실 이동에 어려움이 있나요? (B)", typeLabel: "이동 평가" },
-  q3_a1: { x: 80, y: 340, label: "스스로 뒤처리를 할 수 있나요? (A1)", typeLabel: "뒤처리 평가" },
-  q3_a2: { x: 290, y: 340, label: "스스로 뒤처리를 할 수 있나요? (A2)", typeLabel: "뒤처리 평가" },
-  q3_b1: { x: 540, y: 340, label: "스스로 뒤처리를 할 수 있나요? (B1)", typeLabel: "뒤처리 평가" },
-  q3_b2: { x: 750, y: 340, label: "스스로 뒤처리를 할 수 있나요? (B2)", typeLabel: "뒤처리 평가" },
-  'B-A': { x: 10, y: 500, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
-  'B-B': { x: 135, y: 500, label: "비데", isResult: true, typeLabel: "기기 추천" },
-  'B-C': { x: 260, y: 500, label: "변기 리프트", isResult: true, typeLabel: "기기 추천" },
-  'B-D': { x: 385, y: 500, label: "이동 변기", isResult: true, typeLabel: "기기 추천" },
-  'B-E': { x: 505, y: 500, label: "배설 유도 프로그램", isResult: true, typeLabel: "기기 추천" },
-  'B-F': { x: 630, y: 500, label: "배설 프로그램 + 비데", isResult: true, typeLabel: "기기 추천" },
-  'B-G': { x: 755, y: 500, label: "자동배설로봇 (간헐)", isResult: true, typeLabel: "기기 추천" },
-  'B-H': { x: 880, y: 500, label: "스마트 기저귀 로봇", isResult: true, typeLabel: "기기 추천" },
+  q1: { x: 1385, y: 0, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
+  q2_a: { x: 545, y: 200, label: "화장실 이동에 어려움이 있나요? (A)", typeLabel: "이동 평가" },
+  q2_b: { x: 2225, y: 200, label: "화장실 이동에 어려움이 있나요? (B)", typeLabel: "이동 평가" },
+  q3_a1: { x: 125, y: 400, label: "스스로 뒤처리를 할 수 있나요? (A1)", typeLabel: "뒤처리 평가" },
+  q3_a2: { x: 965, y: 400, label: "스스로 뒤처리를 할 수 있나요? (A2)", typeLabel: "뒤처리 평가" },
+  q3_b1: { x: 1805, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B1)", typeLabel: "뒤처리 평가" },
+  q3_b2: { x: 2645, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B2)", typeLabel: "뒤처리 평가" },
+  'B-A': { x: 0, y: 600, label: "도움 불필요", isResult: true, typeLabel: "기기 추천" },
+  'B-B': { x: 420, y: 600, label: "비데", isResult: true, typeLabel: "기기 추천" },
+  'B-C': { x: 840, y: 600, label: "변기 리프트", isResult: true, typeLabel: "기기 추천" },
+  'B-D': { x: 1260, y: 600, label: "이동 변기", isResult: true, typeLabel: "기기 추천" },
+  'B-E': { x: 1680, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "기기 추천" },
+  'B-F': { x: 2100, y: 600, label: "배설 프로그램 + 비데", isResult: true, typeLabel: "기기 추천" },
+  'B-G': { x: 2520, y: 600, label: "자동배설로봇 (간헐)", isResult: true, typeLabel: "기기 추천" },
+  'B-H': { x: 2940, y: 600, label: "스마트 기저귀 로봇", isResult: true, typeLabel: "기기 추천" },
 };
 
 const transferEdges = [
@@ -361,64 +364,23 @@ const transferEdges = [
   { from: 'q1', to: 'q2', label: "2점 이상", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
   { from: 'q2', to: 'q3', label: "예 (지탱 불가)", condition: (ans: any) => ans['q2'] === 'yes' },
   { from: 'q2', to: 'q4', label: "아니오 (지탱 가능)", condition: (ans: any) => ans['q2'] === 'no' },
-  { 
-    from: 'q3', 
-    to: 'q3_1', 
-    label: "복수 환경", 
-    condition: (ans: any) => {
-      const selected = ans['q3'] || [];
-      const hasCeiling = selected.includes('ceiling');
-      const hasWall = selected.includes('wall');
-      const hasMovable = selected.includes('movable');
-      const fixedCount = [hasCeiling, hasWall].filter(Boolean).length;
-      return fixedCount >= 2 || (fixedCount >= 1 && hasMovable);
-    }
-  },
-  { 
-    from: 'q3', 
-    to: 'q3_2', 
-    label: "이동식만", 
-    condition: (ans: any) => {
-      const selected = ans['q3'] || [];
-      const hasCeiling = selected.includes('ceiling');
-      const hasWall = selected.includes('wall');
-      const hasMovable = selected.includes('movable');
-      const fixedCount = [hasCeiling, hasWall].filter(Boolean).length;
-      if (fixedCount >= 2 || (fixedCount >= 1 && hasMovable)) return false;
-      return !hasCeiling && !hasWall;
-    }
-  },
-  { 
-    from: 'q3', 
-    to: 'T-E', 
-    label: "천장형만", 
-    condition: (ans: any) => {
-      const selected = ans['q3'] || [];
-      const hasCeiling = selected.includes('ceiling');
-      const hasWall = selected.includes('wall');
-      const hasMovable = selected.includes('movable');
-      return hasCeiling && !hasWall && !hasMovable;
-    }
-  },
-  { 
-    from: 'q3', 
-    to: 'T-F', 
-    label: "벽형만", 
-    condition: (ans: any) => {
-      const selected = ans['q3'] || [];
-      const hasCeiling = selected.includes('ceiling');
-      const hasWall = selected.includes('wall');
-      const hasMovable = selected.includes('movable');
-      return hasWall && !hasCeiling && !hasMovable;
-    }
-  },
-  { from: 'q3_1', to: 'T-E', label: "사용 편의", condition: (ans: any) => ans['q3_1'] === 'convenience' },
+  { from: 'q4', to: 'T-C', label: "아니오 (상체 조절)", condition: (ans: any) => ans['q4'] === 'no' },
+  { from: 'q4', to: 'T-D', label: "예 (상체 조절 불가)", condition: (ans: any) => ans['q4'] === 'yes' },
+  { from: 'q3', to: 'T-E', label: "천장식 단독", condition: (ans: any) => (ans['q3'] || []).includes('ceiling') && !(ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
+  { from: 'q3', to: 'T-F', label: "벽식 단독", condition: (ans: any) => !(ans['q3'] || []).includes('ceiling') && (ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
+  { from: 'q3', to: 'q3_1', label: "복수 환경 지원", condition: (ans: any) => {
+      const sel = ans['q3'] || [];
+      const hasCeil = sel.includes('ceiling');
+      const hasWall = sel.includes('wall');
+      const hasMovable = sel.includes('movable');
+      return (hasCeil ? 1 : 0) + (hasWall ? 1 : 0) >= 2 || (((hasCeil ? 1 : 0) + (hasWall ? 1 : 0) >= 1) && hasMovable);
+    }},
+  { from: 'q3', to: 'q3_2', label: "천장/벽 공사 불가", condition: (ans: any) => !(ans['q3'] || []).includes('ceiling') && !(ans['q3'] || []).includes('wall') },
+  { from: 'q3_1', to: 'T-E', label: "편의성", condition: (ans: any) => ans['q3_1'] === 'convenience' },
   { from: 'q3_1', to: 'T-F', label: "비용 절감", condition: (ans: any) => ans['q3_1'] === 'cost' },
-  { from: 'q3_1', to: 'q3_2', label: "공사 최소", condition: (ans: any) => ans['q3_1'] === 'minimal' },
+  { from: 'q3_1', to: 'q3_2', label: "공사 최소화", condition: (ans: any) => ans['q3_1'] === 'minimal' },
   { from: 'q3_2', to: 'T-H', label: "프레임 가능", condition: (ans: any) => ans['q3_2'] === 'yes' },
-  { from: 'q3_2', to: 'T-G', label: "프레임 불가", condition: (ans: any) => ans['q3_2'] === 'no' },
-  { from: 'q4', to: 'T-C', label: "예", condition: (ans: any) => ans['q4'] === 'yes' },
-  { from: 'q4', to: 'T-D', label: "아니오", condition: (ans: any) => ans['q4'] === 'no' },
+  { from: 'q3_2', to: 'T-G', label: "프레임 불가", condition: (ans: any) => ans['q3_2'] === 'no' }
 ];
 
 const toiletingEdges = [
@@ -446,7 +408,162 @@ const getShortOptionText = (text: string) => {
   return parts[0].trim();
 };
 
-export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearnMore }: AlgorithmRunnerProps) {
+const optionDetails: Record<string, string> = {
+  'q1_0': '혼자서 아무런 도구와 도움 없이 자리를 옮기거나 인지 조절이 원활한 상태',
+  'q1_1': '약간 불안정하거나 가벼운 피로감이 있으나 대부분 자력으로 할 수 있는 상태',
+  'q1_2': '넘어짐 방지를 위해 보조 기구를 쓰거나 타인의 가벼운 손길/부축이 있는 상태',
+  'q1_3': '혼자서는 거의 어려워 전적인 지탱이나 부분적인 완전 보조가 자주 들어가는 상태',
+  'q1_4': '신체 협조가 전혀 불가하여 기계 장치나 다수의 제공자가 부축해야 하는 상태',
+  
+  'q2_yes': '다리에 힘이 없어 본인의 힘으로 서서 몸무게를 버티지 못합니다.',
+  'q2_no': '보호자가 부축해 주면 잔존 다리 힘으로 서 있거나 버티실 수 있습니다.',
+  
+  'q4_yes': '앉아 있을 때 허리와 고개가 꺾이고, 보조 손잡이를 꽉 잡지 못합니다.',
+  'q4_no': '앉은 상태에서 스스로 상체를 세우고, 리프트 앞 손잡이를 힘있게 잡을 수 있습니다.',
+
+  'q2a_0': '아무런 도움 없이도 안전하게 화장실까지 걸어서 가십니다.',
+  'q2a_1': '화장실까지 가실 때 가끔 흔들리지만 스스로 해결하십니다.',
+  'q2a_2': '낙상 예방을 위해 보행 보조기를 짚거나 보호자가 잡아주어야 합니다.',
+  'q2a_3': '다리에 힘이 약해 주로 휠체어를 부축해 옮겨 태워 가야 합니다.',
+  'q2a_4': '거동이 일절 불가능하여 침대를 전혀 벗어나지 못하십니다.',
+
+  'q2b_0': '아무런 도움 없이도 안전하게 화장실까지 걸어서 가십니다.',
+  'q2b_1': '화장실까지 가실 때 가끔 흔들리지만 스스로 해결하십니다.',
+  'q2b_2': '낙상 예방을 위해 보행 보조기를 짚거나 보호자가 잡아주어야 합니다.',
+  'q2b_3': '다리에 힘이 약해 주로 휠체어를 부축해 옮겨 태워 가야 합니다.',
+  'q2b_4': '거동이 일절 불가능하여 침대를 전혀 벗어나지 못하십니다.',
+
+  'q3a1_0': '화장실 용변 후에 혼자서 닦고 옷 입기까지 완벽히 해내십니다.',
+  'q3a1_1': '약간 서툴거나 시간이 지체되지만 스스로 닦고 옷 정리를 하십니다.',
+  'q3a1_2': '손에 힘이 없거나 통증으로 인해 엉덩이를 닦아줄 때 가벼운 부축이 필요합니다.',
+  'q3a1_3': '용변 뒤처리를 보호자가 물티슈 등으로 다 닦아주고 옷도 정리해 주어야 합니다.',
+  'q3a1_4': '스스로 위생 관리를 하려는 의도나 시도 자체가 불가능한 중증 상태입니다.',
+
+  'q3a2_0': '화장실 용변 후에 혼자서 닦고 옷 입기까지 완벽히 해내십니다.',
+  'q3a2_1': '약간 서툴거나 시간이 지체되지만 스스로 닦고 옷 정리를 하십니다.',
+  'q3a2_2': '손에 힘이 없거나 통증으로 인해 엉덩이를 닦아줄 때 가벼운 부축이 필요합니다.',
+  'q3a2_3': '용변 뒤처리를 보호자가 물티슈 등으로 다 닦아주고 옷도 정리해 주어야 합니다.',
+  'q3a2_4': '스스로 위생 관리를 하려는 의도나 시도 자체가 불가능한 중증 상태입니다.',
+
+  'q3b1_0': '화장실 용변 후에 혼자서 닦고 옷 입기까지 완벽히 해내십니다.',
+  'q3b1_1': '약간 서툴거나 시간이 지체되지만 스스로 닦고 옷 정리를 하십니다.',
+  'q3b1_2': '손에 힘이 없거나 통증으로 인해 엉덩이를 닦아줄 때 가벼운 부축이 필요합니다.',
+  'q3b1_3': '용변 뒤처리를 보호자가 물티슈 등으로 다 닦아주고 옷도 정리해 주어야 합니다.',
+  'q3b1_4': '스스로 위생 관리를 하려는 의도나 시도 자체가 불가능한 중증 상태입니다.',
+
+  'q3b2_0': '화장실 용변 후에 혼자서 닦고 옷 입기까지 완벽히 해내십니다.',
+  'q3b2_1': '약간 서툴거나 시간이 지체되지만 스스로 닦고 옷 정리를 하십니다.',
+  'q3b2_2': '손에 힘이 없거나 통증으로 인해 엉덩이를 닦아줄 때 가벼운 부축이 필요합니다.',
+  'q3b2_3': '용변 뒤처리를 보호자가 물티슈 등으로 다 닦아주고 옷도 정리해 주어야 합니다.',
+  'q3b2_4': '스스로 위생 관리를 하려는 의도나 시도 자체가 불가능한 중증 상태입니다.',
+
+  'q3_ceiling': '천장 레일 및 슬링 모터 장착을 위한 튼튼한 하중 공사가 가능합니다.',
+  'q3_wall': '방 또는 화장실에 관절식 회전 암 지지대를 박아 고정할 옹벽이 있습니다.',
+  'q3_movable': '집을 훼손하거나 타공을 뚫는 공사는 일절 어려운 환경입니다.',
+  'q3_narrow': '침대 밑 공간이 막혀 있거나 휠체어 회전 반경이 좁아 주행이 어렵습니다.',
+  'q3_home': '보호자 1인이 돌보는 일반 단독주택이나 아파트 가정 환경입니다.',
+  'q3_facility': '이동 통로가 넓고 턱이 없는 요양원, 요양병원 등 전문 의료기관입니다.'
+};
+
+const CustomNode = ({ data }: { data: any }) => {
+  const {
+    id,
+    label,
+    typeLabel,
+    isResult,
+    isActive,
+    isCompleted,
+    isHighlightedResult,
+    nodeW,
+    nodeH,
+    options,
+    type,
+    onNodeClick,
+    onSingleSelect,
+    onMultiSelectClick,
+    completedText,
+  } = data;
+
+  return (
+    <div
+      onClick={() => onNodeClick(id)}
+      className={`flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
+        isHighlightedResult
+          ? 'border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default'
+          : isActive
+            ? 'border-primary bg-white shadow-md ring-2 ring-primary/10 z-20 cursor-default scale-[1.02]'
+            : isCompleted
+              ? 'border-slate-300 bg-white hover:border-primary/50 shadow-sm cursor-pointer hover:shadow'
+              : 'border-slate-100 bg-white opacity-40 grayscale pointer-events-none'
+      }`}
+      style={{
+        width: `${nodeW}px`,
+        minHeight: `${nodeH}px`,
+      }}
+    >
+      <Handle type="target" position={Position.Top} style={{ background: '#cbd5e1', width: '8px', height: '8px' }} />
+      <div className="space-y-1">
+        <div className="flex justify-between items-center w-full">
+          <span className={`text-[8px] font-black uppercase tracking-wider ${
+            isHighlightedResult ? 'text-white/80' : isActive ? 'text-primary' : 'text-slate-400'
+          }`}>
+            {typeLabel}
+          </span>
+          
+          {isCompleted && (
+            <span className="text-emerald-500 bg-emerald-50 w-3.5 h-3.5 rounded-full flex items-center justify-center border border-emerald-200">
+              <Check className="w-2.5 h-2.5 stroke-[4]" />
+            </span>
+          )}
+        </div>
+
+        <h4 className={`text-xs leading-snug font-bold ${
+          isHighlightedResult ? 'text-white' : 'text-slate-800'
+        }`}>
+          {label}
+        </h4>
+      </div>
+
+      {isActive && !isResult && (
+        <div className="pt-2 flex flex-wrap gap-1 border-t border-slate-100 mt-1 shrink-0">
+          {type === 'single' ? (
+            options.map((opt: any) => (
+              <button
+                key={opt.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSingleSelect(id, opt.value);
+                }}
+                className="flex-1 text-[8px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-center whitespace-nowrap cursor-pointer"
+              >
+                {getShortOptionText(opt.text)}
+              </button>
+            ))
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMultiSelectClick(id);
+              }}
+              className="w-full text-[8px] sm:text-[9px] font-extrabold py-0.5 rounded bg-primary text-white text-center hover:bg-primary-dark transition-colors cursor-pointer"
+            >
+              오른쪽 패널에서 조건 입력
+            </button>
+          )}
+        </div>
+      )}
+
+      {isCompleted && !isResult && completedText && (
+        <div className="text-[9px] text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10 mt-1 truncate font-bold text-center">
+          {completedText}
+        </div>
+      )}
+      <Handle type="source" position={Position.Bottom} style={{ background: '#cbd5e1', width: '8px', height: '8px' }} />
+    </div>
+  );
+};
+
+export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', onPathChange, onLearnMore }: AlgorithmRunnerProps) {
   const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(algorithm.startQuestionId);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [history, setHistory] = useState<string[]>([]);
@@ -479,14 +596,12 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
   const selectedGuide = selectedGuideQuestionId ? learningGuides[getGuideKey(selectedGuideQuestionId)] : null;
 
   const handleSingleSelect = (qId: string, optionValue: string) => {
-    // If user interacts with a question that is NOT the active one, we should reset history to this node first
     let currentHistory = [...history];
     let currentAnswers = { ...answers };
 
     if (history.includes(qId)) {
       const idx = history.indexOf(qId);
       currentHistory = history.slice(0, idx);
-      // Remove stale answers
       history.slice(idx).forEach(id => {
         delete currentAnswers[id];
       });
@@ -612,6 +727,30 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
     }
   };
 
+  const handlePrevQuestion = () => {
+    if (history.length === 0) return;
+    const lastQuestionId = history[history.length - 1];
+    const newHistory = history.slice(0, -1);
+    const newAnswers = { ...answers };
+    delete newAnswers[lastQuestionId];
+
+    setAnswers(newAnswers);
+    setHistory(newHistory);
+    setResultId(null);
+    setCurrentQuestionId(lastQuestionId);
+    
+    const prevQuestion = algorithm.questions[lastQuestionId];
+    if (prevQuestion && prevQuestion.type === 'multi') {
+      setTempMultiSelect(newAnswers[lastQuestionId] || []);
+    } else {
+      setTempMultiSelect([]);
+    }
+
+    if (onPathChange) {
+      onPathChange(newHistory);
+    }
+  };
+
   const handleReset = () => {
     setCurrentQuestionId(algorithm.startQuestionId);
     setAnswers({});
@@ -626,28 +765,25 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
 
   // Node dimensions config
   const getNodeWidth = (id: string) => {
-    if (!isTransfer && id.startsWith('B-')) return 110; // toileting results are slightly slimmer
-    return 170; // increased from 160 to prevent text wrapping/overflow
+    if (!isTransfer && id.startsWith('B-')) return 110;
+    return 170;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
     if (node?.isResult) return 76;
-    return 96; // increased from 84 for questions to fit titles and quick-action/selected badges comfortably
+    return 96;
   };
 
-  // Path Bezier curve calculation
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
     const controlY = y1 + (y2 - y1) * 0.45;
     return `M ${x1} ${y1} C ${x1} ${controlY}, ${x2} ${y1 + (y2 - y1) * 0.55}, ${x2} ${y2}`;
   };
 
-  // Check if an edge is active on user's traversed path
   const isEdgeActive = (edge: typeof edges[0]) => {
     if (!history.includes(edge.from)) return false;
     return edge.condition(answers);
   };
 
-  // Check if a node is completed, active, or inactive
   const getNodeStatus = (nodeId: string) => {
     if (nodeId === resultId) return 'result-active';
     if (nodeId === currentQuestionId) return 'active';
@@ -655,18 +791,248 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
     return 'inactive';
   };
 
+  // Render Simple UI Mode (Single Card Wizard)
+  if (uiMode === 'simple') {
+    return (
+      <div className="w-full max-w-2xl mx-auto space-y-6">
+        {/* Simple Progress Bar */}
+        <div className="flex justify-between items-center bg-white border border-slate-200 rounded-2xl px-5 py-3.5 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 tracking-wide">
+              {resultId ? '진단 완료' : `단계 ${history.length + 1}`}
+            </span>
+            <span className="text-xs font-bold text-slate-500">
+              {resultId ? '나의 추천 결과를 확인하세요' : '아래 질문에 답해 주세요'}
+            </span>
+          </div>
+          <button
+            onClick={handleReset}
+            className="px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 hover:border-red-200 border border-slate-200 bg-white rounded-xl shadow-sm transition-all flex items-center gap-1 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>처음부터 다시</span>
+          </button>
+        </div>
+
+        {/* Wizard Main Card */}
+        {resultId ? (
+          // Matched Recommendation screen
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col">
+            <div className="bg-primary px-6 py-5 text-white">
+              <span className="text-xs font-black text-white/80 uppercase tracking-widest block mb-0.5">매칭 추천 결과</span>
+              <h3 className="font-extrabold text-lg sm:text-xl leading-tight">나에게 맞는 추천 기기</h3>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              {/* Result Title */}
+              <div className="text-center pb-5 border-b border-slate-100 space-y-2">
+                <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                  추천 장치
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
+                  {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
+                </h2>
+                {resultDetails[resultId]?.deviceName && (
+                  <span className="text-sm font-semibold text-slate-400 block pt-1">
+                    ({algorithm.results[resultId]?.title})
+                  </span>
+                )}
+              </div>
+
+              {/* Device Image */}
+              {resultDetails[resultId]?.image ? (
+                <div className="relative mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
+                  <Image
+                    src={resultDetails[resultId].image}
+                    alt={resultDetails[resultId].deviceName}
+                    fill
+                    className="object-contain p-2"
+                    priority
+                  />
+                </div>
+              ) : (
+                <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 text-sm">
+                  이미지 준비 중
+                </div>
+              )}
+
+              {/* Simple summary & description */}
+              <div className="space-y-6 text-left">
+                <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">쉽게 보는 추천 이유</h4>
+                  <p className="text-slate-700 font-extrabold leading-relaxed text-base sm:text-lg">
+                    {algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
+                  </p>
+                </div>
+
+                {/* simpleTips warning list */}
+                {algorithm.results[resultId]?.simpleTips && (
+                  <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-sm font-black text-amber-800 flex items-center gap-1.5 uppercase">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      이것만은 꼭 알아두세요! (기기 특징 및 주의사항)
+                    </h4>
+                    <ul className="space-y-2 text-slate-800 font-bold text-sm sm:text-base list-disc pl-5 leading-relaxed">
+                      {algorithm.results[resultId].simpleTips.map((tip, idx) => (
+                        <li key={idx}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-100">
+                {onLearnMore && (
+                  <button
+                    onClick={() => onLearnMore(resultId)}
+                    className="flex-1 py-4 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg cursor-pointer"
+                  >
+                    <span>상세 기기 정보 더 알아보기</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={handleReset}
+                  className="py-4 px-6 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-sm transition-colors cursor-pointer"
+                >
+                  처음부터 다시 진단하기
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Question card
+          currentQuestion && (
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-fade-in flex flex-col text-left">
+              {/* Question title & simpleDescription */}
+              <div className="space-y-3">
+                <span className="text-xs font-black text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20 inline-block">
+                  질문 {history.length + 1}
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-snug">
+                  {currentQuestion.title}
+                </h3>
+                {currentQuestion.simpleDescription && (
+                  <p className="text-sm sm:text-base text-slate-500 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    💡 {currentQuestion.simpleDescription}
+                  </p>
+                )}
+              </div>
+
+              {/* Render Options */}
+              {currentQuestion.type === 'single' ? (
+                <div className="space-y-3">
+                  {currentQuestion.options.map((opt) => {
+                    const detailText = optionDetails[opt.id];
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleSingleSelect(currentQuestion.id, opt.value)}
+                        className="w-full text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-200 hover:border-primary hover:bg-primary/5 transition-all flex flex-col justify-between items-start group font-bold text-slate-800 cursor-pointer shadow-sm"
+                      >
+                        <div className="flex w-full justify-between items-center gap-2">
+                          <span className="text-base sm:text-lg">{opt.text}</span>
+                          <div className="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-primary group-hover:bg-primary transition-all shrink-0">
+                            <div className="w-2.5 h-2.5 rounded-full bg-white scale-0 group-hover:scale-100 transition-transform" />
+                          </div>
+                        </div>
+                        {detailText && (
+                          <span className="text-xs sm:text-sm text-slate-400 font-medium leading-normal pt-1.5 group-hover:text-primary/70 transition-colors">
+                            {detailText}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3">
+                    {currentQuestion.options.map((opt) => {
+                      const isChecked = tempMultiSelect.includes(opt.value);
+                      const detailText = optionDetails[opt.id];
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleMultiToggle(opt.value)}
+                          className={`text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex flex-col justify-between items-start font-bold cursor-pointer shadow-sm ${
+                            isChecked
+                              ? 'border-primary bg-primary/5 text-primary'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="flex w-full justify-between items-center gap-2">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all shrink-0 ${
+                                isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                              }`}>
+                                {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                              </div>
+                              <span className="text-base sm:text-lg leading-snug">{opt.text}</span>
+                            </div>
+                          </div>
+                          {detailText && (
+                            <span className={`text-xs sm:text-sm font-medium leading-normal pt-1.5 pl-8 ${
+                              isChecked ? 'text-primary/70' : 'text-slate-400'
+                            }`}>
+                              {detailText}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    onClick={() => handleMultiSubmit(currentQuestion.id)}
+                    disabled={tempMultiSelect.length === 0}
+                    className="w-full py-4 rounded-xl bg-primary text-white font-extrabold text-sm hover:bg-primary-dark transition-all flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <span>선택 완료하고 다음 질문으로</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Navigation Back / Reset */}
+              <div className="flex justify-between items-center pt-6 border-t border-slate-100">
+                {history.length > 0 ? (
+                  <button
+                    onClick={handlePrevQuestion}
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold text-xs sm:text-sm transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>이전 질문으로</span>
+                  </button>
+                ) : <div />}
+                
+                <button
+                  onClick={handleReset}
+                  className="px-5 py-2.5 rounded-xl text-slate-400 hover:text-red-500 font-bold text-xs sm:text-sm transition-all cursor-pointer"
+                >
+                  자가진단 처음부터 다시 하기
+                </button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    );
+  }
+
+  // Render Detailed UI Mode (React Flow interactive flowchart)
   return (
     <div className="w-full space-y-6">
       
       {/* Top Header Panel */}
-      <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200/80 rounded-2xl px-6 py-4 shadow-sm gap-4">
-        <div>
+      <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm gap-4">
+        <div className="text-left">
           <span className="text-xs font-black text-primary uppercase tracking-wider block mb-0.5">자가 진단 및 흐름 학습</span>
           <h3 className="text-sm font-bold text-slate-700 leading-snug">아래 지도의 카드들을 클릭하며 분기를 직접 탐색해 보세요.</h3>
         </div>
         <button
           onClick={handleReset}
-          className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 hover:border-red-200 border border-slate-200 bg-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+          className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 hover:border-red-200 border border-slate-200 bg-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>진단 초기화</span>
@@ -755,7 +1121,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                       y={midY - 12}
                       width={100}
                       height={24}
-                      className="overflow-visible pointer-events-none"
+                      className="foreign-object overflow-visible pointer-events-none"
                     >
                       <div className="w-full h-full flex items-center justify-center">
                         <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight transition-all duration-300 ${
@@ -820,8 +1186,8 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                           )}
                         </div>
 
-                        {/* Title (Always 자연어) */}
-                        <h4 className={`text-xs leading-snug font-bold ${
+                        {/* Title */}
+                        <h4 className={`text-xs leading-snug font-bold text-left ${
                           isHighlightedResult ? 'text-white' : 'text-slate-800'
                         }`}>
                           {node.label}
@@ -839,7 +1205,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                                   e.stopPropagation();
                                   handleSingleSelect(id, opt.value);
                                 }}
-                                className="flex-1 text-[8px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-center whitespace-nowrap"
+                                className="flex-1 text-[8px] sm:text-[9px] font-extrabold px-1 py-0.5 rounded bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-center whitespace-nowrap cursor-pointer"
                               >
                                 {getShortOptionText(opt.text)}
                               </button>
@@ -847,10 +1213,10 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                           ) : (
                             <button
                               onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedGuideQuestionId(id);
+                                  e.stopPropagation();
+                                  setSelectedGuideQuestionId(id);
                               }}
-                              className="w-full text-[8px] sm:text-[9px] font-extrabold py-0.5 rounded bg-primary text-white text-center hover:bg-primary-dark transition-colors"
+                              className="w-full text-[8px] sm:text-[9px] font-extrabold py-0.5 rounded bg-primary text-white text-center hover:bg-primary-dark transition-colors cursor-pointer"
                             >
                               오른쪽 패널에서 조건 입력
                             </button>
@@ -888,13 +1254,13 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
           
           {/* Active Result screen (Shown when resultId exists) */}
           {resultId ? (
-            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-md overflow-hidden animate-fade-in flex flex-col">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col">
               <div className="bg-primary px-6 py-4 text-white">
                 <span className="text-[10px] font-black text-white/80 uppercase tracking-widest block">자가 진단 최종 매칭</span>
                 <h3 className="font-extrabold text-sm sm:text-base leading-tight">자가평가 결과</h3>
               </div>
 
-              <div className="p-6 space-y-6 flex-1">
+              <div className="p-6 space-y-6 flex-1 text-left">
                 {/* Result Title */}
                 <div className="text-center pb-5 border-b border-slate-100 space-y-2">
                   <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
@@ -923,7 +1289,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                 )}
 
                 {/* Rich Details List */}
-                <div className="space-y-5 text-left text-xs leading-normal">
+                <div className="space-y-5 text-xs leading-normal">
                   {/* When to use */}
                   <div className="space-y-1">
                     <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">언제 사용하는가?</h5>
@@ -990,15 +1356,15 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                   {onLearnMore && (
                     <button
                       onClick={() => onLearnMore(resultId)}
-                      className="w-full py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg scale-[1.01]"
+                      className="w-full py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 hover:shadow-lg scale-[1.01] cursor-pointer"
                     >
-                      <span>상세 정보 및 영상 더 알아보기</span>
+                      <span>상세 기기 정보 더 알아보기</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   )}
                   <button
                     onClick={handleReset}
-                    className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-xs transition-colors"
+                    className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                   >
                     새로운 진단 시작하기
                   </button>
@@ -1007,8 +1373,8 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
             </div>
           ) : (
             /* Question/Guide Detail Panel (Shown during traversal) */
-            <div className="space-y-6">
-              {/* Question panel with selection list (especially important for q3 multi-select) */}
+            <div className="space-y-6 text-left">
+              {/* Question panel with selection list */}
               {currentQuestion && (
                 <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-5 animate-fade-in">
                   <div className="space-y-1.5">
@@ -1027,7 +1393,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                         <button
                           key={opt.id}
                           onClick={() => handleSingleSelect(currentQuestion.id, opt.value)}
-                          className="w-full text-left p-3.5 rounded-xl border border-slate-100 hover:border-primary hover:bg-primary/5 transition-all flex justify-between items-center group font-bold text-slate-700 text-xs"
+                          className="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all flex justify-between items-center group font-bold text-slate-700 text-xs bg-white cursor-pointer"
                         >
                           <span>{opt.text}</span>
                           <div className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center group-hover:border-primary group-hover:bg-primary transition-all shrink-0">
@@ -1045,13 +1411,13 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                             <button
                               key={opt.id}
                               onClick={() => handleMultiToggle(opt.value)}
-                              className={`text-left p-3 rounded-xl border transition-all flex items-center gap-3 font-bold text-xs ${
+                              className={`text-left p-3 rounded-xl border transition-all flex items-center gap-3 font-bold text-xs cursor-pointer ${
                                 isChecked
-                                  ? 'border-primary bg-primary/5 text-primary'
-                                  : 'border-slate-100 bg-white text-slate-600 hover:border-slate-200'
+                                  ? 'border-primary bg-primary/5 text-primary font-black'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                               }`}
                             >
-                              <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all ${
+                              <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all shrink-0 ${
                                 isChecked ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
                               }`}>
                                 {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
@@ -1064,7 +1430,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                       <button
                         onClick={() => handleMultiSubmit(currentQuestion.id)}
                         disabled={tempMultiSelect.length === 0}
-                        className="w-full py-2.5 rounded-xl bg-primary text-white font-extrabold text-xs hover:bg-primary-dark transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-2.5 rounded-xl bg-primary text-white font-extrabold text-xs hover:bg-primary-dark transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
                         <span>선택 완료</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -1076,7 +1442,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
 
               {/* Detailed Explanation Panel for current clicked guide */}
               {selectedGuide ? (
-                <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4 animate-fade-in">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 animate-fade-in">
                   <div className="flex items-center gap-1.5 text-primary">
                     <Info className="w-4 h-4 shrink-0" />
                     <h4 className="font-extrabold text-sm leading-tight">
@@ -1098,7 +1464,7 @@ export default function AlgorithmRunner({ algorithm, mode, onPathChange, onLearn
                   </div>
                 </div>
               ) : (
-                <div className="bg-white border border-slate-200/80 rounded-3xl p-6 text-center shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-sm">
                   <p className="text-xs text-slate-400 font-semibold">알고리즘 단계를 선택하시면 임상 평가 기준과 설명이 여기에 표시됩니다.</p>
                 </div>
               )}
