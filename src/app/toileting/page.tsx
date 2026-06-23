@@ -11,12 +11,38 @@ import { toiletingCases } from '@/data/cases/toiletingCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
+import CareIllustrationCard from '@/components/CareIllustrationCard';
+import CareScenarioGrid from '@/components/CareScenarioGrid';
+import CareSafetyCard from '@/components/CareSafetyCard';
+
+const toiletingScenarios = [
+  { type: 'express-need' as const, title: '배설 신호 인지', description: '소변이나 대변이 마려운 감각을 올바르게 느끼고 의사를 조율합니다.' },
+  { type: 'move-difficulty' as const, title: '화장실 이동', description: '침대에서 일어나 화장실 변기까지 안전하게 이동을 돕습니다.' },
+  { type: 'bedside-toileting' as const, title: '침상 간이 변기', description: '화장실까지 가기 곤란한 대상자를 위해 침상 옆 간이 변기 사용을 보조합니다.' },
+  { type: 'clean-after' as const, title: '뒤처리 및 의복 정리', description: '용변 후 깨끗한 뒤처리와 바지를 입고 벗는 것을 세심하게 케어합니다.' }
+];
+
+const toiletingSafetyItems = [
+  { id: 't-s1', title: '개인 프라이버시 보호', description: '수치심을 유발하지 않게 항상 가림막이나 문을 잘 닫아 드립니다.', illustrationType: 'privacy-protection' as const },
+  { id: 't-s2', title: '변기 고정 및 높이 맞춤', description: '이동식 변기의 바퀴를 잠그고 침대와의 높이 편차를 줄여 고정합니다.', illustrationType: 'safety-check' as const },
+  { id: 't-s3', title: '이동로 장애물 제거', description: '바닥의 물기나 미끄러운 신발, 걸려 넘어질 물건을 모두 치웁니다.', illustrationType: 'move-difficulty' as const },
+  { id: 't-s4', title: '도움 과정 미리 알리기', description: '갑자기 몸을 만지기 전에 진행하려는 과정을 대상자에게 먼저 상냥히 설명합니다.', illustrationType: 'caregiver-prep' as const },
+  { id: 't-s5', title: '철저한 소독 및 위생', description: '배설 즉시 소독 및 환기를 진행하고 용기 수거 등 위생을 정돈합니다.', illustrationType: 'hygiene-manage' as const },
+];
 
 export default function ToiletingPage() {
   const [uiMode, setUiMode] = useState<'detail' | 'simple'>('detail');
   const [activeTab, setActiveTab] = useState<'info' | 'devices' | 'learning' | 'quiz'>('info');
   const [learningPath, setLearningPath] = useState<string[]>([]);
   const [showDetailedStandards, setShowDetailedStandards] = useState(false);
+
+  // Safety checklist state for simple mode Tab 4
+  const [checkedSafety, setCheckedSafety] = useState<Record<string, boolean>>({});
+  const [quizSafetyApproved, setQuizSafetyApproved] = useState(false);
+
+  const handleToggleSafety = (id: string) => {
+    setCheckedSafety(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Quiz state
   const [quizIndex, setQuizIndex] = useState(0);
@@ -144,6 +170,8 @@ export default function ToiletingPage() {
     setIsQuizSubmitted(false);
     setQuizScore(0);
     setQuizFinished(false);
+    setCheckedSafety({});
+    setQuizSafetyApproved(false);
   };
 
   const getToiletImage = (id: string) => {
@@ -213,19 +241,26 @@ export default function ToiletingPage() {
                     : toiletingEducationData.definition.content
                   }
                 </p>
-                <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">배설 영역 주요 5가지 관리 단계</h3>
-                  <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
-                    isSimple ? 'text-base sm:text-lg' : 'text-sm'
-                  }`}>
-                    {toiletingEducationData.definition.examples.map((ex, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>{ex}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {isSimple ? (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">배설 영역 주요 4가지 관리 단계</h3>
+                    <CareScenarioGrid scenarios={toiletingScenarios} />
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">배설 영역 주요 5가지 관리 단계</h3>
+                    <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
+                      isSimple ? 'text-base sm:text-lg' : 'text-sm'
+                    }`}>
+                      {toiletingEducationData.definition.examples.map((ex, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          <span>{ex}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {/* Standards Section */}
@@ -244,30 +279,25 @@ export default function ToiletingPage() {
                       환자분에게 딱 맞는 배설 보조기나 기저귀 로봇을 찾으려면 다음 세 가지 자립 능력을 먼저 확인해 보셔야 합니다.
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">1</div>
-                        <h3 className="text-lg font-bold text-slate-800">대소변 신호(인지력)</h3>
-                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                          스스로 소변이나 대변을 누고 싶다는 느낌(요의, 변의)을 느끼고 참거나 조절할 수 있는지 확인합니다.
-                        </p>
-                      </div>
-                      
-                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">2</div>
-                        <h3 className="text-lg font-bold text-slate-800">화장실 이동 능력</h3>
-                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                          침대에서 일어나 화장실 변기까지 스스로 걷거나 휠체어를 안전하게 조작해 진입할 수 있는지 확인합니다.
-                        </p>
-                      </div>
-
-                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">3</div>
-                        <h3 className="text-lg font-bold text-slate-800">위생 뒤처리 능력</h3>
-                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                          용변을 다 본 후에 휴지를 꺼내 스스로 엉덩이를 깨끗하게 닦아내거나 바지를 올릴 힘이 있는지 확인합니다.
-                        </p>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                      <CareIllustrationCard
+                        type="express-need"
+                        title="1. 대소변 신호(인지력)"
+                        description="스스로 소변이나 대변을 보고 싶다는 감각을 인지하고 조절할 수 있는지 확인합니다."
+                        size="sm"
+                      />
+                      <CareIllustrationCard
+                        type="move-difficulty"
+                        title="2. 화장실 이동 능력"
+                        description="침대에서 일어나 화장실 변기까지 스스로 걷거나 안전하게 진입할 수 있는지 확인합니다."
+                        size="sm"
+                      />
+                      <CareIllustrationCard
+                        type="clean-after"
+                        title="3. 위생 뒤처리 능력"
+                        description="용변 후 스스로 휴지로 닦아내거나 바지를 내리고 올리는 신체 조절력을 확인합니다."
+                        size="sm"
+                      />
                     </div>
 
                     {/* Collapsible detailed standards */}
@@ -363,6 +393,7 @@ export default function ToiletingPage() {
                     targetLevel: '화장실 자력 이동 가능 & 뒤처리 제한 (비데 적합)',
                     simpleDescription: '혼자 화장실에 가실 수는 있지만 손 움직임이 둔하여 휴지로 깨끗하게 닦는 일만 어려워하실 때 자동으로 씻겨주는 기기입니다.',
                     devices: toiletingEducationData.devices.list.filter(d => d.category === '위생 케어'),
+                    actionBadge: '세정 및 위생',
                   },
                   {
                     name: '이동 및 자세 보조',
@@ -370,6 +401,7 @@ export default function ToiletingPage() {
                     targetLevel: '보행 장애 (변기 리프트 / 이동 변기 적합)',
                     simpleDescription: '용변 신호는 아시지만 변기까지 걷다가 넘어질 우려가 클 때, 변기 착석을 돕거나 침대 바로 옆에서 대소변을 보게 돕는 장치입니다.',
                     devices: toiletingEducationData.devices.list.filter(d => d.category === '이동 및 자세 보조'),
+                    actionBadge: '앉기 및 자세 보조',
                   },
                   {
                     name: '배설처리로봇',
@@ -377,6 +409,7 @@ export default function ToiletingPage() {
                     targetLevel: '와상 상태 & 대소변 조절 불가능 (자동배설로봇 / 스마트기저귀 적합)',
                     simpleDescription: '스스로 대소변 신호를 인지하지 못하고 온종일 누워 계시는 분들의 기저귀 대소변을 사람 손 없이 자동으로 세정하고 흡입하는 첨단 로봇입니다.',
                     devices: toiletingEducationData.devices.list.filter(d => d.category === '배설처리로봇'),
+                    actionBadge: '자동 흡입 및 수거',
                   },
                 ].map((cat) => {
                   const isOpen = openCats[cat.name];
@@ -393,6 +426,11 @@ export default function ToiletingPage() {
                             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                               {cat.targetLevel}
                             </span>
+                            {isSimple && (
+                              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                핵심 동작: {cat.actionBadge}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
                             {isSimple ? cat.simpleDescription : cat.description}
@@ -519,7 +557,36 @@ export default function ToiletingPage() {
           {/* Tab 4: 사례 테스트 */}
           {activeTab === 'quiz' && (
             <div className="max-w-3xl mx-auto w-full py-4 animate-fade-in">
-              {!quizFinished ? (
+              {isSimple && !quizSafetyApproved ? (
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-md space-y-6">
+                  <div className="space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-emerald-500 rounded-full inline-block" />
+                      안전한 배설돌봄을 위한 5대 약속
+                    </h2>
+                    <p className="text-sm text-slate-500 leading-relaxed font-semibold">
+                      대상자와 보호자 모두의 위생과 안전을 지키는 가장 확실한 습관입니다. 아래 수칙을 터치하여 모두 확인해 주세요.
+                    </p>
+                  </div>
+
+                  <CareSafetyCard
+                    items={toiletingSafetyItems}
+                    checkedItems={checkedSafety}
+                    onToggle={handleToggleSafety}
+                  />
+
+                  <div className="flex justify-end pt-6 border-t border-slate-200">
+                    <button
+                      onClick={() => setQuizSafetyApproved(true)}
+                      disabled={Object.keys(checkedSafety).length < toiletingSafetyItems.length || !Object.values(checkedSafety).every(Boolean)}
+                      className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-405 disabled:cursor-not-allowed text-white font-extrabold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>확인 완료 및 연습 시작하기</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : !quizFinished ? (
                 <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
                   <div className="bg-slate-100 h-1.5 w-full">
                     <div 

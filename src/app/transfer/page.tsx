@@ -11,12 +11,39 @@ import { transferCases } from '@/data/cases/transferCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
+import CareIllustrationCard from '@/components/CareIllustrationCard';
+import CareScenarioGrid from '@/components/CareScenarioGrid';
+import CareSafetyCard from '@/components/CareSafetyCard';
+
+const transferScenarios = [
+  { type: 'bed-to-wheelchair' as const, title: '침대 ↔ 휠체어 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 태우거나 침대로 이동시킵니다.' },
+  { type: 'wheelchair-to-bed' as const, title: '휠체어 ↔ 침대 이동', description: '휠체어에 앉아 계신 대상자를 침대로 다시 안전하게 눕힙니다.' },
+  { type: 'wheelchair-to-toilet' as const, title: '휠체어 ↔ 변기 이동', description: '화장실 변기나 간이 변기로 자리를 옮겨 배설을 돕습니다.' },
+  { type: 'bed-to-chair' as const, title: '침대 ↔ 의자 이동', description: '식사나 휴식을 위해 침대에서 의자나 다른 앉을 곳으로 이동을 지원합니다.' }
+];
+
+const transferSafetyItems = [
+  { id: 't-s1', title: '바퀴 고정하기', description: '휠체어와 침대의 바퀴 잠금 장치를 반드시 완전히 고정합니다.', illustrationType: 'safety-check' as const },
+  { id: 't-s2', title: '주변 장애물 제거', description: '이동 경로에 발에 걸리거나 미끄러질 물건이 없는지 완전히 치웁니다.', illustrationType: 'move-difficulty' as const },
+  { id: 't-s3', title: '진행 절차 미리 알리기', description: '대상자에게 옮겨 앉을 방향과 방법을 충분히 설명해 안심을 드립니다.', illustrationType: 'caregiver-assist' as const },
+  { id: 't-s4', title: '천천히 조작하기', description: '급하게 움직이지 않고 대상자의 몸 상태를 보며 천천히 안전하게 진행합니다.', illustrationType: 'bed-to-wheelchair' as const },
+  { id: 't-s5', title: '어지러움/통증 수시 확인', description: '이동 도중이나 이동 직후에 머리가 아프거나 어지러운지 대상자 상태를 확인합니다.', illustrationType: 'dizzy-warning' as const },
+];
+
 
 export default function TransferPage() {
   const [uiMode, setUiMode] = useState<'detail' | 'simple'>('detail');
   const [activeTab, setActiveTab] = useState<'info' | 'devices' | 'learning' | 'quiz'>('info');
   const [learningPath, setLearningPath] = useState<string[]>([]);
   const [showDetailedStandards, setShowDetailedStandards] = useState(false);
+
+  // Safety checklist state for simple mode Tab 4
+  const [checkedSafety, setCheckedSafety] = useState<Record<string, boolean>>({});
+  const [quizSafetyApproved, setQuizSafetyApproved] = useState(false);
+
+  const handleToggleSafety = (id: string) => {
+    setCheckedSafety(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Quiz state
   const [quizIndex, setQuizIndex] = useState(0);
@@ -144,6 +171,8 @@ export default function TransferPage() {
     setIsQuizSubmitted(false);
     setQuizScore(0);
     setQuizFinished(false);
+    setCheckedSafety({});
+    setQuizSafetyApproved(false);
   };
 
   const getSlingImage = (id: string) => {
@@ -216,19 +245,26 @@ export default function TransferPage() {
                     : transferEducationData.definition.content
                   }
                 </p>
-                <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
-                  <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
-                    isSimple ? 'text-base sm:text-lg' : 'text-sm'
-                  }`}>
-                    {transferEducationData.definition.examples.map((ex, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>{ex}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {isSimple ? (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
+                    <CareScenarioGrid scenarios={transferScenarios} />
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
+                    <ul className={`grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 ${
+                      isSimple ? 'text-base sm:text-lg' : 'text-sm'
+                    }`}>
+                      {transferEducationData.definition.examples.map((ex, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          <span>{ex}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {/* Standards Section */}
@@ -247,22 +283,19 @@ export default function TransferPage() {
                       환자분의 상태와 집안 환경에 꼭 맞는 이승 보조 기기를 찾기 위해 다음 두 가지를 중점적으로 체크해 보세요.
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">1</div>
-                        <h3 className="text-lg font-bold text-slate-800">자리이동 능력 체크</h3>
-                        <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                          침대에서 휠체어로 스스로 안전하게 넘어갈 수 있는지, 아니면 상당한 신체 지탱이나 전적인 기계 도움(리프트)이 요구되는지 살펴봅니다.
-                        </p>
-                      </div>
-                      
-                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">2</div>
-                        <h3 className="text-lg font-bold text-slate-800">다리 힘(체중 지탱) 체크</h3>
-                        <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                          보호자가 양손으로 겨드랑이 밑을 잡아 지탱해주었을 때, 환자 본인의 다리 힘으로 서 있을 수 있는지 확인합니다.
-                        </p>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                      <CareIllustrationCard
+                        type="move-difficulty"
+                        title="1. 스스로 자리이동이 가능한가요?"
+                        description="침대에서 휠체어로 스스로 넘어갈 수 있는지, 아니면 상당한 신체 지탱이나 전적인 기계 도움(리프트)이 요구되는지 살펴봅니다."
+                        size="sm"
+                      />
+                      <CareIllustrationCard
+                        type="caregiver-assist"
+                        title="2. 본인의 다리 힘으로 서 있을 수 있나요?"
+                        description="보호자가 겨드랑이를 지탱해주었을 때, 환자 본인의 다리 힘으로 체중을 지탱하고 일어설 수 있는지 확인합니다."
+                        size="sm"
+                      />
                     </div>
 
                     {/* Collapsible detailed standards */}
@@ -441,6 +474,7 @@ export default function TransferPage() {
                     targetLevel: '자리이동 가벼운 어려움 (MMT Grade IV ~ V)',
                     simpleDescription: '자리이동이 어느 정도 스스로 가능하지만 가끔 보충 지탱이 필요할 때 마찰을 줄여 옮겨주는 가벼운 판이나 부축 벨트입니다.',
                     devices: transferEducationData.devices.list.filter(d => d.category === '이승보조장비'),
+                    actionBadge: '옮겨 앉기',
                   },
                   {
                     name: '기립보조리프트 / 스탠딩리프트',
@@ -448,6 +482,7 @@ export default function TransferPage() {
                     targetLevel: '하지 지지 어려움 (Grade III 이하) & 상체 가누기 가능',
                     simpleDescription: '다리 힘이 약해 일어서기 곤란하지만 스스로 상체를 가누고 손을 잡고 버틸 수 있을 때, 기계 힘으로 세워주는 장치입니다.',
                     devices: transferEducationData.devices.list.filter(d => d.category === '기립보조리프트 / 스탠딩리프트'),
+                    actionBadge: '일어서기',
                   },
                   {
                     name: '전신슬링 리프트',
@@ -455,6 +490,7 @@ export default function TransferPage() {
                     targetLevel: '하지 지지 및 상체 가누기 불가 (Grade III 이하)',
                     simpleDescription: '다리와 허리 힘이 전혀 없어 스스로 자세를 유지할 수 없는 분을 그네식 전용 시트(슬링)로 감싸 완전히 들어 올려 옮겨주는 기기입니다.',
                     devices: transferEducationData.devices.list.filter(d => d.category === '전신슬링 리프트'),
+                    actionBadge: '공중 들어올리기',
                   },
                 ].map((cat) => {
                   const isOpen = openCats[cat.name];
@@ -471,6 +507,11 @@ export default function TransferPage() {
                             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                               {cat.targetLevel}
                             </span>
+                            {isSimple && (
+                              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                핵심 동작: {cat.actionBadge}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
                             {isSimple ? cat.simpleDescription : cat.description}
@@ -597,7 +638,36 @@ export default function TransferPage() {
           {/* Tab 4: 사례 테스트 */}
           {activeTab === 'quiz' && (
             <div className="max-w-3xl mx-auto w-full py-4 animate-fade-in">
-              {!quizFinished ? (
+              {isSimple && !quizSafetyApproved ? (
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-md space-y-6">
+                  <div className="space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 flex items-center gap-2">
+                      <span className="w-2.5 h-6 bg-emerald-500 rounded-full inline-block" />
+                      안전한 자리이동을 위한 5대 약속
+                    </h2>
+                    <p className="text-sm text-slate-500 leading-relaxed font-semibold">
+                      대상자와 보호자 모두의 안전을 지키는 가장 확실한 습관입니다. 아래 수칙을 터치하여 모두 확인해 주세요.
+                    </p>
+                  </div>
+
+                  <CareSafetyCard
+                    items={transferSafetyItems}
+                    checkedItems={checkedSafety}
+                    onToggle={handleToggleSafety}
+                  />
+
+                  <div className="flex justify-end pt-6 border-t border-slate-200">
+                    <button
+                      onClick={() => setQuizSafetyApproved(true)}
+                      disabled={Object.keys(checkedSafety).length < transferSafetyItems.length || !Object.values(checkedSafety).every(Boolean)}
+                      className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-405 disabled:cursor-not-allowed text-white font-extrabold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>확인 완료 및 연습 시작하기</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : !quizFinished ? (
                 <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
                   <div className="bg-slate-100 h-1.5 w-full">
                     <div 
