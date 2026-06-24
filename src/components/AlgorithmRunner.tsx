@@ -10,6 +10,14 @@ import Image from 'next/image';
 import { Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import SimpleResultCard from './SimpleResultCard';
+import { robotTypeInfo, resultToRobotTypeMap } from '../data';
+
+const getRobotTypeForResult = (resultId: string) => {
+  const mapping = resultToRobotTypeMap[resultId];
+  if (!mapping) return null;
+  const list = robotTypeInfo[mapping.category];
+  return list.find(r => r.id === mapping.robotTypeId) || null;
+};
 
 const simpleIconMap: Record<string, React.ReactNode> = {
   transfer: <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm"><Bed className="w-8 h-8" /></div>,
@@ -1183,7 +1191,30 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Render Map Explorer Mode
   if (uiMode === 'map') {
-    const selectedResultInfo = selectedGuideQuestionId ? resultDetails[selectedGuideQuestionId] : null;
+    const getMapResultInfo = (nodeId: string | null) => {
+      if (!nodeId) return null;
+      const robotType = getRobotTypeForResult(nodeId);
+      if (robotType) {
+        return {
+          deviceName: robotType.name,
+          image: robotType.image,
+          whenToUse: robotType.situations.join(', '),
+          situations: robotType.situations,
+          pros: robotType.functions,
+          precautions: robotType.cautions,
+          environment: robotType.examples && robotType.examples.length > 0 ? `예시 기기: ${robotType.examples.join(', ')}` : '',
+        };
+      }
+      const legacy = resultDetails[nodeId];
+      if (legacy) {
+        return {
+          ...legacy,
+          situations: legacy.whenToUse.split(', '),
+        };
+      }
+      return null;
+    };
+    const selectedResultInfo = selectedGuideQuestionId ? getMapResultInfo(selectedGuideQuestionId) : null;
     return (
       <div className="w-full space-y-6">
         {/* Top Header Panel */}
@@ -1367,37 +1398,41 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   </div>
                 )}
 
-                <div className="space-y-1 text-xs">
-                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">추천 상황</h5>
-                  <p className="text-slate-700 font-semibold leading-relaxed">
-                    {selectedResultInfo.whenToUse}
-                  </p>
+                <div className="space-y-1.5 text-xs">
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">적용 상황</h5>
+                  <ul className="space-y-1 text-slate-700 font-bold list-disc pl-4 leading-relaxed">
+                    {selectedResultInfo.situations.map((sit, idx) => (
+                      <li key={idx}>{sit}</li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주요 장점</h5>
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주요 기능</h5>
                   <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
-                    {selectedResultInfo.pros.slice(0, 2).map((pro, idx) => (
+                    {selectedResultInfo.pros.map((pro, idx) => (
                       <li key={idx}>{pro}</li>
                     ))}
                   </ul>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">유의사항</h5>
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">확인할 점</h5>
                   <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
-                    {selectedResultInfo.precautions.slice(0, 2).map((pre, idx) => (
+                    {selectedResultInfo.precautions.map((pre, idx) => (
                       <li key={idx}>{pre}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="space-y-1 pt-2 border-t border-slate-100 text-xs">
-                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">권장 환경</h5>
-                  <p className="text-slate-650 font-semibold leading-relaxed">
-                    {selectedResultInfo.environment}
-                  </p>
-                </div>
+                {selectedResultInfo.environment && (
+                  <div className="space-y-1 pt-2 border-t border-slate-100 text-xs">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">기타 정보</h5>
+                    <p className="text-slate-650 font-semibold leading-relaxed">
+                      {selectedResultInfo.environment}
+                    </p>
+                  </div>
+                )}
               </div>
             ) : selectedGuide ? (
               /* Display Question details */
@@ -1718,92 +1753,199 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               </div>
 
               <div className="p-6 space-y-6 flex-1">
-                {/* Result Title */}
-                <div className="text-center pb-5 border-b border-slate-100 space-y-2">
-                  <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                    최적 추천 돌봄로봇
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
-                    {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
-                  </h2>
-                </div>
+                {(() => {
+                  const robotType = getRobotTypeForResult(resultId);
+                  if (robotType) {
+                    return (
+                      <>
+                        {/* Result Title */}
+                        <div className="text-center pb-5 border-b border-slate-100 space-y-2">
+                          <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                            최적 추천 돌봄로봇 유형
+                          </span>
+                          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
+                            {robotType.name}
+                          </h2>
+                          <p className="text-xs sm:text-sm text-slate-650 font-bold leading-normal">
+                            {robotType.oneLine}
+                          </p>
+                        </div>
 
-                {/* Device representative Image */}
-                {resultDetails[resultId]?.image ? (
-                  <div className="relative mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
-                    <Image
-                      src={resultDetails[resultId].image}
-                      alt={resultDetails[resultId].deviceName}
-                      fill
-                      className="object-contain p-2 hover:scale-105 transition-transform duration-300"
-                      priority
-                    />
-                  </div>
-                ) : (
-                  <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-xs">
-                    이미지 준비 중
-                  </div>
-                )}
+                        {/* Device representative Image */}
+                        {robotType.image ? (
+                          <div className="relative mx-auto w-44 h-44 rounded-2xl bg-white border border-slate-100 flex items-center justify-center p-3">
+                            <img
+                              src={robotType.image}
+                              alt={robotType.name}
+                              className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                                const sibling = (e.target as HTMLElement).nextElementSibling;
+                                if (sibling) (sibling as HTMLElement).style.display = 'flex';
+                              }}
+                            />
+                            <div className="hidden flex-col items-center justify-center gap-2 text-slate-400">
+                              <Bot className="w-6 h-6" />
+                              <span className="text-[10px] font-bold">이미지 준비 중</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mx-auto w-44 h-44 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-xs">
+                            이미지 준비 중
+                          </div>
+                        )}
 
-                {/* Details layout: grid of 3 key cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  {/* When to use */}
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2 col-span-2">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">사용 조건 / 상황</h5>
-                    <p className="text-slate-700 font-semibold leading-relaxed text-sm">
-                      {resultDetails[resultId]?.whenToUse}
-                    </p>
-                  </div>
+                        {/* Details Layout */}
+                        <div className="grid grid-cols-1 gap-4 text-xs">
+                          {/* Applicability situations */}
+                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
+                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">적용 상황</h5>
+                            <ul className="space-y-1 text-slate-700 font-bold list-disc pl-4 leading-relaxed">
+                              {robotType.situations.map((sit, i) => (
+                                <li key={i}>{sit}</li>
+                              ))}
+                            </ul>
+                          </div>
 
-                  {/* Pros */}
-                  {resultDetails[resultId]?.pros && (
-                    <div className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 space-y-2">
-                      <h5 className="font-bold text-emerald-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
-                        <ThumbsUp className="w-3.5 h-3.5" />
-                        주요 장점
-                      </h5>
-                      <ul className="space-y-1 text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
-                        {resultDetails[resultId].pros.map((pro, idx) => (
-                          <li key={idx}>{pro}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                          {/* Split layout: Functions & Cautions */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-5 space-y-2">
+                              <h5 className="font-bold text-emerald-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                                주요 기능
+                              </h5>
+                              <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
+                                {robotType.functions.map((func, idx) => (
+                                  <li key={idx}>{func}</li>
+                                ))}
+                              </ul>
+                            </div>
 
-                  {/* Precautions */}
-                  {resultDetails[resultId]?.precautions && (
-                    <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-2">
-                      <h5 className="font-bold text-amber-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        사용 시 유의사항
-                      </h5>
-                      <ul className="space-y-1 text-amber-850 font-semibold list-disc pl-4 leading-relaxed">
-                        {resultDetails[resultId].precautions.map((pre, idx) => (
-                          <li key={idx}>{pre}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                            <div className="bg-amber-50/40 border border-amber-100 rounded-2xl p-5 space-y-2">
+                              <h5 className="font-bold text-amber-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                                확인할 점
+                              </h5>
+                              <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
+                                {robotType.cautions.map((caut, idx) => (
+                                  <li key={idx}>{caut}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
 
-                {/* Additional Clinical details */}
-                <div className="space-y-4 border-t border-slate-100 pt-6 text-xs leading-normal">
-                  <div className="space-y-1">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">매칭 매커니즘 / 임상 근거</h5>
-                    <p className="text-slate-600 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      {resultDetails[resultId]?.reason || algorithm.results[resultId]?.reason}
-                    </p>
-                  </div>
+                        {/* Examples & clinical reasons */}
+                        <div className="space-y-4 border-t border-slate-100 pt-6 text-xs leading-normal">
+                          {robotType.examples && robotType.examples.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-[10px] font-bold text-slate-400">예시 기기:</span>
+                              {robotType.examples.map((ex, i) => (
+                                <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
+                                  {ex}
+                                </span>
+                              ))}
+                            </div>
+                          )}
 
-                  {resultDetails[resultId]?.environment && (
-                    <div className="space-y-1">
-                      <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">설치 및 권장 주거 환경</h5>
-                      <p className="text-slate-750 font-extrabold">
-                        ✓ {resultDetails[resultId].environment}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                          <div className="space-y-1">
+                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">판단 사유 / 임상 근거</h5>
+                            <p className="text-slate-600 font-semibold leading-relaxed bg-slate-55 p-3 rounded-xl border border-slate-100">
+                              {algorithm.results[resultId]?.reason}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  }
+
+                  // Fallback to legacy result details (e.g. for None / general self-care results)
+                  return (
+                    <>
+                      {/* Result Title */}
+                      <div className="text-center pb-5 border-b border-slate-100 space-y-2">
+                        <span className="text-[9px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                          최적 추천 결과
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
+                          {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
+                        </h2>
+                      </div>
+
+                      {/* Device representative Image */}
+                      {resultDetails[resultId]?.image ? (
+                        <div className="relative mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
+                          <Image
+                            src={resultDetails[resultId].image}
+                            alt={resultDetails[resultId].deviceName}
+                            fill
+                            className="object-contain p-2 hover:scale-105 transition-transform duration-300"
+                            priority
+                          />
+                        </div>
+                      ) : (
+                        <div className="mx-auto w-48 h-48 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-xs">
+                          이미지 준비 중
+                        </div>
+                      )}
+
+                      {/* Details layout: grid of 3 key cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2 col-span-2">
+                          <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">사용 조건 / 상황</h5>
+                          <p className="text-slate-700 font-semibold leading-relaxed text-sm">
+                            {resultDetails[resultId]?.whenToUse}
+                          </p>
+                        </div>
+
+                        {resultDetails[resultId]?.pros && (
+                          <div className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 space-y-2">
+                            <h5 className="font-bold text-emerald-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                              주요 장점
+                            </h5>
+                            <ul className="space-y-1 text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
+                              {resultDetails[resultId].pros.map((pro, idx) => (
+                                <li key={idx}>{pro}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {resultDetails[resultId]?.precautions && (
+                          <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-2">
+                            <h5 className="font-bold text-amber-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              사용 시 유의사항
+                            </h5>
+                            <ul className="space-y-1 text-amber-850 font-semibold list-disc pl-4 leading-relaxed">
+                              {resultDetails[resultId].precautions.map((pre, idx) => (
+                                <li key={idx}>{pre}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Additional Clinical details */}
+                      <div className="space-y-4 border-t border-slate-100 pt-6 text-xs leading-normal">
+                        <div className="space-y-1">
+                          <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">매칭 매커니즘 / 임상 근거</h5>
+                          <p className="text-slate-600 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            {resultDetails[resultId]?.reason || algorithm.results[resultId]?.reason}
+                          </p>
+                        </div>
+
+                        {resultDetails[resultId]?.environment && (
+                          <div className="space-y-1">
+                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">설치 및 권장 주거 환경</h5>
+                            <p className="text-slate-750 font-extrabold">
+                              ✓ {resultDetails[resultId].environment}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* Action buttons */}
                 <div className="space-y-3 pt-6 border-t border-slate-100 mt-6 shrink-0">

@@ -63,3 +63,5 @@ export const algorithmsData: Record<string, AlgorithmData> = {
 };
 export type { Question, Result, CaseStudy, EducationData };
 export { toiletingCareAlgorithm, transferCareAlgorithm, feedingCareAlgorithm };
+
+export * from './robotTypes';

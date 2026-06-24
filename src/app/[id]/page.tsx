@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // Data layers
-import { algorithmsData } from '@/data';
+import { algorithmsData, robotTypeInfo } from '@/data';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
@@ -97,7 +97,7 @@ export default function AlgorithmPage({ params }: PageProps) {
     setIsFinished(false);
   };
 
-  const devicesList = algoData.education.devices.list;
+  const devicesList = robotTypeInfo[algoId] || [];
 
   const handlePrevDevice = () => {
     if (deviceIndex > 0) {
@@ -329,7 +329,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           <div className="h-0.5 bg-slate-100 w-full" />
 
           {/* Carousel Layout wrapper with fixed minimum height */}
-          <div className="relative flex items-center justify-between gap-2 sm:gap-4 select-none min-h-[580px] sm:min-h-[460px] md:min-h-[400px]">
+          <div className="relative flex items-center justify-between gap-2 sm:gap-4 select-none min-h-[640px] sm:min-h-[500px] md:min-h-[440px]">
             {/* Left Prev Arrow Button */}
             <button
               onClick={handlePrevDevice}
@@ -345,78 +345,89 @@ export default function AlgorithmPage({ params }: PageProps) {
                 
                 {/* Robot Image or Fallback container */}
                 <div className="md:col-span-4 flex justify-center self-center">
-                  <div className="relative w-full max-w-[160px] h-[160px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
-                    {getDeviceImage(devicesList[deviceIndex].id) ? (
+                  <div className="relative w-full max-w-[180px] h-[180px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
+                    {devicesList[deviceIndex]?.image ? (
                       <img
-                        src={getDeviceImage(devicesList[deviceIndex].id)}
+                        src={devicesList[deviceIndex].image}
                         alt={devicesList[deviceIndex].name}
                         className="w-full h-full object-contain"
+                        onError={(e) => {
+                          // Handle image load failure by resetting src or showing error text
+                          (e.target as HTMLElement).style.display = 'none';
+                          const sibling = (e.target as HTMLElement).nextElementSibling;
+                          if (sibling) (sibling as HTMLElement).style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <div className="text-center p-4 flex flex-col items-center justify-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
-                          <Bot className="w-5 h-5" />
-                        </div>
-                        <span className="text-[10px] font-bold text-slate-400 leading-normal">
-                          이미지 준비 중<br />({devicesList[deviceIndex].id})
-                        </span>
+                    ) : null}
+                    <div 
+                      className="text-center p-4 flex flex-col items-center justify-center gap-3"
+                      style={{ display: devicesList[deviceIndex]?.image ? 'none' : 'flex' }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
+                        <Bot className="w-5 h-5" />
                       </div>
-                    )}
+                      <span className="text-[10px] font-bold text-slate-400 leading-normal">
+                        이미지 준비 중
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Robot Details contents */}
                 <div className="md:col-span-8 space-y-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
-                      {devicesList[deviceIndex].category}
-                    </span>
-                    <span className="text-xs text-slate-400 font-semibold">
-                      코드: {devicesList[deviceIndex].id}
-                    </span>
-                  </div>
-
                   <div>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-none">
-                      {devicesList[deviceIndex].name}
+                      {devicesList[deviceIndex]?.name}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 font-bold mt-2 leading-relaxed">
-                      {devicesList[deviceIndex].description}
+                    <p className="text-xs sm:text-sm text-slate-600 font-bold mt-2 leading-relaxed">
+                      {devicesList[deviceIndex]?.oneLine}
                     </p>
                   </div>
 
-                  {/* Applicability targets bullets */}
+                  {/* Applicability situations bullets */}
                   <div className="space-y-1.5">
-                    <span className="text-xs font-bold text-slate-400 block">적용 대상자</span>
+                    <span className="text-xs font-bold text-slate-400 block">적용 상황</span>
                     <ul className="text-xs text-slate-600 font-bold list-disc list-inside space-y-0.5">
-                      {devicesList[deviceIndex].target.split('및').flatMap(s => s.split(',')).map(s => s.trim()).filter(Boolean).map((tgt, i) => (
-                        <li key={i} className="leading-relaxed">{tgt}</li>
+                      {devicesList[deviceIndex]?.situations.map((sit, i) => (
+                        <li key={i} className="leading-relaxed">{sit}</li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Left / Right Split Layout for Pros & Precautions */}
+                  {/* Left / Right Split Layout for Functions & Cautions */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    {/* Pros Box */}
+                    {/* Functions Box */}
                     <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-4">
-                      <span className="text-xs font-bold text-emerald-700 block mb-2">사용 장점</span>
+                      <span className="text-xs font-bold text-emerald-700 block mb-2">주요 기능</span>
                       <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
-                        {devicesList[deviceIndex].pros.map((pro, idx) => (
-                          <li key={idx}>{pro}</li>
+                        {devicesList[deviceIndex]?.functions.map((func, idx) => (
+                          <li key={idx}>{func}</li>
                         ))}
                       </ul>
                     </div>
 
-                    {/* Precautions Box */}
+                    {/* Cautions Box */}
                     <div className="bg-amber-50/40 border border-amber-100 rounded-xl p-4">
-                      <span className="text-xs font-bold text-amber-700 block mb-2">유의사항</span>
+                      <span className="text-xs font-bold text-amber-700 block mb-2">확인할 점</span>
                       <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
-                        {devicesList[deviceIndex].precautions.map((pre, idx) => (
-                          <li key={idx}>{pre}</li>
+                        {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
+                          <li key={idx}>{caut}</li>
                         ))}
                       </ul>
                     </div>
                   </div>
+
+                  {/* Example devices chip list */}
+                  {devicesList[deviceIndex]?.examples && devicesList[deviceIndex].examples!.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="text-[10px] font-bold text-slate-400">예시 기기:</span>
+                      {devicesList[deviceIndex].examples!.map((ex, i) => (
+                        <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
+                          {ex}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                 </div>
 
