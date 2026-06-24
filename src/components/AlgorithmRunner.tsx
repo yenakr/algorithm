@@ -471,38 +471,38 @@ const learningGuides: Record<string, { title: string; content: string; details: 
 
 // Node positioning and styling configurations (Detail Mode React Flow coordinates)
 const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 760, y: 0, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
-  q2: { x: 1520, y: 200, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
-  q4: { x: 965, y: 400, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
-  q3: { x: 2075, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
-  q3_1: { x: 2075, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
-  q3_2: { x: 2645, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
+  q1: { x: 450, y: 0, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
+  q2: { x: 775, y: 200, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
+  q4: { x: 500, y: 400, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
+  q3: { x: 1050, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
+  q3_1: { x: 1050, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
+  q3_2: { x: 1300, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
   'T-A': { x: 0, y: 1000, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-B': { x: 420, y: 1000, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-C': { x: 840, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-D': { x: 1260, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-E': { x: 1680, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-F': { x: 2100, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-H': { x: 2520, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-G': { x: 2940, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-B': { x: 200, y: 1000, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-C': { x: 400, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-D': { x: 600, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-E': { x: 800, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-F': { x: 1000, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-H': { x: 1200, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-G': { x: 1400, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 1385, y: 0, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
-  q2_a: { x: 545, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
-  q2_b: { x: 2225, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
-  q3_a1: { x: 125, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
-  q3_a2: { x: 965, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
-  q3_b1: { x: 1805, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
-  q3_b2: { x: 2645, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q1: { x: 700, y: 0, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
+  q2_a: { x: 300, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
+  q2_b: { x: 1100, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
+  q3_a1: { x: 100, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_a2: { x: 500, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_b1: { x: 900, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_b2: { x: 1300, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
   'B-A': { x: 0, y: 600, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-B': { x: 420, y: 600, label: "온수 세정 자동 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-C': { x: 840, y: 600, label: "변기 전동 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-D': { x: 1260, y: 600, label: "이동식 전동변기", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-E': { x: 1680, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-F': { x: 2100, y: 600, label: "배설 프로그램 및 세정 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-G': { x: 2520, y: 600, label: "자동배설처리로봇 (간헐적)", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-H': { x: 2940, y: 600, label: "자동배설처리로봇 (지속적)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-B': { x: 200, y: 600, label: "온수 세정 자동 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-C': { x: 400, y: 600, label: "변기 전동 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-D': { x: 600, y: 600, label: "이동식 전동변기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-E': { x: 800, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-F': { x: 1000, y: 600, label: "배설 프로그램 및 세정 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-G': { x: 1200, y: 600, label: "자동배설처리로봇 (간헐적)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-H': { x: 1400, y: 600, label: "자동배설처리로봇 (지속적)", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const transferEdges = [
@@ -548,15 +548,15 @@ const toiletingEdges = [
 ];
 
 const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 1385, y: 0, label: "삼킴 작용에 사래 들림이 있나요?", typeLabel: "삼킴 평가" },
-  q2_a: { x: 545, y: 200, label: "스스로 식사 도구 숟가락질이 가능하나요?", typeLabel: "상지 조절 평가" },
-  q2_b: { x: 2225, y: 200, label: "식사 행위를 스스로 자각하고 집중하나요?", typeLabel: "인지 집중 평가" },
-  q3_a: { x: 545, y: 400, label: "고개를 숙여 떠주는 음식을 드실 수 있나요?", typeLabel: "경부 조절 평가" },
-  'F-A': { x: 125, y: 600, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-B': { x: 545, y: 600, label: "기능성 보조 식기 / 그립 지원 도구", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-C': { x: 965, y: 600, label: "전동 식사보조 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-D': { x: 1805, y: 600, label: "연하 보조식 / 밀착 급식 지원", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-E': { x: 2645, y: 600, label: "인지 환기 보조 장치", isResult: true, typeLabel: "돌봄로봇 추천" },
+  q1: { x: 512, y: 0, label: "삼킴 작용에 사래 들림이 있나요?", typeLabel: "삼킴 평가" },
+  q2_a: { x: 250, y: 200, label: "스스로 식사 도구 숟가락질이 가능하나요?", typeLabel: "상지 조절 평가" },
+  q2_b: { x: 775, y: 200, label: "식사 행위를 스스로 자각하고 집중하나요?", typeLabel: "인지 집중 평가" },
+  q3_a: { x: 525, y: 400, label: "고개를 숙여 떠주는 음식을 드실 수 있나요?", typeLabel: "경부 조절 평가" },
+  'F-A': { x: 0, y: 600, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-B': { x: 200, y: 600, label: "기능성 보조 식기 / 그립 지원 도구", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-C': { x: 400, y: 600, label: "전동 식사보조 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-D': { x: 650, y: 600, label: "연하 보조식 / 밀착 급식 지원", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-E': { x: 900, y: 600, label: "인지 환기 보조 장치", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const feedingEdges = [
@@ -769,7 +769,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const handleFitView = () => {
     if (wrapperRef.current) {
       const wrapperWidth = wrapperRef.current.clientWidth;
-      const logicalWidth = 3110;
+      const logicalWidth = 1650;
       const fitScale = Math.max(0.5, Math.min(wrapperWidth / logicalWidth, 1.0));
       setZoom(fitScale);
     }
@@ -1357,7 +1357,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 ref={containerRef}
                 className="relative select-none origin-top-left"
                 style={{ 
-                  width: '3110px', 
+                  width: '1650px', 
                   height: isTransfer ? '1100px' : '700px',
                   transform: `scale(${zoom})`,
                   transition: 'transform 0.15s ease-out'
