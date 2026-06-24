@@ -984,12 +984,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (resId) {
       setResultId(resId);
       setCurrentQuestionId(null);
-      setSelectedGuideQuestionId(qId);
+      setSelectedGuideQuestionId(resId);
     } else if (nextId) {
       setCurrentQuestionId(nextId);
       const nextQuestion = algorithm.questions[nextId];
       if (nextQuestion && nextQuestion.type === 'multi') {
         setTempMultiSelect(currentAnswers[nextId] || []);
+      }
+      if (uiMode === 'map') {
+        setSelectedGuideQuestionId(nextId);
       }
     } else {
       alert('알고리즘 분기 경로를 매칭할 수 없습니다.');
