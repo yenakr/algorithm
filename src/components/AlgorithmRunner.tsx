@@ -762,6 +762,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Detailed mode map collapsible & zoom states
   const [showDecisionMap, setShowDecisionMap] = useState(false);
   const [zoom, setZoom] = useState(0.75);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -869,6 +870,31 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   const selectedGuide = selectedGuideQuestionId ? learningGuides[getGuideKey(selectedGuideQuestionId)] : null;
 
+  const getMapResultInfo = (nodeId: string | null) => {
+    if (!nodeId) return null;
+    const robotType = getRobotTypeForResult(nodeId);
+    if (robotType) {
+      return {
+        deviceName: robotType.name,
+        image: robotType.image,
+        whenToUse: robotType.situations.join(', '),
+        situations: robotType.situations,
+        pros: robotType.functions,
+        precautions: robotType.cautions,
+        environment: robotType.examples && robotType.examples.length > 0 ? `예시 기기: ${robotType.examples.join(', ')}` : '',
+      };
+    }
+    const legacy = resultDetails[nodeId];
+    if (legacy) {
+      return {
+        ...legacy,
+        situations: legacy.whenToUse.split(', '),
+      };
+    }
+    return null;
+  };
+  const selectedResultInfo = selectedGuideQuestionId ? getMapResultInfo(selectedGuideQuestionId) : null;
+
   const handleSingleSelect = (qId: string, optionValue: string) => {
     let currentHistory = [...history];
     let currentAnswers = { ...answers };
@@ -973,6 +999,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const handleNodeClick = (nodeId: string) => {
     if (uiMode === 'map') {
       setSelectedGuideQuestionId(nodeId);
+      setIsHelpModalOpen(true);
       return;
     }
 
@@ -1044,16 +1071,17 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Node dimensions config
   const getNodeWidth = (id: string) => {
-    return 210;
+    return 160;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 80;
-    return 130;
+    if (node?.isResult) return 85;
+    return 145;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
-    return `M ${x1} ${y1} L ${x2} ${y2}`;
+    const controlY = y1 + (y2 - y1) * 0.45;
+    return `M ${x1} ${y1} C ${x1} ${controlY}, ${x2} ${y1 + (y2 - y1) * 0.55}, ${x2} ${y2}`;
   };
 
   const isEdgeActive = (edge: typeof edges[0]) => {
@@ -1286,32 +1314,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     );
   }
 
-  // Render Map Explorer Mode
   if (uiMode === 'map') {
-    const getMapResultInfo = (nodeId: string | null) => {
-      if (!nodeId) return null;
-      const robotType = getRobotTypeForResult(nodeId);
-      if (robotType) {
-        return {
-          deviceName: robotType.name,
-          image: robotType.image,
-          whenToUse: robotType.situations.join(', '),
-          situations: robotType.situations,
-          pros: robotType.functions,
-          precautions: robotType.cautions,
-          environment: robotType.examples && robotType.examples.length > 0 ? `예시 기기: ${robotType.examples.join(', ')}` : '',
-        };
-      }
-      const legacy = resultDetails[nodeId];
-      if (legacy) {
-        return {
-          ...legacy,
-          situations: legacy.whenToUse.split(', '),
-        };
-      }
-      return null;
-    };
-    const selectedResultInfo = selectedGuideQuestionId ? getMapResultInfo(selectedGuideQuestionId) : null;
     return (
       <div className="w-full space-y-6">
         {/* Zoom Controls Panel */}
@@ -1344,7 +1347,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: Flowchart Map */}
-          <div className="lg:col-span-8 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+          <div className="lg:col-span-12 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
             <div 
               ref={wrapperRef}
               className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
@@ -1433,10 +1436,23 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                 </span>
                               </div>
                             )}
-                            <h4 className={`text-[13px] leading-snug font-bold text-left ${
+                            <h4 className={`text-[15px] leading-snug font-bold text-left flex items-center justify-between gap-1.5 ${
                               isHighlightedResult ? 'text-white' : 'text-slate-800'
                             }`}>
-                              {cleanInternalCodes(node.label)}
+                              <span>{cleanInternalCodes(node.label)}</span>
+                              {!isResult && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedGuideQuestionId(id);
+                                    setIsHelpModalOpen(true);
+                                  }}
+                                  className="p-0.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 shrink-0 transition-colors cursor-pointer"
+                                  title="기준 설명 보기"
+                                >
+                                  <HelpCircle className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </h4>
                           </div>
 
@@ -1454,9 +1470,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         handleSingleSelect(id, val);
                                       }
                                     }}
-                                    className={`px-2 py-1 rounded text-[10px] font-black transition-all border cursor-pointer ${
+                                    className={`px-2 py-1.5 rounded text-[12px] font-bold transition-all border cursor-pointer ${
                                       isBranchSelected
-                                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm font-black'
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
                                     }`}
                                   >
@@ -1476,7 +1492,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           </div>
 
           {/* Right Column: Details Panel */}
-          <div className="lg:col-span-4 w-full lg:sticky lg:top-6 space-y-6 text-left">
+          <div className="hidden">
             {selectedResultInfo ? (
               /* Display Result/Robot details in map mode */
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 animate-fade-in text-left">
@@ -1843,7 +1859,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Active Question / Result Details & Path History */}
-        <div className="lg:col-span-8 w-full space-y-6">
+        <div className="lg:col-span-12 w-full space-y-6">
           {resultId ? (
             /* Result Details Card in Detailed Mode */
             <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden animate-fade-in flex flex-col text-left">
@@ -2083,9 +2099,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
                 {/* Question title & description */}
                 <div className="space-y-3">
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-snug">
-                    {getDisplayText(currentQuestion, 'title', uiMode)}
-                  </h3>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-snug flex-1">
+                      {getDisplayText(currentQuestion, 'title', uiMode)}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setSelectedGuideQuestionId(currentQuestion.id);
+                        setIsHelpModalOpen(true);
+                      }}
+                      className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer shrink-0"
+                      title="평가 기준 도움말 보기"
+                    >
+                      <HelpCircle className="w-5 h-5" />
+                    </button>
+                  </div>
                   {getDisplayText(currentQuestion, 'description', uiMode) && (
                     <p className="text-sm text-slate-550 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100/60">
                       💡 {getDisplayText(currentQuestion, 'description', uiMode)}
@@ -2198,7 +2226,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         </div>
 
         {/* Right Column: Dynamic Detail Panel (Guide info) */}
-        <div className="lg:col-span-4 w-full lg:sticky lg:top-6 space-y-6">
+        <div className="hidden">
           {selectedGuide ? (
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 animate-fade-in text-left">
               <div className="flex items-center gap-1.5 text-primary">
@@ -2229,6 +2257,117 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         </div>
 
       </div>
+
+      {/* Elegant Help/Detail Modal */}
+      {isHelpModalOpen && (selectedGuide || selectedResultInfo) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div 
+            className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden flex flex-col text-left animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                {selectedResultInfo ? <Bot className="w-5 h-5 text-blue-400" /> : <Info className="w-5 h-5 text-blue-400" />}
+                <span className="text-sm font-extrabold">
+                  {selectedResultInfo ? '추천 돌봄로봇 상세 안내' : '평가 기준 및 설명'}
+                </span>
+              </div>
+              <button 
+                onClick={() => setIsHelpModalOpen(false)}
+                className="text-white/70 hover:text-white text-xl font-bold cursor-pointer transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 overflow-y-auto max-h-[70vh] space-y-5">
+              {selectedResultInfo ? (
+                /* Result Robot Details */
+                <div className="space-y-4">
+                  <div className="text-center pb-4 border-b border-slate-100 space-y-2">
+                    <h3 className="text-xl font-black text-slate-800 tracking-tight">
+                      {selectedResultInfo.deviceName}
+                    </h3>
+                  </div>
+                  
+                  {selectedResultInfo.image && (
+                    <div className="relative mx-auto w-36 h-36 rounded-2xl bg-slate-55 border border-slate-100 flex items-center justify-center p-2">
+                      <img
+                        src={selectedResultInfo.image}
+                        alt={selectedResultInfo.deviceName}
+                        className="object-contain max-h-full"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5 text-xs">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">적용 상황</h5>
+                    <p className="text-slate-700 font-bold leading-relaxed">
+                      {selectedResultInfo.whenToUse}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주요 장점</h5>
+                    <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
+                      {selectedResultInfo.pros.map((pro, idx) => (
+                        <li key={idx}>{pro}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주의 및 확인할 점</h5>
+                    <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
+                      {selectedResultInfo.precautions.map((pre, idx) => (
+                        <li key={idx}>{pre}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ) : selectedGuide ? (
+                /* Question Guide Details */
+                <div className="space-y-4">
+                  <div className="pb-3 border-b border-slate-100">
+                    <h3 className="text-lg font-black text-slate-800">
+                      {selectedGuide.title}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-xs text-slate-650 leading-relaxed font-bold bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    💡 {selectedGuide.content}
+                  </p>
+
+                  <div className="space-y-3 pt-2">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">등급별 판정 기준</h5>
+                    <div className="space-y-3.5">
+                      {selectedGuide.details.map((detail, idx) => (
+                        <div key={idx} className="text-xs leading-relaxed font-medium bg-slate-50/50 p-3 rounded-xl border border-slate-100/60">
+                          <strong className="text-slate-800 block mb-1 font-bold">{detail.key}</strong>
+                          <span className="text-slate-550 block leading-normal">{detail.val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-slate-50 px-6 py-4 flex justify-end border-t border-slate-100">
+              <button
+                onClick={() => setIsHelpModalOpen(false)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow transition-colors cursor-pointer"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
