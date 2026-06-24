@@ -8,15 +8,12 @@ export default function Footer() {
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-500 fill-current" />
             <span className="text-white font-bold text-sm tracking-wide">
-              돌봄로봇 교육 및 자가평가
-            </span>
-            <span className="text-xs text-slate-500 border-l border-slate-700 pl-2">
-              연구용 MVP
+              돌봄로봇 알고리즘 학습
             </span>
           </div>
           <div className="text-xs text-slate-500 text-center md:text-right">
-            <p>본 플랫폼은 이승 및 배설 돌봄로봇 교육 알고리즘 연구 및 학습 목적으로 제작되었습니다.</p>
-            <p className="mt-1">© {new Date().getFullYear()} Hanyang University Care Robotics. All rights reserved.</p>
+            <p>배설돌봄, 식사돌봄, 이승돌봄 알고리즘의 이해를 돕기 위한 학습용 페이지입니다.</p>
+            <p className="mt-1">© 2026 Hanyang University Care Robotics.</p>
           </div>
         </div>
       </div>

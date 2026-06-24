@@ -14,7 +14,7 @@ export default function Navbar() {
                 <Heart className="w-5 h-5 fill-current" />
               </div>
               <span className="text-sm sm:text-base font-black text-slate-800 tracking-tight">
-                돌봄로봇 교육 및 자가평가
+                돌봄로봇 알고리즘 학습
               </span>
             </Link>
           </div>

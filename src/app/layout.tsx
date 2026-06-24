@@ -4,9 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "돌봄로봇 교육 및 자가평가 플랫폼",
-  description: `이승돌봄 및 배설돌봄 로봇 교육자료를 학습하고, 
-자가 평가 및 사례 테스트를 통해 나에게 맞는 최적의 돌봄로봇/기기 유형을 확인해보세요.`
+  title: "돌봄로봇 알고리즘 학습",
+  description: "대상자의 상태와 돌봄 환경을 바탕으로 상황에 맞는 배설돌봄, 식사돌봄, 이승돌봄 로봇 유형을 판단하는 알고리즘을 학습합니다."
 };
 
 export default function RootLayout({
