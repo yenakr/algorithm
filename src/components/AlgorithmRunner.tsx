@@ -780,6 +780,41 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     }
   }, [showDecisionMap]);
 
+
+  const focusNode = (nodeId: string | null) => {
+    if (!nodeId || !wrapperRef.current) return;
+    const node = nodes[nodeId];
+    if (!node) return;
+
+    const nodeW = getNodeWidth(nodeId);
+    const nodeH = getNodeHeight(nodeId);
+    const wrapper = wrapperRef.current;
+    
+    const targetLeft = (node.x + nodeW / 2) * zoom - wrapper.clientWidth / 2;
+    const targetTop = (node.y + nodeH / 2) * zoom - wrapper.clientHeight / 2;
+    
+    wrapper.scrollTo({
+      left: Math.max(0, targetLeft),
+      top: Math.max(0, targetTop),
+      behavior: 'smooth'
+    });
+  };
+
+  useEffect(() => {
+    if (uiMode === 'map') {
+      const timer = setTimeout(() => {
+        focusNode(selectedGuideQuestionId);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedGuideQuestionId, zoom, uiMode]);
+
+  useEffect(() => {
+    if (uiMode === 'map' && !selectedGuideQuestionId) {
+      setSelectedGuideQuestionId('q1');
+    }
+  }, [uiMode]);
+
   const isTransfer = algorithm.id === 'transfer';
   const isFeeding = algorithm.id === 'feeding';
   const nodes = isTransfer ? transferNodes : (isFeeding ? feedingNodes : toiletingNodes);
@@ -999,7 +1034,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     return edge.condition(answers);
   };
 
-  const isEdgeHighlighted = (fromId: string, toId: string) => {
+  const isEdgeHighlighted = (fromId: string, toId: string | null) => {
+    if (!toId) return false;
     if (toId === selectedGuideQuestionId) return true;
     let current = selectedGuideQuestionId;
     const visited = new Set();
@@ -1365,11 +1401,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     const isResult = node.isResult;
                     const isHighlightedResult = status === 'result-active';
 
+                    const isPartofPath = id === selectedGuideQuestionId || isEdgeHighlighted(id, selectedGuideQuestionId) || edges.some(e => e.from === selectedGuideQuestionId && e.to === id);
+                    const dimOpacity = isPartofPath ? 'opacity-100' : 'opacity-65';
+
                     return (
                       <div
                         key={id}
                         onClick={() => handleNodeClick(id)}
-                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
+                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-4 select-none transition-all duration-300 ${dimOpacity} ${
                           isHighlightedResult
                             ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
                             : isActive

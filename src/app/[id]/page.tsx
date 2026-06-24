@@ -74,6 +74,7 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   // Original image error tracking
   const [imageError, setImageError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Device Carousel State
   const [deviceIndex, setDeviceIndex] = useState(0);
@@ -143,7 +144,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['original-tree', 'algo-map', 'step-learning', 'robot-types', 'quiz-section'];
-      const scrollPosition = window.scrollY + 160;
+      const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -186,9 +187,10 @@ export default function AlgorithmPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Algorithm switching tabs */}
-      <div className="bg-white border-b border-slate-200 py-4 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 flex justify-center gap-3 flex-wrap">
+      {/* Sticky Dual Navigation Header */}
+      <div className="sticky top-0 z-45 bg-white/95 border-b border-slate-200 shadow-md backdrop-blur-md py-3.5 space-y-3">
+        {/* 1. Algorithm switching tabs */}
+        <div className="max-w-[1400px] mx-auto px-4 flex justify-center gap-2.5 flex-wrap">
           {[
             { id: 'toileting', name: '배설돌봄' },
             { id: 'feeding', name: '식사돌봄' },
@@ -197,9 +199,9 @@ export default function AlgorithmPage({ params }: PageProps) {
             <Link
               key={tab.id}
               href={`/${tab.id}`}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-full text-xs font-black transition-all duration-200 ${
                 algoId === tab.id
-                  ? 'bg-slate-900 text-white shadow-sm scale-105'
+                  ? 'bg-slate-900 text-white shadow-sm'
                   : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
               }`}
             >
@@ -207,11 +209,9 @@ export default function AlgorithmPage({ params }: PageProps) {
             </Link>
           ))}
         </div>
-      </div>
 
-      {/* Sticky Section Navigation Bar */}
-      <div className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 py-2 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+        {/* 2. Section Navigation Bar */}
+        <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
           {[
             { id: 'original-tree', name: '원본 트리' },
             { id: 'algo-map', name: '알고리즘 지도' },
@@ -222,9 +222,9 @@ export default function AlgorithmPage({ params }: PageProps) {
             <a
               key={sec.id}
               href={`#${sec.id}`}
-              className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+              className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${
                 activeSection === sec.id
-                  ? 'bg-slate-900 text-white shadow-sm'
+                  ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
               }`}
             >
@@ -240,7 +240,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 1: Original Algorithm Tree */}
         <section 
           id="original-tree" 
-          style={{ scrollMarginTop: '140px' }}
+          style={{ scrollMarginTop: '180px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="text-center">
@@ -284,7 +284,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 2: Interactive Decision Map Explorer */}
         <section 
           id="algo-map"
-          style={{ scrollMarginTop: '140px' }}
+          style={{ scrollMarginTop: '180px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -318,7 +318,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 3: Interactive Q&A Algorithm Runner */}
         <section 
           id="step-learning"
-          style={{ scrollMarginTop: '140px' }}
+          style={{ scrollMarginTop: '180px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="space-y-1">
@@ -350,7 +350,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 4: Related Care Robots Carousel Slider */}
         <section 
           id="robot-types"
-          style={{ scrollMarginTop: '140px' }}
+          style={{ scrollMarginTop: '180px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -507,7 +507,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 5: Case Study Quiz */}
         <section 
           id="quiz-section"
-          style={{ scrollMarginTop: '140px' }}
+          style={{ scrollMarginTop: '180px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex items-center gap-3">
@@ -673,6 +673,32 @@ export default function AlgorithmPage({ params }: PageProps) {
         </section>
 
       </div>
+
+      {/* Lightbox Modal */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div className="relative max-w-5xl w-full max-h-[90vh] bg-white rounded-2xl p-4 overflow-auto flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center w-full border-b pb-2">
+              <h3 className="font-bold text-slate-800 text-base">{getOriginalTitle()} 크게 보기</h3>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-slate-500 hover:text-slate-850 font-bold text-sm bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                닫기
+              </button>
+            </div>
+            <img
+              src={algoData.diagramImage}
+              alt={`${algoData.title} 크게 보기`}
+              className="max-w-full h-auto object-contain rounded"
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
