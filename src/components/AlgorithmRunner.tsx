@@ -407,7 +407,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '화장실까지 갈 수 있고 인지도 양호할 때, 용변 후 스스로 항문을 화장지로 닦아내고 바지와 속옷을 올바르게 제 위치로 정리할 수 있는지 손가락 미세 가동 능력과 관절의 꼬임 능력을 봅니다.',
     details: [
       { key: '0~1점 (양호)', val: '위생 처리를 온전히 혼자서 하여 기기 도움 불필요 (B-A)' },
-      { key: '2~4점 (장해)', val: '어깨 결림이나 관절염 등으로 뒤처리가 힘들어 양변기 자동 온수 세정 비데(B-B) 도입 필요' }
+      { key: '2~4점 (어려움)', val: '어깨 결림이나 관절염 등으로 뒤처리가 힘들어 양변기 자동 온수 세정 비데(B-B) 도입 필요' }
     ]
   },
   toileting_q3_a2: {
@@ -415,7 +415,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '인지 지각은 양호하나 화장실까지 걸어가지 못할 때, 변기 착석을 도우면서 용변 처리를 완수할 수 있도록 뒤처리와 기립을 보완하는 단계를 결정합니다.',
     details: [
       { key: '0~1점 (양호)', val: '변기 시트를 높이고 손잡이로 일어서기만 도우면 혼자 닦을 수 있어 양변기 전동 변기 리프트(B-C) 도입' },
-      { key: '2~4점 (장해)', val: '화장실 이동도 어렵고 용변 후 닦아줄 사람도 필요해 침대 옆에서 해결하는 이동 변기(B-D) 도입' }
+      { key: '2~4점 (어려움)', val: '화장실 이동도 어렵고 용변 후 닦아줄 사람도 필요해 침대 옆에서 해결하는 이동 변기(B-D) 도입' }
     ]
   },
   toileting_q3_b1: {
@@ -423,7 +423,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '인지 지각은 낮고 화장실 이동은 가능할 때 스스로 항문을 세정하고 뒤처리를 수행할 수 있는지 확인합니다.',
     details: [
       { key: '0~1점 (양호)', val: '유도를 통한 시간 맞춰 화장실 이용 후 스스로 뒤처리' },
-      { key: '2~4점 (장해)', val: '시간 맞춰 화장실 유도 및 비데 세정 자동화 구축' }
+      { key: '2~4점 (어려움)', val: '시간 맞춰 화장실 유도 및 비데 세정 자동화 구축' }
     ]
   },
   toileting_q3_b2: {
@@ -431,7 +431,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '인지도 낮고 이동도 불가능해 누워 지내는 와상 상태에서 배설 후 엉덩이 세정 조치를 기계적으로 자동화할 수 있는지 결정합니다.',
     details: [
       { key: '0~1점 (양호)', val: '누운 채 탈착형 자동배설로봇 간헐적 이용' },
-      { key: '2~4점 (장해)', val: '24시간 스마트 기저귀 흡인형 배설로봇 지속 가동' }
+      { key: '2~4점 (어려움)', val: '24시간 스마트 기저귀 흡인형 배설로봇 지속 가동' }
     ]
   },
   feeding_q1: {
@@ -439,7 +439,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '식사 중 사래가 자주 걸리거나 기침을 하는지, 또는 목으로 삼키는 생리적인 동작에 어려움이 있는지 검사합니다. 삼킴 장애가 동반될 경우 흡인성 폐렴이나 질식의 고위험 상태로 보고 별도 수동 식사 급여 및 연하식 관리를 적용해야 합니다.',
     details: [
       { key: '0~1점 (양호)', val: '사래 들림 없이 식사하거나 가벼운 마른 기침 정도로 안전하게 음식물을 목 뒤로 넘기는 자립 수준' },
-      { key: '2~4점 (장해)', val: '저작 및 삼킴 곤란이 있어 연식/죽 등의 특별 조리식이 필요하거나 콧줄/튜브 급식이 유지되어 밀착 모니터링이 필요한 상태' }
+      { key: '2~4점 (어려움)', val: '저작 및 삼킴 곤란이 있어 연식/죽 등의 특별 조리식이 필요하거나 콧줄/튜브 급식이 유지되어 밀착 모니터링이 필요한 상태' }
     ]
   },
   feeding_q2_a: {
@@ -447,8 +447,8 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     content: '식기를 집어 숟가락으로 음식을 푸고, 이를 조절해 입 앞까지 흘리지 않고 안전하게 배달하는 상체 근력 및 손 동작 제어 기능을 평가합니다.',
     details: [
       { key: '0점 (문제 없음)', val: '아무 도움 없이 스스로 숟가락과 식기를 쥐고 흘리지 않고 식사함' },
-      { key: '1~2점 (약간의 장해)', val: '손떨림이 있거나 관절염 등으로 일부 반찬을 흘리지만, 스마트 자이로 스푼이나 잡기 편한 특수 그립 식기가 보조되면 스스로 식사 가능한 수준' },
-      { key: '3~4점 (중증 장해)', val: '어깨/팔 마비로 숟가락 조작이 아예 불가능하여 고개를 움직여 섭식할 수 있는지 추가로 체크해야 하는 상태' }
+      { key: '1~2점 (약간의 어려움)', val: '손떨림이 있거나 관절염 등으로 일부 반찬을 흘리지만, 스마트 자이로 스푼이나 잡기 편한 특수 그립 식기가 보조되면 스스로 식사 가능한 수준' },
+      { key: '3~4점 (심한 어려움)', val: '어깨/팔 마비로 숟가락 조작이 아예 불가능하여 고개를 움직여 섭식할 수 있는지 추가로 체크해야 하는 상태' }
     ]
   },
   feeding_q3_a: {
@@ -463,7 +463,7 @@ const learningGuides: Record<string, { title: string; content: string; details: 
     title: '식사 행위 집중 및 인지 능력 평가',
     content: '인지 저하(치매 등)로 인해 본인이 밥을 먹는 상황을 망각하거나, 음식을 입에 물고만 있는 등 식사의 영양 공급에 장애가 생기는지 검사합니다.',
     details: [
-      { key: '예 (집중함)', val: '삼킴 기능의 장해 집중 보조와 특수 점도식 공급 관리가 이루어져야 합니다.' },
+      { key: '예 (집중함)', val: '삼킴 기능의 어려움 집중 보조와 특수 점도식 공급 관리가 이루어져야 합니다.' },
       { key: '아니오 (집중 불가)', val: '식사 진행 속도를 음성 등으로 지속 환기시켜 섭식을 유도하는 인지 환기 보조 기기를 고려해야 합니다.' }
     ]
   }
@@ -532,19 +532,19 @@ const transferEdges = [
 
 const toiletingEdges = [
   { from: 'q1', to: 'q2_a', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 0 && parseInt(ans['q1'] || '-1') <= 1 },
-  { from: 'q1', to: 'q2_b', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
+  { from: 'q1', to: 'q2_b', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
   { from: 'q2_a', to: 'q3_a1', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 0 && parseInt(ans['q2_a'] || '-1') <= 1 },
-  { from: 'q2_a', to: 'q3_a2', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 2 },
+  { from: 'q2_a', to: 'q3_a2', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 2 },
   { from: 'q2_b', to: 'q3_b1', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q2_b'] || '-1') >= 0 && parseInt(ans['q2_b'] || '-1') <= 1 },
-  { from: 'q2_b', to: 'q3_b2', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q2_b'] || '-1') >= 2 },
+  { from: 'q2_b', to: 'q3_b2', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q2_b'] || '-1') >= 2 },
   { from: 'q3_a1', to: 'B-A', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_a1'] || '-1') >= 0 && parseInt(ans['q3_a1'] || '-1') <= 1 },
-  { from: 'q3_a1', to: 'B-B', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_a1'] || '-1') >= 2 },
+  { from: 'q3_a1', to: 'B-B', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_a1'] || '-1') >= 2 },
   { from: 'q3_a2', to: 'B-C', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_a2'] || '-1') >= 0 && parseInt(ans['q3_a2'] || '-1') <= 1 },
-  { from: 'q3_a2', to: 'B-D', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_a2'] || '-1') >= 2 },
+  { from: 'q3_a2', to: 'B-D', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_a2'] || '-1') >= 2 },
   { from: 'q3_b1', to: 'B-E', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 0 && parseInt(ans['q3_b1'] || '-1') <= 1 },
-  { from: 'q3_b1', to: 'B-F', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 2 },
+  { from: 'q3_b1', to: 'B-F', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 2 },
   { from: 'q3_b2', to: 'B-G', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 0 && parseInt(ans['q3_b2'] || '-1') <= 1 },
-  { from: 'q3_b2', to: 'B-H', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 2 },
+  { from: 'q3_b2', to: 'B-H', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 2 },
 ];
 
 const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
@@ -561,10 +561,10 @@ const feedingNodes: Record<string, { x: number; y: number; label: string; isResu
 
 const feedingEdges = [
   { from: 'q1', to: 'q2_a', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 0 && parseInt(ans['q1'] || '-1') <= 1 },
-  { from: 'q1', to: 'q2_b', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
+  { from: 'q1', to: 'q2_b', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
   { from: 'q2_a', to: 'F-A', label: "0점 (양호)", condition: (ans: any) => ans['q2_a'] === '0' },
-  { from: 'q2_a', to: 'F-B', label: "1~2점 (약간의 장해)", condition: (ans: any) => ans['q2_a'] === '1' || ans['q2_a'] === '2' },
-  { from: 'q2_a', to: 'q3_a', label: "3~4점 (중증 장해)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 3 },
+  { from: 'q2_a', to: 'F-B', label: "1~2점 (약간의 어려움)", condition: (ans: any) => ans['q2_a'] === '1' || ans['q2_a'] === '2' },
+  { from: 'q2_a', to: 'q3_a', label: "3~4점 (심한 어려움)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 3 },
   { from: 'q3_a', to: 'F-C', label: "예 (목 조절)", condition: (ans: any) => ans['q3_a'] === 'yes' },
   { from: 'q3_a', to: 'F-D', label: "아니오 (조절불가)", condition: (ans: any) => ans['q3_a'] === 'no' },
   { from: 'q2_b', to: 'F-D', label: "예 (인지 가능)", condition: (ans: any) => ans['q2_b'] === 'yes' },
