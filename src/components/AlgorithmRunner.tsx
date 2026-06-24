@@ -12,6 +12,21 @@ import '@xyflow/react/dist/style.css';
 import SimpleResultCard from './SimpleResultCard';
 import { robotTypeInfo, resultToRobotTypeMap } from '../data';
 
+
+const cleanInternalCodes = (text: string): string => {
+  if (!text) return '';
+  let cleaned = text
+    .replace(/^[BTF]-[A-H]\.?\s*/gi, '')
+    .replace(/\b[BTF]-[A-H]\.?\s*/gi, '')
+    .replace(/["']?[BTF]-[A-H]["']?/gi, '');
+  cleaned = cleaned
+    .replace(/도움 불필요\(위생 자립\)/g, '도움 없이 진행 가능')
+    .replace(/도움 불필요/g, '도움 없이 진행 가능')
+    .replace(/용변 후 처리 돕기/g, '용변 후 처리 보조')
+    .replace(/화장실 이동 돕기/g, '화장실 이동 보조');
+  return cleaned.trim();
+};
+
 const getRobotTypeForResult = (resultId: string) => {
   const mapping = resultToRobotTypeMap[resultId];
   if (!mapping) return null;
@@ -462,8 +477,8 @@ const transferNodes: Record<string, { x: number; y: number; label: string; isRes
   q3: { x: 2075, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
   q3_1: { x: 2075, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
   q3_2: { x: 2645, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
-  'T-A': { x: 0, y: 1000, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-B': { x: 420, y: 1000, label: "이승보조장비", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-A': { x: 0, y: 1000, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-B': { x: 420, y: 1000, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "돌봄로봇 추천" },
   'T-C': { x: 840, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
   'T-D': { x: 1260, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
   'T-E': { x: 1680, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
@@ -474,20 +489,20 @@ const transferNodes: Record<string, { x: number; y: number; label: string; isRes
 
 const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
   q1: { x: 1385, y: 0, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
-  q2_a: { x: 545, y: 200, label: "화장실 이동에 어려움이 있나요? (A)", typeLabel: "이동 평가" },
-  q2_b: { x: 2225, y: 200, label: "화장실 이동에 어려움이 있나요? (B)", typeLabel: "이동 평가" },
-  q3_a1: { x: 125, y: 400, label: "스스로 뒤처리를 할 수 있나요? (A1)", typeLabel: "뒤처리 평가" },
-  q3_a2: { x: 965, y: 400, label: "스스로 뒤처리를 할 수 있나요? (A2)", typeLabel: "뒤처리 평가" },
-  q3_b1: { x: 1805, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B1)", typeLabel: "뒤처리 평가" },
-  q3_b2: { x: 2645, y: 400, label: "스스로 뒤처리를 할 수 있나요? (B2)", typeLabel: "뒤처리 평가" },
-  'B-A': { x: 0, y: 600, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-B': { x: 420, y: 600, label: "비데", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-C': { x: 840, y: 600, label: "변기 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-D': { x: 1260, y: 600, label: "이동 변기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  q2_a: { x: 545, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
+  q2_b: { x: 2225, y: 200, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
+  q3_a1: { x: 125, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_a2: { x: 965, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_b1: { x: 1805, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  q3_b2: { x: 2645, y: 400, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "뒤처리 평가" },
+  'B-A': { x: 0, y: 600, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-B': { x: 420, y: 600, label: "온수 세정 자동 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-C': { x: 840, y: 600, label: "변기 전동 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-D': { x: 1260, y: 600, label: "이동식 전동변기", isResult: true, typeLabel: "돌봄로봇 추천" },
   'B-E': { x: 1680, y: 600, label: "배설 유도 프로그램", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-F': { x: 2100, y: 600, label: "배설 프로그램 + 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-G': { x: 2520, y: 600, label: "자동배설로봇 (간헐)", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'B-H': { x: 2940, y: 600, label: "스마트 기저귀 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-F': { x: 2100, y: 600, label: "배설 프로그램 및 세정 비데", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-G': { x: 2520, y: 600, label: "자동배설처리로봇 (간헐적)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'B-H': { x: 2940, y: 600, label: "자동배설처리로봇 (지속적)", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const transferEdges = [
@@ -537,7 +552,7 @@ const feedingNodes: Record<string, { x: number; y: number; label: string; isResu
   q2_a: { x: 545, y: 200, label: "스스로 식사 도구 숟가락질이 가능하나요?", typeLabel: "상지 조절 평가" },
   q2_b: { x: 2225, y: 200, label: "식사 행위를 스스로 자각하고 집중하나요?", typeLabel: "인지 집중 평가" },
   q3_a: { x: 545, y: 400, label: "고개를 숙여 떠주는 음식을 드실 수 있나요?", typeLabel: "경부 조절 평가" },
-  'F-A': { x: 125, y: 600, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-A': { x: 125, y: 600, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
   'F-B': { x: 545, y: 600, label: "기능성 보조 식기 / 그립 지원 도구", isResult: true, typeLabel: "돌봄로봇 추천" },
   'F-C': { x: 965, y: 600, label: "전동 식사보조 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
   'F-D': { x: 1805, y: 600, label: "연하 보조식 / 밀착 급식 지원", isResult: true, typeLabel: "돌봄로봇 추천" },
@@ -746,7 +761,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Detailed mode map collapsible & zoom states
   const [showDecisionMap, setShowDecisionMap] = useState(false);
-  const [zoom, setZoom] = useState(0.3);
+  const [zoom, setZoom] = useState(0.75);
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -754,7 +769,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (wrapperRef.current) {
       const wrapperWidth = wrapperRef.current.clientWidth;
       const logicalWidth = 3110;
-      const fitScale = Math.max(0.15, Math.min(wrapperWidth / logicalWidth, 1.0));
+      const fitScale = Math.max(0.5, Math.min(wrapperWidth / logicalWidth, 1.0));
       setZoom(fitScale);
     }
   };
@@ -967,13 +982,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Node dimensions config
   const getNodeWidth = (id: string) => {
-    if (!isTransfer && id.startsWith('B-')) return 110;
-    return 170;
+    return 220;
   };
   const getNodeHeight = (id: string) => {
-    const node = nodes[id];
-    if (node?.isResult) return 76;
-    return 96;
+    return 110;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -986,6 +998,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (!history.includes(edge.from)) return false;
     return edge.condition(answers);
   };
+
+  const isEdgeHighlighted = (fromId: string, toId: string) => {
+    if (toId === selectedGuideQuestionId) return true;
+    let current = selectedGuideQuestionId;
+    const visited = new Set();
+    while (current) {
+      if (visited.has(current)) break;
+      visited.add(current);
+      const parentEdge = edges.find(e => e.to === current);
+      if (parentEdge) {
+        if (parentEdge.from === fromId && parentEdge.to === toId) {
+          return true;
+        }
+        current = parentEdge.from;
+      } else {
+        break;
+      }
+    }
+    return false;
+  };
+
 
   const getNodeStatus = (nodeId: string) => {
     if (uiMode === 'map') {
@@ -1037,11 +1070,11 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
             {/* Simple Result Card */}
             <SimpleResultCard
-              robotName={algorithm.results[resultId]?.simpleTitle || algorithm.results[resultId]?.title}
-              shortDescription={algorithm.results[resultId]?.simpleDescription || algorithm.results[resultId]?.description}
-              reason={algorithm.results[resultId]?.simpleReason || algorithm.results[resultId]?.reason}
-              whenToUse={algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse}
-              precautions={algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions}
+              robotName={cleanInternalCodes(algorithm.results[resultId]?.simpleTitle || algorithm.results[resultId]?.title)}
+              shortDescription={cleanInternalCodes(algorithm.results[resultId]?.simpleDescription || algorithm.results[resultId]?.description)}
+              reason={cleanInternalCodes(algorithm.results[resultId]?.simpleReason || algorithm.results[resultId]?.reason)}
+              whenToUse={cleanInternalCodes(algorithm.results[resultId]?.simpleResultSummary || resultDetails[resultId]?.whenToUse)}
+              precautions={(algorithm.results[resultId]?.simpleTips || resultDetails[resultId]?.precautions || []).map(cleanInternalCodes)}
             />
 
             {/* Action buttons */}
@@ -1217,36 +1250,31 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     const selectedResultInfo = selectedGuideQuestionId ? getMapResultInfo(selectedGuideQuestionId) : null;
     return (
       <div className="w-full space-y-6">
-        {/* Top Header Panel */}
-        <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm gap-4 text-left">
-          <div>
-            <span className="text-xs font-black text-primary uppercase tracking-wider block mb-0.5">의사결정 알고리즘 지도</span>
-            <h3 className="text-sm font-bold text-slate-700 leading-snug">지도의 카드를 클릭하여 추천 판정 기준과 각 돌봄로봇 상세 정보를 확인해 보세요.</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setZoom(z => Math.max(0.15, z - 0.1))} 
-              className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
-            >
-              -
-            </button>
-            <span className="text-[10px] font-bold text-slate-400 min-w-10 text-center">
-              {Math.round(zoom * 100)}%
-            </span>
-            <button 
-              onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} 
-              className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
-            >
-              +
-            </button>
-            <button 
-              onClick={handleFitView} 
-              className="p-1 px-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer flex items-center gap-1"
-            >
-              <Maximize2 className="w-3 h-3" />
-              <span>화면맞춤</span>
-            </button>
-          </div>
+        {/* Zoom Controls Panel */}
+        <div className="flex justify-end items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 shadow-sm gap-2">
+          <span className="text-[11px] font-bold text-slate-400 mr-2">지도 확대/축소:</span>
+          <button 
+            onClick={() => setZoom(z => Math.max(0.3, z - 0.1))} 
+            className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+          >
+            -
+          </button>
+          <span className="text-[10px] font-bold text-slate-500 min-w-10 text-center">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button 
+            onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} 
+            className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+          >
+            +
+          </button>
+          <button 
+            onClick={handleFitView} 
+            className="p-1 px-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-505 hover:bg-slate-50 hover:text-slate-700 cursor-pointer flex items-center gap-1"
+          >
+            <Maximize2 className="w-3 h-3" />
+            <span>화면맞춤</span>
+          </button>
         </div>
 
         {/* 2-Column Layout */}
@@ -1281,13 +1309,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     const startY = fromNode.y + parentH;
                     const endX = toNode.x + childW / 2;
                     const endY = toNode.y;
+                    const active = isEdgeActive(edge);
+                    const highlighted = uiMode === 'map' ? isEdgeHighlighted(edge.from, edge.to) : active;
                     return (
                       <g key={`${edge.from}-${edge.to}-${idx}`}>
                         <path
                           d={getBezierPath(startX, startY, endX, endY)}
                           fill="none"
-                          stroke="#E2E8F0"
-                          strokeWidth={1.5}
+                          stroke={highlighted ? "#3B82F6" : "#94A3B8"}
+                          strokeWidth={highlighted ? 3.0 : 1.5}
                         />
                       </g>
                     );
@@ -1316,7 +1346,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         className="foreign-object overflow-visible pointer-events-none"
                       >
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight bg-white text-slate-400 border-slate-200">
+                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight bg-white text-slate-650 border-slate-350">
                             {edge.label}
                           </span>
                         </div>
@@ -1361,10 +1391,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                               {node.typeLabel}
                             </span>
                           </div>
-                          <h4 className={`text-xs leading-snug font-bold text-left ${
+                          <h4 className={`text-sm leading-snug font-bold text-left ${
                             isHighlightedResult ? 'text-white' : 'text-slate-800'
                           }`}>
-                            {node.label}
+                            {cleanInternalCodes(node.label)}
                           </h4>
                         </div>
                       </div>
@@ -1866,7 +1896,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           최적 추천 결과
                         </span>
                         <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
-                          {resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title}
+                          {cleanInternalCodes(resultDetails[resultId]?.deviceName || algorithm.results[resultId]?.title)}
                         </h2>
                       </div>
 
@@ -1930,7 +1960,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <div className="space-y-1">
                           <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">매칭 매커니즘 / 임상 근거</h5>
                           <p className="text-slate-600 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            {resultDetails[resultId]?.reason || algorithm.results[resultId]?.reason}
+                            {cleanInternalCodes(resultDetails[resultId]?.reason || algorithm.results[resultId]?.reason)}
                           </p>
                         </div>
 

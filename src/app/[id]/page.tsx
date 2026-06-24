@@ -36,6 +36,22 @@ const getDeviceImage = (deviceId: string) => {
   return imageMap[deviceId] || '';
 };
 
+const cleanInternalCodes = (text: string): string => {
+  if (!text) return '';
+  let cleaned = text
+    .replace(/^[BTF]-[A-H]\.?\s*/gi, '')
+    .replace(/\b[BTF]-[A-H]\.?\s*/gi, '')
+    .replace(/["']?[BTF]-[A-H]["']?/gi, '');
+  
+  cleaned = cleaned
+    .replace(/도움 불필요\(위생 자립\)/g, '도움 없이 진행 가능')
+    .replace(/도움 불필요/g, '도움 없이 진행 가능')
+    .replace(/용변 후 처리 돕기/g, '용변 후 처리 보조')
+    .replace(/화장실 이동 돕기/g, '화장실 이동 보조');
+    
+  return cleaned.trim();
+};
+
 export default function AlgorithmPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const router = useRouter();
@@ -127,7 +143,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['original-tree', 'algo-map', 'step-learning', 'robot-types', 'quiz-section'];
-      const scrollPosition = window.scrollY + 120;
+      const scrollPosition = window.scrollY + 160;
 
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -150,8 +166,8 @@ export default function AlgorithmPage({ params }: PageProps) {
     <div className="flex-1 bg-slate-50 pb-20">
       {/* Upper Navigation Bar */}
       <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-650 hover:text-slate-900 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span>메인으로 돌아가기</span>
           </Link>
@@ -160,19 +176,42 @@ export default function AlgorithmPage({ params }: PageProps) {
 
       {/* Intro section */}
       <section className="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-4xl mx-auto text-center space-y-4">
+        <div className="max-w-[1400px] mx-auto text-center space-y-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
             {algoData.title}
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-350 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             {algoData.fullDescription}
           </p>
         </div>
       </section>
 
+      {/* Algorithm switching tabs */}
+      <div className="bg-white border-b border-slate-200 py-4 shadow-sm">
+        <div className="max-w-[1400px] mx-auto px-4 flex justify-center gap-3 flex-wrap">
+          {[
+            { id: 'toileting', name: '배설돌봄' },
+            { id: 'feeding', name: '식사돌봄' },
+            { id: 'transfer', name: '이승돌봄' }
+          ].map((tab) => (
+            <Link
+              key={tab.id}
+              href={`/${tab.id}`}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
+                algoId === tab.id
+                  ? 'bg-slate-900 text-white shadow-sm scale-105'
+                  : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
+              }`}
+            >
+              {tab.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* Sticky Section Navigation Bar */}
       <div className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+        <div className="max-w-[1400px] mx-auto px-4 py-2 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
           {[
             { id: 'original-tree', name: '원본 트리' },
             { id: 'algo-map', name: '알고리즘 지도' },
@@ -186,7 +225,7 @@ export default function AlgorithmPage({ params }: PageProps) {
               className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
                 activeSection === sec.id
                   ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
               }`}
             >
               {sec.name}
@@ -196,12 +235,12 @@ export default function AlgorithmPage({ params }: PageProps) {
       </div>
 
       {/* Main Single Flow Column */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 space-y-16">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 space-y-16">
         
         {/* Section 1: Original Algorithm Tree */}
         <section 
           id="original-tree" 
-          style={{ scrollMarginTop: '100px' }}
+          style={{ scrollMarginTop: '140px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="text-center">
@@ -235,7 +274,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
 
           <div className="flex justify-end">
-            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-650 transition-colors">
               <ArrowUp className="w-3.5 h-3.5" />
               <span>맨 위로</span>
             </a>
@@ -245,7 +284,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 2: Interactive Decision Map Explorer */}
         <section 
           id="algo-map"
-          style={{ scrollMarginTop: '100px' }}
+          style={{ scrollMarginTop: '140px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -254,7 +293,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                 알고리즘 지도
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                지도에서 각 단계를 선택하면 판단 기준과 관련 돌봄로봇 정보를 확인할 수 있습니다.
+                각 단계를 선택하면 판단 기준과 연결되는 돌봄로봇 유형을 확인할 수 있습니다.
               </p>
             </div>
           </div>
@@ -269,7 +308,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
 
           <div className="flex justify-end">
-            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-650 transition-colors">
               <ArrowUp className="w-3.5 h-3.5" />
               <span>맨 위로</span>
             </a>
@@ -279,7 +318,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 3: Interactive Q&A Algorithm Runner */}
         <section 
           id="step-learning"
-          style={{ scrollMarginTop: '100px' }}
+          style={{ scrollMarginTop: '140px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="space-y-1">
@@ -301,7 +340,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
 
           <div className="flex justify-end">
-            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-650 transition-colors">
               <ArrowUp className="w-3.5 h-3.5" />
               <span>맨 위로</span>
             </a>
@@ -311,7 +350,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 4: Related Care Robots Carousel Slider */}
         <section 
           id="robot-types"
-          style={{ scrollMarginTop: '100px' }}
+          style={{ scrollMarginTop: '140px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -333,7 +372,7 @@ export default function AlgorithmPage({ params }: PageProps) {
             {/* Left Prev Arrow Button */}
             <button
               onClick={handlePrevDevice}
-              className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
+              className="p-2 rounded-full border border-slate-200 bg-white text-slate-650 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
               aria-label="이전 로봇 보기"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -352,7 +391,6 @@ export default function AlgorithmPage({ params }: PageProps) {
                         alt={devicesList[deviceIndex].name}
                         className="w-full h-full object-contain"
                         onError={(e) => {
-                          // Handle image load failure by resetting src or showing error text
                           (e.target as HTMLElement).style.display = 'none';
                           const sibling = (e.target as HTMLElement).nextElementSibling;
                           if (sibling) (sibling as HTMLElement).style.display = 'flex';
@@ -377,19 +415,19 @@ export default function AlgorithmPage({ params }: PageProps) {
                 <div className="md:col-span-8 space-y-4">
                   <div>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-none">
-                      {devicesList[deviceIndex]?.name}
+                      {cleanInternalCodes(devicesList[deviceIndex]?.name)}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 font-bold mt-2 leading-relaxed">
-                      {devicesList[deviceIndex]?.oneLine}
+                    <p className="text-xs sm:text-sm text-slate-650 font-bold mt-2 leading-relaxed">
+                      {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)}
                     </p>
                   </div>
 
                   {/* Applicability situations bullets */}
                   <div className="space-y-1.5">
                     <span className="text-xs font-bold text-slate-400 block">적용 상황</span>
-                    <ul className="text-xs text-slate-600 font-bold list-disc list-inside space-y-0.5">
+                    <ul className="text-xs text-slate-650 font-bold list-disc list-inside space-y-0.5">
                       {devicesList[deviceIndex]?.situations.map((sit, i) => (
-                        <li key={i} className="leading-relaxed">{sit}</li>
+                        <li key={i} className="leading-relaxed">{cleanInternalCodes(sit)}</li>
                       ))}
                     </ul>
                   </div>
@@ -399,9 +437,9 @@ export default function AlgorithmPage({ params }: PageProps) {
                     {/* Functions Box */}
                     <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-4">
                       <span className="text-xs font-bold text-emerald-700 block mb-2">주요 기능</span>
-                      <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                      <ul className="text-[11px] sm:text-xs text-slate-650 font-semibold list-disc list-inside space-y-1 leading-relaxed">
                         {devicesList[deviceIndex]?.functions.map((func, idx) => (
-                          <li key={idx}>{func}</li>
+                          <li key={idx}>{cleanInternalCodes(func)}</li>
                         ))}
                       </ul>
                     </div>
@@ -409,9 +447,9 @@ export default function AlgorithmPage({ params }: PageProps) {
                     {/* Cautions Box */}
                     <div className="bg-amber-50/40 border border-amber-100 rounded-xl p-4">
                       <span className="text-xs font-bold text-amber-700 block mb-2">확인할 점</span>
-                      <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                      <ul className="text-[11px] sm:text-xs text-slate-650 font-semibold list-disc list-inside space-y-1 leading-relaxed">
                         {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
-                          <li key={idx}>{caut}</li>
+                          <li key={idx}>{cleanInternalCodes(caut)}</li>
                         ))}
                       </ul>
                     </div>
@@ -437,7 +475,7 @@ export default function AlgorithmPage({ params }: PageProps) {
             {/* Right Next Arrow Button */}
             <button
               onClick={handleNextDevice}
-              className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
+              className="p-2 rounded-full border border-slate-200 bg-white text-slate-650 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
               aria-label="다음 로봇 보기"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -459,7 +497,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
 
           <div className="flex justify-end">
-            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-650 transition-colors">
               <ArrowUp className="w-3.5 h-3.5" />
               <span>맨 위로</span>
             </a>
@@ -469,7 +507,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 5: Case Study Quiz */}
         <section 
           id="quiz-section"
-          style={{ scrollMarginTop: '100px' }}
+          style={{ scrollMarginTop: '140px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex items-center gap-3">
@@ -485,35 +523,37 @@ export default function AlgorithmPage({ params }: PageProps) {
           {algoData.quizzes && algoData.quizzes.length > 0 ? (
             <div className="space-y-6">
               {!isFinished ? (
-                <div className="space-y-6">
-                  {/* Progress */}
-                  <div className="flex justify-between items-center text-xs font-semibold text-slate-500">
+                <div className="space-y-6 animate-fade-in">
+                  {/* Progress & Score */}
+                  <div className="flex justify-between items-center text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2">
                     <span>진행률: {quizIndex + 1} / {algoData.quizzes.length} 문제</span>
-                    <span className="text-emerald-600">현재 점수: {score}점</span>
+                    <span className="text-emerald-600 font-bold">현재 점수: {score}점</span>
                   </div>
 
                   {/* Scenario Card */}
-                  <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-5 sm:p-6 space-y-4">
-                    <span className="inline-block text-xs font-bold bg-slate-200 text-slate-700 px-2.5 py-1 rounded">
+                  <div className="bg-slate-50 border-l-4 border-l-slate-900 border border-slate-200/60 rounded-r-xl p-5 sm:p-6 space-y-3">
+                    <span className="inline-block text-xs font-black bg-slate-900 text-white px-2 py-0.5 rounded">
                       상황 사례
                     </span>
-                    <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-semibold">
-                      {algoData.quizzes[quizIndex].scenario}
+                    <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-semibold max-w-4xl">
+                      {cleanInternalCodes(algoData.quizzes[quizIndex].scenario)}
                     </p>
                   </div>
 
                   {/* Question */}
-                  <h4 className="text-base sm:text-lg font-bold text-slate-800">
-                    Q. {algoData.quizzes[quizIndex].question}
-                  </h4>
+                  <div className="p-4 bg-blue-50/40 border border-blue-100/60 rounded-xl">
+                    <h4 className="text-base sm:text-lg font-bold text-slate-800">
+                      Q. {cleanInternalCodes(algoData.quizzes[quizIndex].question)}
+                    </h4>
+                  </div>
 
                   {/* Options */}
-                  <div className="grid grid-cols-1 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {algoData.quizzes[quizIndex].options.map((option, idx) => {
                       const isSelected = selectedOption === idx;
                       const isCorrect = idx === algoData.quizzes[quizIndex].correctAnswerIndex;
                       
-                      let optionStyle = 'border-slate-200 hover:bg-slate-50 text-slate-700';
+                      let optionStyle = 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white';
                       if (isSelected) {
                         optionStyle = 'border-blue-600 bg-blue-50 text-blue-900 ring-2 ring-blue-600/20';
                       }
@@ -523,7 +563,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                         } else if (isSelected) {
                           optionStyle = 'border-rose-600 bg-rose-50 text-rose-900 ring-2 ring-rose-600/20';
                         } else {
-                          optionStyle = 'border-slate-200 opacity-60 text-slate-400';
+                          optionStyle = 'border-slate-200 opacity-60 text-slate-400 bg-slate-50/20';
                         }
                       }
 
@@ -535,11 +575,11 @@ export default function AlgorithmPage({ params }: PageProps) {
                           className={`flex items-start gap-3 p-4 rounded-xl border text-left font-semibold text-sm transition-all duration-200 ${optionStyle}`}
                         >
                           <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 border ${
-                            isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-500'
+                            isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-505'
                           }`}>
                             {idx + 1}
                           </span>
-                          <span>{option}</span>
+                          <span>{cleanInternalCodes(option)}</span>
                         </button>
                       );
                     })}
@@ -583,8 +623,8 @@ export default function AlgorithmPage({ params }: PageProps) {
                         }`}>
                           {selectedOption === algoData.quizzes[quizIndex].correctAnswerIndex ? '정답입니다!' : '오답입니다.'}
                         </h5>
-                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-semibold">
-                          {algoData.quizzes[quizIndex].explanation}
+                        <p className="text-xs sm:text-sm text-slate-650 leading-relaxed font-semibold">
+                          {cleanInternalCodes(algoData.quizzes[quizIndex].explanation)}
                         </p>
                       </div>
                     </div>
@@ -592,7 +632,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                 </div>
               ) : (
                 /* Quiz Complete screen */
-                <div className="text-center py-10 space-y-6 max-w-md mx-auto">
+                <div className="text-center py-10 space-y-6 max-w-md mx-auto animate-fade-in">
                   <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mx-auto shadow-sm">
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
@@ -625,7 +665,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           )}
 
           <div className="flex justify-end">
-            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-650 transition-colors">
               <ArrowUp className="w-3.5 h-3.5" />
               <span>맨 위로</span>
             </a>
