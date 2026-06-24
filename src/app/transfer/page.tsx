@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { 
+  BookOpen, GitMerge, CheckSquare, Shield, ArrowRight, CheckCircle2, 
+  ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ThumbsUp, AlertTriangle, Map 
+} from 'lucide-react';
 
 // Data imports
 import { transferCareAlgorithm } from '@/data/algorithms/transferCare';
@@ -11,19 +13,10 @@ import { transferCases } from '@/data/cases/transferCases';
 
 // Component imports
 import AlgorithmRunner from '@/components/AlgorithmRunner';
-import ScenarioStepList from '@/components/ScenarioStepList';
-import SafetyCheckCard from '@/components/SafetyCheckCard';
 import CareTabs from '@/components/CareTabs';
 import CareSafetyCard from '@/components/CareSafetyCard';
 import RobotStorySection from '@/components/RobotStorySection';
 import { IllustrationType } from '@/components/CareSceneIllustration';
-
-const transferScenarios = [
-  { type: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 이동', description: '누워 계신 대상자를 휠체어로 안전하게 옮겨 안전히 앉히는 상황입니다.' },
-  { type: 'wheelchair-to-toilet' as const, title: '휠체어에서 변기로 이동', description: '화장실 이용을 위해 휠체어에서 변기로 옮겨 앉는 상황입니다.' },
-  { type: 'wheelchair-to-bed' as const, title: '휠체어에서 침대로 이동', description: '휠체어에 앉아 계신 대상자를 침대로 다시 안전하게 눕히는 상황입니다.' },
-  { type: 'bed-to-chair' as const, title: '침대에서 의자로 이동', description: '식사나 휴식을 위해 침대에서 일반 의자로 이동을 돕는 상황입니다.' }
-];
 
 const transferScenariosData = [
   { illustrationType: 'bed-to-wheelchair' as const, title: '침대에서 휠체어로 옮겨 앉기', description: '누워 있는 자세에서 휠체어로 옮겨 앉을 때 힘이 드는 경우입니다.' },
@@ -89,20 +82,11 @@ const transferSafetyItems = [
   { id: 't-s5', title: '어지러움/통증 수시 확인', description: '이동 도중이나 이동 직후에 머리가 아프거나 어지러운지 대상자 상태를 확인합니다.', illustrationType: 'dizzy-warning' as const },
 ];
 
-const transferSafetyCheckItems = [
-  { id: 'ts-c1', title: '바퀴 고정 확인', description: '이승하기 전 침대와 휠체어 바퀴의 잠금장치를 반드시 잠갔는지 확인하세요.', type: 'lock' as const },
-  { id: 'ts-c2', title: '주변 장애물 제거', description: '발에 걸리거나 휠체어 이동을 방해하는 주변 장애물을 깨끗이 치워주세요.', type: 'obstacle' as const },
-  { id: 'ts-c3', title: '어지러움 시 즉시 중단', description: '환자가 어지러움, 통증 등을 호소하면 즉시 이동을 멈추고 안정을 유도하세요.', type: 'warning' as const },
-];
-
-
 export default function TransferPage() {
-  const [uiMode, setUiMode] = useState<'detail' | 'simple'>('detail');
-  const [activeTab, setActiveTab] = useState<'info' | 'devices' | 'learning' | 'quiz'>('info');
+  const [activeTab, setActiveTab] = useState<'devices' | 'learning' | 'map' | 'quiz'>('devices');
   const [learningPath, setLearningPath] = useState<string[]>([]);
-  const [showDetailedStandards, setShowDetailedStandards] = useState(false);
 
-  // Safety checklist state for simple mode Tab 4
+  // Safety checklist state for Tab 4
   const [checkedSafety, setCheckedSafety] = useState<Record<string, boolean>>({});
   const [quizSafetyApproved, setQuizSafetyApproved] = useState(false);
 
@@ -117,58 +101,8 @@ export default function TransferPage() {
   const [quizScore, setQuizScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
 
-  // Collapsible categories state for Care Robot Types
-  const [openCats, setOpenCats] = useState<Record<string, boolean>>({
-    '이승보조장비': true,
-    '기립보조리프트 / 스탠딩리프트': true,
-    '전신슬링 리프트': true,
-  });
-
-  // Resolve active mode on mount and listen to changes
-  useEffect(() => {
-    const resolveMode = () => {
-      const searchParams = new URLSearchParams(window.location.search);
-      const queryMode = searchParams.get('mode');
-      
-      let activeMode: 'detail' | 'simple' = 'detail';
-      
-      if (queryMode === 'simple' || queryMode === 'detail') {
-        activeMode = queryMode;
-        localStorage.setItem('care-mode', queryMode);
-      } else {
-        const saved = localStorage.getItem('care-mode');
-        if (saved === 'simple' || saved === 'detail') {
-          activeMode = saved as 'detail' | 'simple';
-        }
-      }
-      setUiMode(activeMode);
-    };
-
-    resolveMode();
-
-    const handleModeChange = () => {
-      resolveMode();
-    };
-
-    window.addEventListener('careModeChanged', handleModeChange);
-    window.addEventListener('popstate', handleModeChange);
-
-    return () => {
-      window.removeEventListener('careModeChanged', handleModeChange);
-      window.removeEventListener('popstate', handleModeChange);
-    };
-  }, []);
-
-  const toggleCat = (catName: string) => {
-    setOpenCats(prev => ({ ...prev, [catName]: !prev[catName] }));
-  };
-
   const handleLearnMore = (deviceId: string) => {
     setActiveTab('devices');
-    const device = transferEducationData.devices.list.find(d => d.id === deviceId);
-    if (device) {
-      setOpenCats(prev => ({ ...prev, [device.category]: true }));
-    }
     setTimeout(() => {
       const element = document.getElementById(`device-${deviceId}`);
       if (element) {
@@ -182,13 +116,13 @@ export default function TransferPage() {
   };
 
   const tabs = [
-    { id: 'info', name: uiMode === 'simple' ? '쉽게 알아보기' : '소개 & 평가기준', icon: BookOpen },
-    { id: 'devices', name: uiMode === 'simple' ? '돌봄로봇 살펴보기' : '이승로봇 종류', icon: Shield },
-    { id: 'learning', name: uiMode === 'simple' ? '나에게 맞는 돌봄로봇 찾기' : '알고리즘 학습', icon: GitMerge },
-    { id: 'quiz', name: uiMode === 'simple' ? '연습해보기' : '사례 테스트 (퀴즈)', icon: CheckSquare },
+    { id: 'devices', name: '돌봄로봇 알아보기', icon: Shield },
+    { id: 'learning', name: '나에게 맞는 돌봄로봇 찾기', icon: GitMerge },
+    { id: 'map', name: '알고리즘 지도', icon: Map },
+    { id: 'quiz', name: '연습해보기', icon: CheckSquare },
   ] as const;
 
-  const tabOrder = ['info', 'devices', 'learning', 'quiz'] as const;
+  const tabOrder = ['devices', 'learning', 'map', 'quiz'] as const;
   const currentIdx = tabOrder.indexOf(activeTab);
 
   const handlePrevTab = () => {
@@ -240,17 +174,11 @@ export default function TransferPage() {
     setQuizSafetyApproved(false);
   };
 
-
-
-  const isSimple = uiMode === 'simple';
-
   return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col w-full max-w-full overflow-x-hidden min-w-0 ${
-      isSimple ? 'text-lg' : 'text-sm sm:text-base'
-    }`}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col w-full max-w-full overflow-x-hidden min-w-0 text-lg">
       {/* Page Header */}
       <div className="border-b border-slate-200 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className={`font-extrabold text-slate-800 tracking-tight ${isSimple ? 'text-4xl' : 'text-3xl'}`}>
+        <h1 className="font-extrabold text-slate-800 tracking-tight text-4xl">
           이승돌봄로봇
         </h1>
       </div>
@@ -260,178 +188,26 @@ export default function TransferPage() {
         tabs={tabs} 
         activeTab={activeTab} 
         onChange={setActiveTab} 
-        isSimple={isSimple} 
+        isSimple={true} 
       />
 
       {/* Tab Content */}
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex-1">
-          {/* Tab 1: 소개 & 평가기준 */}
-          {activeTab === 'info' && (
-            <div className="space-y-10 animate-fade-in text-left">
-              {isSimple ? (
-                <>
-                  {/* Definition Card */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2">
-                      <span className="w-2.5 h-6 bg-indigo-600 rounded-full inline-block" />
-                      자리이동(이승) 돌봄이란?
-                    </h2>
-                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-semibold">
-                      스스로 다른 자리로 옮겨 앉기 어려울 때, 침대·의자·휠체어·변기 등으로 안전하게 이동하도록 돕는 돌봄입니다.
-                    </p>
-                  </div>
-
-                  {/* Scenarios Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                      <span className="w-2.5 h-5 bg-indigo-600 rounded inline-block" />
-                      주로 이런 상황에서 필요합니다
-                    </h3>
-                    <ScenarioStepList scenarios={transferScenarios} />
-                  </div>
-
-                  {/* Safety Precautions Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                      <span className="w-2.5 h-5 bg-amber-500 rounded inline-block" />
-                      사용 전 확인하세요 (핵심 주의사항)
-                    </h3>
-                    <SafetyCheckCard items={transferSafetyCheckItems} />
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Definition Card */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-4">
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
-                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                      {transferEducationData.definition.title}
-                    </h2>
-                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-semibold">
-                      {transferEducationData.definition.content}
-                    </p>
-                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-3">
-                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">주요 이승 상황 예시</h3>
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-semibold text-slate-700 text-sm">
-                        {transferEducationData.definition.examples.map((ex, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            <span>{ex}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Standards Section */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
-                      <span className="w-2.5 h-6 bg-primary rounded-full inline-block" />
-                      자리이동 기능평가
-                    </h2>
-                    <p className="text-sm sm:text-base text-slate-500 font-semibold">
-                      {transferEducationData.standards.description} 2점 이상부터 이승돌봄로봇의 적극적 개입이 요구됩니다.
-                    </p>
-
-                    {/* Grid representation of scores */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                      {transferEducationData.standards.items.map((item) => {
-                        const scoreVal = parseInt(item.score);
-                        const isHighlight = scoreVal >= 2;
-                        return (
-                          <div 
-                            key={item.score} 
-                            className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
-                              isHighlight 
-                                ? 'border-primary bg-white shadow-md ring-1 ring-primary/20 scale-[1.02]' 
-                                : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
-                            }`}
-                          >
-                            <div>
-                              <div className="flex justify-between items-center mb-3">
-                                <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-                                  isHighlight ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'
-                                }`}>
-                                  {item.score}
-                                </span>
-                                {isHighlight && (
-                                  <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
-                                    로봇 매칭 기준
-                                  </span>
-                                )}
-                              </div>
-                              <h3 className="text-base font-bold text-slate-800 mb-1.5">{item.label}</h3>
-                              <p className="text-xs text-slate-500 leading-relaxed font-semibold">{item.details}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Muscle Grade Section */}
-                    {transferEducationData.standards.subSection && (
-                      <div className="border-t border-slate-100 pt-8 mt-8 space-y-4">
-                        <h3 className="text-lg font-bold text-slate-800">
-                          {transferEducationData.standards.subSection.title}
-                        </h3>
-                        <p className="text-sm text-slate-500 font-semibold">
-                          {transferEducationData.standards.subSection.description}
-                        </p>
-
-                        <div className="bg-white border border-slate-200/80 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-bold text-slate-700 shadow-sm">
-                          <div className="flex items-center gap-2 bg-white p-3 rounded-lg border border-slate-200">
-                            <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
-                            <span>Grade 0 ~ III: 체중 지지 불가능 (전신슬링 리프트 적합)</span>
-                          </div>
-                          <div className="flex items-center gap-2 bg-white p-3 rounded-lg border border-slate-200">
-                            <span className="w-3 h-3 rounded-full bg-primary shrink-0" />
-                            <span>Grade IV ~ V: 체중 지지 가능 (기립보조리프트 적합)</span>
-                          </div>
-                        </div>
-
-                        <div className="overflow-x-auto rounded-xl border border-slate-200/70">
-                          <table className="min-w-full divide-y divide-slate-200 text-left text-sm bg-white">
-                            <thead className="bg-slate-50 font-bold text-slate-700">
-                              <tr>
-                                <th className="px-6 py-3">근력 레벨</th>
-                                <th className="px-6 py-3">상태 구분</th>
-                                <th className="px-6 py-3">임상 판정 기준</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
-                              {transferEducationData.standards.subSection.items.map((subItem) => {
-                                const isWeightBearing = ['Grade IV', 'Grade V'].includes(subItem.grade);
-                                return (
-                                  <tr key={subItem.grade} className={isWeightBearing ? 'bg-slate-50/30' : ''}>
-                                    <td className="px-6 py-4 font-bold text-slate-800">{subItem.grade}</td>
-                                    <td className="px-6 py-4">
-                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                        isWeightBearing ? 'bg-sky-100 text-primary' : 'bg-slate-100 text-slate-500'
-                                      }`}>
-                                        {subItem.label}
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 font-semibold text-slate-700">
-                                      {subItem.criteria}
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Tab 2: 이승로봇 종류 */}
+          {/* Tab 1: 돌봄로봇 알아보기 */}
           {activeTab === 'devices' && (
-            isSimple ? (
+            <div className="space-y-8 animate-fade-in text-left">
+              {/* Definition Card */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2">
+                  <span className="w-2.5 h-6 bg-indigo-600 rounded-full inline-block" />
+                  자리이동(이승) 돌봄이란?
+                </h2>
+                <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-semibold">
+                  스스로 다른 자리로 옮겨 앉기 어려울 때, 침대·의자·휠체어·변기 등으로 안전하게 이동하도록 돕는 돌봄입니다.
+                </p>
+              </div>
+
               <RobotStorySection
                 scenariosTitle="이런 상황에서 필요해요"
                 scenarios={transferScenariosData}
@@ -444,162 +220,18 @@ export default function TransferPage() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               />
-            ) : (
-              <div className="space-y-6 animate-fade-in">
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
-                  <h2 className="font-bold text-slate-800 mb-2 text-xl sm:text-2xl">
-                    이승돌봄로봇 종류
-                  </h2>
-                  <p className="text-slate-500 font-semibold leading-relaxed text-sm sm:text-base">
-                    환자분의 신체 조건과 가정 공간 환경에 따라 가장 잘 맞는 장치를 선택합니다. 크게 이승보조도구, 일어서기 보조 전동/수동 리프트, 공중에 매다는 그네식 리프트로 분류됩니다.
-                  </p>
-                </div>
-
-                {/* Collapsible Categories Accordion */}
-                <div className="space-y-6">
-                  {[
-                    {
-                      name: '이승보조장비',
-                      description: '자리이동 기능에 가벼운 어려움이 있어 간단한 도구를 활용해 신체 마찰과 보호자의 신체 부담을 줄여주는 장비군입니다.',
-                      targetLevel: '자리이동 가벼운 어려움 (MMT Grade IV ~ V)',
-                      devices: transferEducationData.devices.list.filter(d => d.category === '이승보조장비'),
-                    },
-                    {
-                      name: '기립보조리프트 / 스탠딩리프트',
-                      description: '다리 근력이 약해 스스로 지탱하여 일어서기는 어려우나, 상체 조절이 가능하여 보호자나 전동 로봇의 힘을 빌려 일어서고 앉을 수 있는 장비군입니다.',
-                      targetLevel: '하지 지지 어려움 (Grade III 이하) & 상체 가누기 가능',
-                      devices: transferEducationData.devices.list.filter(d => d.category === '기립보조리프트 / 스탠딩리프트'),
-                    },
-                    {
-                      name: '전신슬링 리프트',
-                      description: '다리 지지와 상체 조절이 모두 불가능한 와상/중증 상태의 환자를 전용 슬링 시트로 완전히 공중에 매달아 이동시키는 안전한 리프트 장비군입니다.',
-                      targetLevel: '하지 지지 및 상체 가누기 불가 (Grade III 이하)',
-                      devices: transferEducationData.devices.list.filter(d => d.category === '전신슬링 리프트'),
-                    },
-                  ].map((cat) => {
-                    const isOpen = openCats[cat.name];
-                    return (
-                      <div key={cat.name} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
-                        {/* Accordion Header */}
-                        <button
-                          onClick={() => toggleCat(cat.name)}
-                          className="w-full text-left p-6 bg-slate-50/70 hover:bg-slate-100/80 transition-all flex justify-between items-start gap-4 border-b border-slate-200/60 cursor-pointer"
-                        >
-                          <div className="space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="text-lg font-bold text-slate-800">{cat.name}</h3>
-                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                                {cat.targetLevel}
-                              </span>
-                            </div>
-                            <p className="text-xs sm:text-sm text-slate-500 font-semibold leading-relaxed">
-                              {cat.description}
-                            </p>
-                          </div>
-                          <div className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-500 shrink-0 mt-1">
-                            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          </div>
-                        </button>
-
-                        {/* Accordion Content */}
-                        {isOpen && (
-                          <div className="p-6 bg-slate-50/20">
-                            {cat.devices.length === 0 ? (
-                              <p className="text-sm text-slate-400 text-center py-4">등록된 로봇 정보가 없습니다.</p>
-                            ) : (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {cat.devices.map((device) => {
-                                  const imgPath = getSlingImage(device.id);
-                                  return (
-                                    <div id={`device-${device.id}`} key={device.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow duration-200 transition-all">
-                                      <div className="p-5 sm:p-6 space-y-6">
-                                        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                                          {/* Device Image */}
-                                          <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
-                                            <Image
-                                              src={imgPath}
-                                              alt={device.name}
-                                              fill
-                                              className="object-contain p-1"
-                                            />
-                                          </div>
-                                          
-                                          {/* Device Info */}
-                                          <div className="flex-1 space-y-3 text-center sm:text-left">
-                                            <div>
-                                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-primary-light text-primary uppercase">
-                                                {device.category}
-                                              </span>
-                                              <h3 className="text-base sm:text-lg font-bold text-slate-800 mt-1.5 leading-snug">{device.name}</h3>
-                                            </div>
-                                            <p className="text-xs text-slate-400 font-semibold leading-normal">
-                                              <strong className="text-slate-600 block mb-0.5">추천 대상자:</strong>
-                                              {device.target}
-                                            </p>
-                                          </div>
-                                        </div>
-
-                                        {/* Description */}
-                                        <p className="text-sm text-slate-600 leading-relaxed font-semibold border-t border-slate-100 pt-4">
-                                          {device.description}
-                                        </p>
-
-                                        {/* Pros and Precautions */}
-                                        <div className="grid grid-cols-1 gap-4 pt-2">
-                                          {/* Pros */}
-                                          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2">
-                                            <h4 className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 uppercase font-extrabold">
-                                              <ThumbsUp className="w-3.5 h-3.5" />
-                                              장점
-                                            </h4>
-                                            <ul className="space-y-1 text-xs text-emerald-800 font-semibold list-disc pl-4 leading-relaxed">
-                                              {device.pros.map((pro, idx) => (
-                                                <li key={idx}>{pro}</li>
-                                              ))}
-                                            </ul>
-                                          </div>
-
-                                          {/* Precautions */}
-                                          <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2">
-                                            <h4 className="text-xs font-bold text-amber-700 flex items-center gap-1.5 uppercase font-extrabold">
-                                              <AlertTriangle className="w-3.5 h-3.5" />
-                                              유의사항
-                                            </h4>
-                                            <ul className="space-y-1 text-xs text-amber-800 font-semibold list-disc pl-4 leading-relaxed">
-                                              {device.precautions.map((pre, idx) => (
-                                                <li key={idx}>{pre}</li>
-                                              ))}
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )
+            </div>
           )}
 
-          {/* Tab 3: 알고리즘 학습 */}
+          {/* Tab 2: 나에게 맞는 돌봄로봇 찾기 */}
           {activeTab === 'learning' && (
             <div className="space-y-6 animate-fade-in flex-1 flex flex-col">
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
-                <h2 className={`font-bold text-slate-800 mb-2 ${isSimple ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-                  {isSimple ? '나에게 맞는 돌봄로봇 찾기' : '알고리즘 학습'}
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm text-left">
+                <h2 className="font-bold text-slate-800 mb-2 text-2xl sm:text-3xl">
+                  나에게 맞는 돌봄로봇 찾기
                 </h2>
-                <p className={`text-slate-500 leading-relaxed font-semibold ${isSimple ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
-                  {isSimple 
-                    ? '몇 가지 간단한 질문에 차근차근 답하시면, 환자분에게 가장 안전한 이송 보조 장치 유형을 찾아드립니다.'
-                    : '상태 평가 질문에 답하며 돌봄 로봇 매칭 기준을 확인해보세요.'
-                  }
+                <p className="text-slate-500 leading-relaxed font-semibold text-base sm:text-lg">
+                  몇 가지 간단한 질문에 차근차근 답하시면, 환자분에게 가장 안전한 이송 보조 장치 유형을 찾아드립니다.
                 </p>
               </div>
 
@@ -607,7 +239,7 @@ export default function TransferPage() {
                 <AlgorithmRunner
                   algorithm={transferCareAlgorithm}
                   mode="learning"
-                  uiMode={uiMode}
+                  uiMode="simple"
                   onPathChange={(path) => setLearningPath(path)}
                   onLearnMore={handleLearnMore}
                 />
@@ -615,17 +247,28 @@ export default function TransferPage() {
             </div>
           )}
 
-          {/* Tab 4: 사례 테스트 */}
+          {/* Tab 3: 알고리즘 지도 */}
+          {activeTab === 'map' && (
+            <div className="space-y-6 animate-fade-in flex-1 flex flex-col">
+              <AlgorithmRunner
+                algorithm={transferCareAlgorithm}
+                mode="learning"
+                uiMode="map"
+              />
+            </div>
+          )}
+
+          {/* Tab 4: 연습해보기 */}
           {activeTab === 'quiz' && (
             <div className="max-w-3xl mx-auto w-full py-4 animate-fade-in">
-              {isSimple && !quizSafetyApproved ? (
+              {!quizSafetyApproved ? (
                 <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-md space-y-6">
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-left">
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 flex items-center gap-2">
                       <span className="w-2.5 h-6 bg-emerald-500 rounded-full inline-block" />
                       안전한 자리이동을 위한 5대 약속
                     </h2>
-                    <p className="text-sm text-slate-500 leading-relaxed font-semibold">
+                    <p className="text-sm text-slate-550 leading-relaxed font-semibold">
                       대상자와 보호자 모두의 안전을 지키는 가장 확실한 습관입니다. 아래 수칙을 터치하여 모두 확인해 주세요.
                     </p>
                   </div>
@@ -640,7 +283,7 @@ export default function TransferPage() {
                     <button
                       onClick={() => setQuizSafetyApproved(true)}
                       disabled={Object.keys(checkedSafety).length < transferSafetyItems.length || !Object.values(checkedSafety).every(Boolean)}
-                      className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-405 disabled:cursor-not-allowed text-white font-extrabold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                      className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-extrabold transition-all shadow-md flex items-center gap-2 cursor-pointer"
                     >
                       <span>확인 완료 및 연습 시작하기</span>
                       <ArrowRight className="w-4 h-4" />
@@ -648,7 +291,7 @@ export default function TransferPage() {
                   </div>
                 </div>
               ) : !quizFinished ? (
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden text-left">
                   <div className="bg-slate-100 h-1.5 w-full">
                     <div 
                       className="bg-primary h-full transition-all duration-300"
@@ -668,12 +311,12 @@ export default function TransferPage() {
 
                     <div className="p-5 bg-slate-50 rounded-xl border border-slate-200/50 space-y-2">
                       <span className="text-xs font-black text-slate-400 uppercase tracking-wider block">사례 (Scenario)</span>
-                      <p className={`text-slate-700 leading-relaxed font-semibold ${isSimple ? 'text-base sm:text-lg' : 'text-sm'}`}>
+                      <p className="text-slate-700 leading-relaxed font-semibold text-base sm:text-lg">
                         {transferCases[quizIndex].scenario}
                       </p>
                     </div>
 
-                    <h3 className={`font-bold text-slate-800 ${isSimple ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}>
+                    <h3 className="font-bold text-slate-800 text-xl sm:text-2xl">
                       {transferCases[quizIndex].question}
                     </h3>
 
@@ -700,9 +343,7 @@ export default function TransferPage() {
                             key={idx}
                             onClick={() => handleQuizAnswer(idx)}
                             disabled={isQuizSubmitted}
-                            className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between font-bold cursor-pointer ${
-                              isSimple ? 'text-base sm:text-lg' : 'text-sm'
-                            } ${btnStyle}`}
+                            className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between font-bold cursor-pointer text-base sm:text-lg ${btnStyle}`}
                           >
                             <span className="text-sm sm:text-base">{opt}</span>
                             <ChevronRight className="w-4 h-4 shrink-0" />
@@ -732,7 +373,7 @@ export default function TransferPage() {
                     </div>
 
                     {isQuizSubmitted && (
-                      <div className="mt-6 p-5 rounded-xl border border-slate-200/80 bg-white shadow-sm space-y-2 animate-fade-in">
+                      <div className="mt-6 p-5 rounded-xl border border-slate-200/80 bg-white shadow-sm space-y-2 animate-fade-in text-left">
                         <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-semibold">
                           <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                           <span>정답 해설 ({selectedQuizOption === transferCases[quizIndex].correctAnswerIndex ? '정답입니다!' : '오답입니다.'})</span>

@@ -89,7 +89,7 @@ interface Algorithm {
 interface AlgorithmRunnerProps {
   algorithm: Algorithm;
   mode: 'learning';
-  uiMode?: 'simple' | 'detail';
+  uiMode?: 'simple' | 'detail' | 'map';
   onPathChange?: (path: string[]) => void;
   onLearnMore?: (deviceId: string) => void;
 }
@@ -623,7 +623,7 @@ export function getDisplayText<T extends Record<string, any>>(
 }
 
 export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', onPathChange, onLearnMore }: AlgorithmRunnerProps) {
-  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(algorithm.startQuestionId);
+  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(uiMode === 'map' ? null : algorithm.startQuestionId);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [history, setHistory] = useState<string[]>([]);
   const [resultId, setResultId] = useState<string | null>(null);
@@ -777,6 +777,11 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
 
   const handleNodeClick = (nodeId: string) => {
+    if (uiMode === 'map') {
+      setSelectedGuideQuestionId(nodeId);
+      return;
+    }
+
     if (nodes[nodeId]?.isResult) return;
     
     setSelectedGuideQuestionId(nodeId);
@@ -860,11 +865,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
 
   const isEdgeActive = (edge: typeof edges[0]) => {
+    if (uiMode === 'map') return false;
     if (!history.includes(edge.from)) return false;
     return edge.condition(answers);
   };
 
   const getNodeStatus = (nodeId: string) => {
+    if (uiMode === 'map') {
+      if (nodeId === selectedGuideQuestionId) {
+        return nodes[nodeId]?.isResult ? 'result-active' : 'active';
+      }
+      return 'completed';
+    }
     if (nodeId === resultId) return 'result-active';
     if (nodeId === currentQuestionId) return 'active';
     if (history.includes(nodeId)) return 'completed';
@@ -1056,6 +1068,258 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             </div>
           )
         )}
+      </div>
+    );
+  }
+
+  // Render Map Explorer Mode
+  if (uiMode === 'map') {
+    const selectedResultInfo = selectedGuideQuestionId ? resultDetails[selectedGuideQuestionId] : null;
+    return (
+      <div className="w-full space-y-6">
+        {/* Top Header Panel */}
+        <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm gap-4 text-left">
+          <div>
+            <span className="text-xs font-black text-primary uppercase tracking-wider block mb-0.5">의사결정 알고리즘 지도</span>
+            <h3 className="text-sm font-bold text-slate-700 leading-snug">지도의 카드를 클릭하여 추천 판정 기준과 각 돌봄로봇 상세 정보를 확인해 보세요.</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setZoom(z => Math.max(0.15, z - 0.1))} 
+              className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+            >
+              -
+            </button>
+            <span className="text-[10px] font-bold text-slate-400 min-w-10 text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button 
+              onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} 
+              className="p-1 px-2.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer"
+            >
+              +
+            </button>
+            <button 
+              onClick={handleFitView} 
+              className="p-1 px-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 cursor-pointer flex items-center gap-1"
+            >
+              <Maximize2 className="w-3 h-3" />
+              <span>화면맞춤</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 2-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Flowchart Map */}
+          <div className="lg:col-span-8 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+            <div 
+              ref={wrapperRef}
+              className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
+              style={{ maxHeight: '600px' }}
+            >
+              <div 
+                ref={containerRef}
+                className="relative select-none origin-top-left"
+                style={{ 
+                  width: '3110px', 
+                  height: isTransfer ? '1100px' : '700px',
+                  transform: `scale(${zoom})`,
+                  transition: 'transform 0.15s ease-out'
+                }}
+              >
+                {/* SVG Connections */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                  {edges.map((edge, idx) => {
+                    const fromNode = nodes[edge.from];
+                    const toNode = nodes[edge.to];
+                    if (!fromNode || !toNode) return null;
+                    const parentW = getNodeWidth(edge.from);
+                    const parentH = getNodeHeight(edge.from);
+                    const childW = getNodeWidth(edge.to);
+                    const startX = fromNode.x + parentW / 2;
+                    const startY = fromNode.y + parentH;
+                    const endX = toNode.x + childW / 2;
+                    const endY = toNode.y;
+                    return (
+                      <g key={`${edge.from}-${edge.to}-${idx}`}>
+                        <path
+                          d={getBezierPath(startX, startY, endX, endY)}
+                          fill="none"
+                          stroke="#E2E8F0"
+                          strokeWidth={1.5}
+                        />
+                      </g>
+                    );
+                  })}
+                  {/* SVG Condition Labels */}
+                  {edges.map((edge, idx) => {
+                    const fromNode = nodes[edge.from];
+                    const toNode = nodes[edge.to];
+                    if (!fromNode || !toNode) return null;
+                    const parentW = getNodeWidth(edge.from);
+                    const parentH = getNodeHeight(edge.from);
+                    const childW = getNodeWidth(edge.to);
+                    const startX = fromNode.x + parentW / 2;
+                    const startY = fromNode.y + parentH;
+                    const endX = toNode.x + childW / 2;
+                    const endY = toNode.y;
+                    const midX = (startX + endX) / 2;
+                    const midY = (startY + endY) / 2;
+                    return (
+                      <foreignObject
+                        key={`label-${edge.from}-${edge.to}-${idx}`}
+                        x={midX - 50}
+                        y={midY - 12}
+                        width={100}
+                        height={24}
+                        className="foreign-object overflow-visible pointer-events-none"
+                      >
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight bg-white text-slate-400 border-slate-200">
+                            {edge.label}
+                          </span>
+                        </div>
+                      </foreignObject>
+                    );
+                  })}
+                </svg>
+
+                {/* HTML Nodes */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                  {Object.entries(nodes).map(([id, node]) => {
+                    const status = getNodeStatus(id);
+                    const nodeW = getNodeWidth(id);
+                    const nodeH = getNodeHeight(id);
+                    const isActive = status === 'active';
+                    const isResult = node.isResult;
+                    const isHighlightedResult = status === 'result-active';
+
+                    return (
+                      <div
+                        key={id}
+                        onClick={() => handleNodeClick(id)}
+                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
+                          isHighlightedResult
+                            ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
+                            : isActive
+                              ? 'border-2 border-primary bg-primary/5 shadow-md ring-4 ring-primary/20 scale-[1.02] z-20 cursor-default'
+                              : 'border-sky-300 bg-sky-50 text-slate-800 shadow-sm cursor-pointer hover:shadow-md hover:border-sky-400'
+                        }`}
+                        style={{
+                          left: `${node.x}px`,
+                          top: `${node.y}px`,
+                          width: `${nodeW}px`,
+                          height: `${nodeH}px`,
+                        }}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center w-full">
+                            <span className={`text-[8px] font-black uppercase tracking-wider ${
+                              isHighlightedResult ? 'text-white/85' : isActive ? 'text-primary' : 'text-slate-500'
+                            }`}>
+                              {node.typeLabel}
+                            </span>
+                          </div>
+                          <h4 className={`text-xs leading-snug font-bold text-left ${
+                            isHighlightedResult ? 'text-white' : 'text-slate-800'
+                          }`}>
+                            {node.label}
+                          </h4>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Details Panel */}
+          <div className="lg:col-span-4 w-full lg:sticky lg:top-6 space-y-6 text-left">
+            {selectedResultInfo ? (
+              /* Display Result/Robot details in map mode */
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 animate-fade-in text-left">
+                <div className="flex items-center gap-1.5 text-primary">
+                  <Bot className="w-5 h-5 shrink-0" />
+                  <h4 className="font-extrabold text-sm leading-tight">
+                    {selectedResultInfo.deviceName}
+                  </h4>
+                </div>
+                
+                {selectedResultInfo.image && (
+                  <div className="relative mx-auto w-32 h-32 rounded-xl bg-slate-55 border border-slate-100 flex items-center justify-center p-2">
+                    <Image
+                      src={selectedResultInfo.image}
+                      alt={selectedResultInfo.deviceName}
+                      fill
+                      className="object-contain p-1"
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-1 text-xs">
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">추천 상황</h5>
+                  <p className="text-slate-700 font-semibold leading-relaxed">
+                    {selectedResultInfo.whenToUse}
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주요 장점</h5>
+                  <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
+                    {selectedResultInfo.pros.slice(0, 2).map((pro, idx) => (
+                      <li key={idx}>{pro}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">유의사항</h5>
+                  <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
+                    {selectedResultInfo.precautions.slice(0, 2).map((pre, idx) => (
+                      <li key={idx}>{pre}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="space-y-1 pt-2 border-t border-slate-100 text-xs">
+                  <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">권장 환경</h5>
+                  <p className="text-slate-650 font-semibold leading-relaxed">
+                    {selectedResultInfo.environment}
+                  </p>
+                </div>
+              </div>
+            ) : selectedGuide ? (
+              /* Display Question details */
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 animate-fade-in text-left">
+                <div className="flex items-center gap-1.5 text-primary">
+                  <Info className="w-4 h-4 shrink-0" />
+                  <h4 className="font-extrabold text-sm leading-tight">
+                    {selectedGuide.title}
+                  </h4>
+                </div>
+                
+                <p className="text-xs text-slate-600 leading-relaxed font-semibold">
+                  {selectedGuide.content}
+                </p>
+
+                <div className="border-t border-slate-100 pt-3 space-y-2">
+                  {selectedGuide.details.map((detail, idx) => (
+                    <div key={idx} className="text-[11px] leading-relaxed font-medium">
+                      <strong className="text-slate-700 block mb-0.5">{detail.key}</strong>
+                      <span className="text-slate-400 block">{detail.val}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm">
+                <p className="text-xs text-slate-400 font-semibold">알고리즘 단계를 선택하시면 임상 평가 기준과 설명이 여기에 표시됩니다.</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
