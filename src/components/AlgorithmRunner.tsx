@@ -1427,15 +1427,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-2.5">
                           <div>
-                            {isResult && (
-                              <div className="mb-0.5">
-                                <span className={`text-[9px] font-black uppercase tracking-wider ${
-                                  isHighlightedResult ? 'text-white/85' : 'text-primary'
-                                }`}>
-                                  추천 결과
-                                </span>
-                              </div>
-                            )}
                             <h4 className={`text-[15px] leading-snug font-bold text-left flex items-center justify-between gap-1.5 ${
                               isHighlightedResult ? 'text-white' : 'text-slate-800'
                             }`}>
