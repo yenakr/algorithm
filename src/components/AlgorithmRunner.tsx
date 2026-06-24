@@ -815,6 +815,33 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     }
   }, [uiMode]);
 
+
+  const getOptionValueLeadingTo = (qId: string, targetId: string) => {
+    const question = algorithm.questions[qId];
+    if (!question || !question.options) return null;
+    
+    // Check single select options
+    for (const opt of question.options) {
+      const tempAnswers = { ...answers, [qId]: opt.value };
+      let nextId = null;
+      if (question.nextQuestionId) {
+        nextId = typeof question.nextQuestionId === 'function' 
+          ? question.nextQuestionId(tempAnswers) 
+          : question.nextQuestionId;
+      }
+      if (question.resultId) {
+        const resId = typeof question.resultId === 'function' 
+          ? question.resultId(tempAnswers) 
+          : question.resultId;
+        if (resId) nextId = resId;
+      }
+      if (nextId === targetId) {
+        return opt.value;
+      }
+    }
+    return question.options[0]?.value || null;
+  };
+
   const isTransfer = algorithm.id === 'transfer';
   const isFeeding = algorithm.id === 'feeding';
   const nodes = isTransfer ? transferNodes : (isFeeding ? feedingNodes : toiletingNodes);
@@ -1017,15 +1044,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Node dimensions config
   const getNodeWidth = (id: string) => {
-    return 220;
+    return 210;
   };
   const getNodeHeight = (id: string) => {
-    return 110;
+    const node = nodes[id];
+    if (node?.isResult) return 80;
+    return 130;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
-    const controlY = y1 + (y2 - y1) * 0.45;
-    return `M ${x1} ${y1} C ${x1} ${controlY}, ${x2} ${y1 + (y2 - y1) * 0.55}, ${x2} ${y2}`;
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
   };
 
   const isEdgeActive = (edge: typeof edges[0]) => {
@@ -1358,37 +1386,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       </g>
                     );
                   })}
-                  {/* SVG Condition Labels */}
-                  {edges.map((edge, idx) => {
-                    const fromNode = nodes[edge.from];
-                    const toNode = nodes[edge.to];
-                    if (!fromNode || !toNode) return null;
-                    const parentW = getNodeWidth(edge.from);
-                    const parentH = getNodeHeight(edge.from);
-                    const childW = getNodeWidth(edge.to);
-                    const startX = fromNode.x + parentW / 2;
-                    const startY = fromNode.y + parentH;
-                    const endX = toNode.x + childW / 2;
-                    const endY = toNode.y;
-                    const midX = (startX + endX) / 2;
-                    const midY = (startY + endY) / 2;
-                    return (
-                      <foreignObject
-                        key={`label-${edge.from}-${edge.to}-${idx}`}
-                        x={midX - 50}
-                        y={midY - 12}
-                        width={100}
-                        height={24}
-                        className="foreign-object overflow-visible pointer-events-none"
-                      >
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border shadow-sm tracking-tight bg-white text-slate-650 border-slate-350">
-                            {edge.label}
-                          </span>
-                        </div>
-                      </foreignObject>
-                    );
-                  })}
+                  
                 </svg>
 
                 {/* HTML Nodes */}
@@ -1404,11 +1402,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     const isPartofPath = id === selectedGuideQuestionId || isEdgeHighlighted(id, selectedGuideQuestionId) || edges.some(e => e.from === selectedGuideQuestionId && e.to === id);
                     const dimOpacity = isPartofPath ? 'opacity-100' : 'opacity-65';
 
+                    const outgoingEdges = edges.filter(e => e.from === id);
+
                     return (
                       <div
                         key={id}
                         onClick={() => handleNodeClick(id)}
-                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-4 select-none transition-all duration-300 ${dimOpacity} ${
+                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${dimOpacity} ${
                           isHighlightedResult
                             ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
                             : isActive
@@ -1422,19 +1422,50 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           height: `${nodeH}px`,
                         }}
                       >
-                        <div className="space-y-1">
-                          <div className="flex justify-between items-center w-full">
-                            <span className={`text-[8px] font-black uppercase tracking-wider ${
-                              isHighlightedResult ? 'text-white/85' : isActive ? 'text-primary' : 'text-slate-500'
+                        <div className="flex-1 flex flex-col justify-between gap-2.5">
+                          <div>
+                            {isResult && (
+                              <div className="mb-0.5">
+                                <span className={`text-[9px] font-black uppercase tracking-wider ${
+                                  isHighlightedResult ? 'text-white/85' : 'text-primary'
+                                }`}>
+                                  추천 결과
+                                </span>
+                              </div>
+                            )}
+                            <h4 className={`text-[13px] leading-snug font-bold text-left ${
+                              isHighlightedResult ? 'text-white' : 'text-slate-800'
                             }`}>
-                              {node.typeLabel}
-                            </span>
+                              {cleanInternalCodes(node.label)}
+                            </h4>
                           </div>
-                          <h4 className={`text-sm leading-snug font-bold text-left ${
-                            isHighlightedResult ? 'text-white' : 'text-slate-800'
-                          }`}>
-                            {cleanInternalCodes(node.label)}
-                          </h4>
+
+                          {!isResult && outgoingEdges.length > 0 && (
+                            <div className="flex gap-1.5 flex-wrap pt-1.5 border-t border-slate-100 mt-auto">
+                              {outgoingEdges.map((edge, eIdx) => {
+                                const isBranchSelected = answers[id] !== undefined && isEdgeActive(edge);
+                                return (
+                                  <button
+                                    key={eIdx}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const val = getOptionValueLeadingTo(id, edge.to);
+                                      if (val !== null) {
+                                        handleSingleSelect(id, val);
+                                      }
+                                    }}
+                                    className={`px-2 py-1 rounded text-[10px] font-black transition-all border cursor-pointer ${
+                                      isBranchSelected
+                                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                                        : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
+                                    }`}
+                                  >
+                                    {edge.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
