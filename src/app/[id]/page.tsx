@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowLeft, BookOpen, GitMerge, HelpCircle, CheckCircle2, 
-  ChevronRight, ChevronLeft, RefreshCw, AlertCircle, FileText, Image as ImageIcon, Bot
+  ChevronRight, ChevronLeft, RefreshCw, AlertCircle, FileText, Image as ImageIcon, Bot, ArrowUp
 } from 'lucide-react';
 
 // Data layers
@@ -45,6 +45,9 @@ export default function AlgorithmPage({ params }: PageProps) {
   if (!algoData) {
     return notFound();
   }
+
+  // Active section tracking state
+  const [activeSection, setActiveSection] = useState('original-tree');
 
   // Quiz state
   const [quizIndex, setQuizIndex] = useState(0);
@@ -112,6 +115,37 @@ export default function AlgorithmPage({ params }: PageProps) {
     }
   };
 
+  // Determine original algorithm title
+  const getOriginalTitle = () => {
+    if (algoId === 'toileting') return '배설돌봄로봇의 활용 알고리즘';
+    if (algoId === 'feeding') return '식사돌봄로봇의 활용 알고리즘';
+    if (algoId === 'transfer') return '이승돌봄로봇의 활용 알고리즘';
+    return `${algoData.title} 원본`;
+  };
+
+  // Scroll spy setup
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['original-tree', 'algo-map', 'step-learning', 'robot-types', 'quiz-section'];
+      const scrollPosition = window.scrollY + 120;
+
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="flex-1 bg-slate-50 pb-20">
       {/* Upper Navigation Bar */}
@@ -124,7 +158,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Hero section */}
+      {/* Intro section */}
       <section className="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
@@ -136,32 +170,53 @@ export default function AlgorithmPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Sticky Section Navigation Bar */}
+      <div className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+          {[
+            { id: 'original-tree', name: '원본 트리' },
+            { id: 'algo-map', name: '알고리즘 지도' },
+            { id: 'step-learning', name: '단계별 학습' },
+            { id: 'robot-types', name: '돌봄로봇 유형' },
+            { id: 'quiz-section', name: '사례 퀴즈' }
+          ].map((sec) => (
+            <a
+              key={sec.id}
+              href={`#${sec.id}`}
+              className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                activeSection === sec.id
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {sec.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* Main Single Flow Column */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 space-y-16">
         
         {/* Section 1: Original Algorithm Tree */}
-        <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-              <FileText className="w-5 h-5" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-800">
-              원본 알고리즘 트리 보기
+        <section 
+          id="original-tree" 
+          style={{ scrollMarginTop: '100px' }}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
+        >
+          <div className="text-center">
+            <h2 className="text-2xl font-black text-slate-800">
+              {getOriginalTitle()}
             </h2>
           </div>
-          <div className="h-0.5 bg-slate-100 w-full" />
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
-            아래 이미지는 알고리즘의 전체 흐름을 한눈에 볼 수 있도록 정리한 원본 도식입니다.<br />
-            세부 판단 과정은 다음 단계에서 직접 선택하며 학습할 수 있습니다.
-          </p>
 
           {/* Diagram display box */}
-          <div className="relative border border-slate-200 bg-slate-100/50 rounded-xl overflow-hidden min-h-[300px] flex items-center justify-center p-4">
+          <div className="relative border border-slate-200/60 bg-slate-100/30 rounded-xl overflow-x-auto min-h-[300px] flex items-center justify-center p-2">
             {!imageError ? (
               <img
                 src={algoData.diagramImage}
                 alt={`${algoData.title} 원본 이미지`}
-                className="max-h-[500px] object-contain rounded"
+                className="max-w-none md:max-w-full object-contain rounded"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -171,24 +226,98 @@ export default function AlgorithmPage({ params }: PageProps) {
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-bold text-slate-700">원본 알고리즘 트리 이미지가 들어갈 영역입니다.</h4>
-                  <p className="text-xs text-slate-500 leading-normal">
-                    교수님께 받은 고해상도 이미지를 프로젝트 폴더의 <code className="bg-slate-200 px-1 py-0.5 rounded text-blue-700">public{algoData.diagramImage}</code> 경로에 업로드해 주세요.
+                  <p className="text-xs text-slate-500 leading-normal text-center">
+                    이미지를 프로젝트 폴더의 <code className="bg-slate-200 px-1 py-0.5 rounded text-blue-700">public{algoData.diagramImage}</code> 경로에 위치시켜 주세요.
                   </p>
                 </div>
               </div>
             )}
           </div>
+
+          <div className="flex justify-end">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span>맨 위로</span>
+            </a>
+          </div>
         </section>
 
-        {/* Section: Related Care Robots Carousel Slider */}
-        <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+        {/* Section 2: Interactive Decision Map Explorer */}
+        <section 
+          id="algo-map"
+          style={{ scrollMarginTop: '100px' }}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
+        >
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
-                <Bot className="w-5 h-5" />
-              </div>
-              <h2 className="text-xl font-bold text-slate-800">
-                추천 돌봄로봇 유형 살펴보기
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-slate-800">
+                알고리즘 지도
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                지도에서 각 단계를 선택하면 판단 기준과 관련 돌봄로봇 정보를 확인할 수 있습니다.
+              </p>
+            </div>
+          </div>
+          <div className="h-0.5 bg-slate-100 w-full" />
+          
+          <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-slate-50/50">
+            <AlgorithmRunner 
+              algorithm={algoData.algorithm} 
+              mode="learning"
+              uiMode="map"
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span>맨 위로</span>
+            </a>
+          </div>
+        </section>
+
+        {/* Section 3: Interactive Q&A Algorithm Runner */}
+        <section 
+          id="step-learning"
+          style={{ scrollMarginTop: '100px' }}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
+        >
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black text-slate-800">
+              단계별 학습
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+              질문에 응답해가며 대상자에 맞는 돌봄로봇 유형을 판단합니다.
+            </p>
+          </div>
+          <div className="h-0.5 bg-slate-100 w-full" />
+          
+          <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-slate-50/50">
+            <AlgorithmRunner 
+              algorithm={algoData.algorithm} 
+              mode="learning"
+              uiMode="simple"
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span>맨 위로</span>
+            </a>
+          </div>
+        </section>
+
+        {/* Section 4: Related Care Robots Carousel Slider */}
+        <section 
+          id="robot-types"
+          style={{ scrollMarginTop: '100px' }}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
+        >
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-slate-800">
+                돌봄로봇 유형 살펴보기
               </h2>
             </div>
             
@@ -199,24 +328,24 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
 
-          {/* Carousel Layout wrapper */}
-          <div className="relative flex items-center justify-between gap-2 sm:gap-4 select-none">
+          {/* Carousel Layout wrapper with fixed minimum height */}
+          <div className="relative flex items-center justify-between gap-2 sm:gap-4 select-none min-h-[580px] sm:min-h-[460px] md:min-h-[400px]">
             {/* Left Prev Arrow Button */}
             <button
               onClick={handlePrevDevice}
               className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
               aria-label="이전 로봇 보기"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
             {/* Premium Cuttoon style main card */}
-            <div className="flex-1 min-w-0 bg-slate-50/50 border border-slate-200/60 rounded-2xl p-6 sm:p-8 transition-all duration-300">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <div className="flex-1 min-w-0 bg-slate-50/50 border border-slate-200/60 rounded-2xl p-5 sm:p-6 transition-all duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 
                 {/* Robot Image or Fallback container */}
-                <div className="md:col-span-4 flex justify-center">
-                  <div className="relative w-full max-w-[200px] h-[200px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
+                <div className="md:col-span-4 flex justify-center self-center">
+                  <div className="relative w-full max-w-[160px] h-[160px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
                     {getDeviceImage(devicesList[deviceIndex].id) ? (
                       <img
                         src={getDeviceImage(devicesList[deviceIndex].id)}
@@ -225,10 +354,10 @@ export default function AlgorithmPage({ params }: PageProps) {
                       />
                     ) : (
                       <div className="text-center p-4 flex flex-col items-center justify-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
-                          <Bot className="w-6 h-6" />
+                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
+                          <Bot className="w-5 h-5" />
                         </div>
-                        <span className="text-[11px] font-bold text-slate-400 leading-normal">
+                        <span className="text-[10px] font-bold text-slate-400 leading-normal">
                           이미지 준비 중<br />({devicesList[deviceIndex].id})
                         </span>
                       </div>
@@ -243,43 +372,49 @@ export default function AlgorithmPage({ params }: PageProps) {
                       {devicesList[deviceIndex].category}
                     </span>
                     <span className="text-xs text-slate-400 font-semibold">
-                      기기 코드: {devicesList[deviceIndex].id}
+                      코드: {devicesList[deviceIndex].id}
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-black text-slate-800">
-                    {devicesList[deviceIndex].name}
-                  </h3>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-none">
+                      {devicesList[deviceIndex].name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-500 font-bold mt-2 leading-relaxed">
+                      {devicesList[deviceIndex].description}
+                    </p>
+                  </div>
 
-                  <p className="text-sm text-slate-600 leading-relaxed font-semibold">
-                    {devicesList[deviceIndex].description}
-                  </p>
+                  {/* Applicability targets bullets */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-bold text-slate-400 block">적용 대상자</span>
+                    <ul className="text-xs text-slate-600 font-bold list-disc list-inside space-y-0.5">
+                      {devicesList[deviceIndex].target.split('및').flatMap(s => s.split(',')).map(s => s.trim()).filter(Boolean).map((tgt, i) => (
+                        <li key={i} className="leading-relaxed">{tgt}</li>
+                      ))}
+                    </ul>
+                  </div>
 
-                  <div className="bg-white border border-slate-100 rounded-xl p-4 space-y-3">
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block mb-1">적용 대상자</span>
-                      <p className="text-xs text-slate-600 font-semibold leading-relaxed">
-                        {devicesList[deviceIndex].target}
-                      </p>
+                  {/* Left / Right Split Layout for Pros & Precautions */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    {/* Pros Box */}
+                    <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-4">
+                      <span className="text-xs font-bold text-emerald-700 block mb-2">사용 장점</span>
+                      <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                        {devicesList[deviceIndex].pros.map((pro, idx) => (
+                          <li key={idx}>{pro}</li>
+                        ))}
+                      </ul>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <div>
-                        <span className="text-xs font-bold text-emerald-600 block mb-1">👍 장점</span>
-                        <ul className="text-xs text-slate-500 font-semibold list-disc list-inside space-y-0.5">
-                          {devicesList[deviceIndex].pros.map((pro, idx) => (
-                            <li key={idx}>{pro}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-amber-600 block mb-1">⚠️ 유의사항</span>
-                        <ul className="text-xs text-slate-500 font-semibold list-disc list-inside space-y-0.5">
-                          {devicesList[deviceIndex].precautions.map((pre, idx) => (
-                            <li key={idx}>{pre}</li>
-                          ))}
-                        </ul>
-                      </div>
+                    {/* Precautions Box */}
+                    <div className="bg-amber-50/40 border border-amber-100 rounded-xl p-4">
+                      <span className="text-xs font-bold text-amber-700 block mb-2">유의사항</span>
+                      <ul className="text-[11px] sm:text-xs text-slate-600 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                        {devicesList[deviceIndex].precautions.map((pre, idx) => (
+                          <li key={idx}>{pre}</li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
 
@@ -294,7 +429,7 @@ export default function AlgorithmPage({ params }: PageProps) {
               className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
               aria-label="다음 로봇 보기"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
@@ -311,37 +446,27 @@ export default function AlgorithmPage({ params }: PageProps) {
               />
             ))}
           </div>
-        </section>
 
-        {/* Section 2: Interactive Clicking Algorithm */}
-        <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-              <GitMerge className="w-5 h-5" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-800">
-              단계별 알고리즘 따라가기
-            </h2>
-          </div>
-          <div className="h-0.5 bg-slate-100 w-full" />
-          
-          <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-slate-50/50">
-            <AlgorithmRunner 
-              algorithm={algoData.algorithm} 
-              mode="learning"
-              uiMode="simple"
-            />
+          <div className="flex justify-end">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span>맨 위로</span>
+            </a>
           </div>
         </section>
 
-        {/* Section 3: Case Study Quiz */}
-        <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+        {/* Section 5: Case Study Quiz */}
+        <section 
+          id="quiz-section"
+          style={{ scrollMarginTop: '100px' }}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
+        >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
               <HelpCircle className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-slate-800">
-              알고리즘 기반 사례 퀴즈
+              사례 기반 퀴즈
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
@@ -487,6 +612,13 @@ export default function AlgorithmPage({ params }: PageProps) {
           ) : (
             <p className="text-slate-400 text-sm text-center py-6">준비된 퀴즈가 없습니다.</p>
           )}
+
+          <div className="flex justify-end">
+            <a href="#original-tree" className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span>맨 위로</span>
+            </a>
+          </div>
         </section>
 
       </div>

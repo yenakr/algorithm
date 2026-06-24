@@ -410,6 +410,39 @@ const learningGuides: Record<string, { title: string; content: string; details: 
       { key: '0~1점 (양호)', val: '누운 채 탈착형 자동배설로봇 간헐적 이용' },
       { key: '2~4점 (장해)', val: '24시간 스마트 기저귀 흡인형 배설로봇 지속 가동' }
     ]
+  },
+  feeding_q1: {
+    title: '삼킴(연하) 기능 평가',
+    content: '식사 중 사래가 자주 걸리거나 기침을 하는지, 또는 목으로 삼키는 생리적인 동작에 어려움이 있는지 검사합니다. 삼킴 장애가 동반될 경우 흡인성 폐렴이나 질식의 고위험 상태로 보고 별도 수동 식사 급여 및 연하식 관리를 적용해야 합니다.',
+    details: [
+      { key: '0~1점 (양호)', val: '사래 들림 없이 식사하거나 가벼운 마른 기침 정도로 안전하게 음식물을 목 뒤로 넘기는 자립 수준' },
+      { key: '2~4점 (장해)', val: '저작 및 삼킴 곤란이 있어 연식/죽 등의 특별 조리식이 필요하거나 콧줄/튜브 급식이 유지되어 밀착 모니터링이 필요한 상태' }
+    ]
+  },
+  feeding_q2_a: {
+    title: '상지 조절 및 식사 거동 평가',
+    content: '식기를 집어 숟가락으로 음식을 푸고, 이를 조절해 입 앞까지 흘리지 않고 안전하게 배달하는 상체 근력 및 손 동작 제어 기능을 평가합니다.',
+    details: [
+      { key: '0점 (문제 없음)', val: '아무 도움 없이 스스로 숟가락과 식기를 쥐고 흘리지 않고 식사함' },
+      { key: '1~2점 (약간의 장해)', val: '손떨림이 있거나 관절염 등으로 일부 반찬을 흘리지만, 스마트 자이로 스푼이나 잡기 편한 특수 그립 식기가 보조되면 스스로 식사 가능한 수준' },
+      { key: '3~4점 (중증 장해)', val: '어깨/팔 마비로 숟가락 조작이 아예 불가능하여 고개를 움직여 섭식할 수 있는지 추가로 체크해야 하는 상태' }
+    ]
+  },
+  feeding_q3_a: {
+    title: '경부 조절 및 협조 능력 평가',
+    content: '팔은 움직이지 못하지만, 밥공기나 숟가락이 얼굴 근처에 왔을 때 목을 움직여 받아먹을 수 있는지 판단합니다.',
+    details: [
+      { key: '예 (조절 가능)', val: '고개 숙임이 가능하므로 숟가락에 올려진 음식을 입으로 안전하게 가져오는 전동 식사로봇 적용이 유용합니다.' },
+      { key: '아니오 (조절불능)', val: '목을 가누지 못해 삼키는 자세 유지가 안 되므로 기계를 쓰지 않고 보호자가 안전 속도로 직접 급식을 전담해야 합니다.' }
+    ]
+  },
+  feeding_q2_b: {
+    title: '식사 행위 집중 및 인지 능력 평가',
+    content: '인지 저하(치매 등)로 인해 본인이 밥을 먹는 상황을 망각하거나, 음식을 입에 물고만 있는 등 식사의 영양 공급에 장애가 생기는지 검사합니다.',
+    details: [
+      { key: '예 (집중함)', val: '삼킴 기능의 장해 집중 보조와 특수 점도식 공급 관리가 이루어져야 합니다.' },
+      { key: '아니오 (집중 불가)', val: '식사 진행 속도를 음성 등으로 지속 환기시켜 섭식을 유도하는 인지 환기 보조 기기를 고려해야 합니다.' }
+    ]
   }
 };
 
@@ -489,6 +522,30 @@ const toiletingEdges = [
   { from: 'q3_b1', to: 'B-F', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 2 },
   { from: 'q3_b2', to: 'B-G', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 0 && parseInt(ans['q3_b2'] || '-1') <= 1 },
   { from: 'q3_b2', to: 'B-H', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 2 },
+];
+
+const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
+  q1: { x: 1385, y: 0, label: "삼킴 작용에 사래 들림이 있나요?", typeLabel: "삼킴 평가" },
+  q2_a: { x: 545, y: 200, label: "스스로 식사 도구 숟가락질이 가능하나요?", typeLabel: "상지 조절 평가" },
+  q2_b: { x: 2225, y: 200, label: "식사 행위를 스스로 자각하고 집중하나요?", typeLabel: "인지 집중 평가" },
+  q3_a: { x: 545, y: 400, label: "고개를 숙여 떠주는 음식을 드실 수 있나요?", typeLabel: "경부 조절 평가" },
+  'F-A': { x: 125, y: 600, label: "도움 불필요", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-B': { x: 545, y: 600, label: "기능성 보조 식기 / 그립 지원 도구", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-C': { x: 965, y: 600, label: "전동 식사보조 로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-D': { x: 1805, y: 600, label: "연하 보조식 / 밀착 급식 지원", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-E': { x: 2645, y: 600, label: "인지 환기 보조 장치", isResult: true, typeLabel: "돌봄로봇 추천" },
+};
+
+const feedingEdges = [
+  { from: 'q1', to: 'q2_a', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 0 && parseInt(ans['q1'] || '-1') <= 1 },
+  { from: 'q1', to: 'q2_b', label: "2~4점 (장해)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
+  { from: 'q2_a', to: 'F-A', label: "0점 (양호)", condition: (ans: any) => ans['q2_a'] === '0' },
+  { from: 'q2_a', to: 'F-B', label: "1~2점 (약간의 장해)", condition: (ans: any) => ans['q2_a'] === '1' || ans['q2_a'] === '2' },
+  { from: 'q2_a', to: 'q3_a', label: "3~4점 (중증 장해)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 3 },
+  { from: 'q3_a', to: 'F-C', label: "예 (목 조절)", condition: (ans: any) => ans['q3_a'] === 'yes' },
+  { from: 'q3_a', to: 'F-D', label: "아니오 (조절불가)", condition: (ans: any) => ans['q3_a'] === 'no' },
+  { from: 'q2_b', to: 'F-D', label: "예 (인지 가능)", condition: (ans: any) => ans['q2_b'] === 'yes' },
+  { from: 'q2_b', to: 'F-E', label: "아니오 (인지장애)", condition: (ans: any) => ans['q2_b'] === 'no' },
 ];
 
 const getShortOptionText = (text: string) => {
@@ -701,8 +758,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   }, [showDecisionMap]);
 
   const isTransfer = algorithm.id === 'transfer';
-  const nodes = isTransfer ? transferNodes : toiletingNodes;
-  const edges = isTransfer ? transferEdges : toiletingEdges;
+  const isFeeding = algorithm.id === 'feeding';
+  const nodes = isTransfer ? transferNodes : (isFeeding ? feedingNodes : toiletingNodes);
+  const edges = isTransfer ? transferEdges : (isFeeding ? feedingEdges : toiletingEdges);
 
   const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
 
@@ -715,9 +773,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   const getGuideKey = (qId: string | null) => {
     if (!qId) return '';
-    return algorithm.id === 'toileting' && ['q1', 'q2_a', 'q2_b', 'q3_a1', 'q3_a2', 'q3_b1', 'q3_b2'].includes(qId)
-      ? `toileting_${qId}`
-      : qId;
+    if (algorithm.id === 'toileting' && ['q1', 'q2_a', 'q2_b', 'q3_a1', 'q3_a2', 'q3_b1', 'q3_b2'].includes(qId)) {
+      return `toileting_${qId}`;
+    }
+    if (algorithm.id === 'feeding' && ['q1', 'q2_a', 'q2_b', 'q3_a'].includes(qId)) {
+      return `feeding_${qId}`;
+    }
+    return qId;
   };
 
   const selectedGuide = selectedGuideQuestionId ? learningGuides[getGuideKey(selectedGuideQuestionId)] : null;
