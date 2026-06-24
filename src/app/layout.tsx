@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="ko" className="h-full antialiased">
       <body className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
         <Navbar />
-        <main className="flex-1 flex flex-col w-full max-w-full overflow-x-hidden min-w-0">
+        <main className="flex-1 flex flex-col w-full max-w-full min-w-0">
           {children}
         </main>
         <Footer />

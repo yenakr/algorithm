@@ -188,7 +188,7 @@ export default function AlgorithmPage({ params }: PageProps) {
       </section>
 
       {/* Sticky Dual Navigation Header */}
-      <div className="sticky top-0 z-45 bg-white/95 border-b border-slate-200 shadow-md backdrop-blur-md py-3.5 space-y-3">
+      <div className="sticky top-16 z-45 bg-white/95 border-b border-slate-200 shadow-md backdrop-blur-md py-3.5 space-y-3">
         {/* 1. Algorithm switching tabs */}
         <div className="max-w-[1400px] mx-auto px-4 flex justify-center gap-2.5 flex-wrap">
           {[
