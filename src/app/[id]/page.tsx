@@ -5,7 +5,7 @@ import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowLeft, BookOpen, GitMerge, HelpCircle, CheckCircle2, 
-  ChevronRight, RefreshCw, AlertCircle, FileText, Image as ImageIcon
+  ChevronRight, ChevronLeft, RefreshCw, AlertCircle, FileText, Image as ImageIcon, Bot
 } from 'lucide-react';
 
 // Data layers
@@ -17,6 +17,24 @@ import AlgorithmRunner from '@/components/AlgorithmRunner';
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+
+const getDeviceImage = (deviceId: string) => {
+  const imageMap: Record<string, string> = {
+    'B-B': '/images/hygiene_bidet.png',
+    'B-C': '/images/toilet_lift.png',
+    'B-D': '/images/toilet_lift.png',
+    'B-G': '/images/excretion_robot.png',
+    'B-H': '/images/smart_diaper_robot.png',
+    'T-B': '/images/transfer_board.png',
+    'T-C': '/images/standing_aid.png',
+    'T-D': '/images/manual_standing_aid.png',
+    'T-E': '/images/transfer_lift.png',
+    'T-F': '/images/wall_lift.png',
+    'T-G': '/images/mobile_sling_lift.png',
+    'T-H': '/images/gantry_lift.png',
+  };
+  return imageMap[deviceId] || '';
+};
 
 export default function AlgorithmPage({ params }: PageProps) {
   const resolvedParams = use(params);
@@ -37,6 +55,9 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   // Original image error tracking
   const [imageError, setImageError] = useState(false);
+
+  // Device Carousel State
+  const [deviceIndex, setDeviceIndex] = useState(0);
 
   const handleQuizAnswer = (optionIdx: number) => {
     if (isSubmitted) return;
@@ -65,11 +86,30 @@ export default function AlgorithmPage({ params }: PageProps) {
   };
 
   const handleResetQuiz = () => {
+    setDeviceIndex(0);
     setQuizIndex(0);
     setSelectedOption(null);
     setIsSubmitted(false);
     setScore(0);
     setIsFinished(false);
+  };
+
+  const devicesList = algoData.education.devices.list;
+
+  const handlePrevDevice = () => {
+    if (deviceIndex > 0) {
+      setDeviceIndex(prev => prev - 1);
+    } else {
+      setDeviceIndex(devicesList.length - 1);
+    }
+  };
+
+  const handleNextDevice = () => {
+    if (deviceIndex < devicesList.length - 1) {
+      setDeviceIndex(prev => prev + 1);
+    } else {
+      setDeviceIndex(0);
+    }
   };
 
   return (
@@ -81,9 +121,6 @@ export default function AlgorithmPage({ params }: PageProps) {
             <ArrowLeft className="w-4 h-4" />
             <span>메인으로 돌아가기</span>
           </Link>
-          <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">
-            돌봄로봇 알고리즘 교육용 독립 사이트
-          </span>
         </div>
       </div>
 
@@ -140,6 +177,139 @@ export default function AlgorithmPage({ params }: PageProps) {
                 </div>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Section: Related Care Robots Carousel Slider */}
+        <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
+                <Bot className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800">
+                추천 돌봄로봇 유형 살펴보기
+              </h2>
+            </div>
+            
+            {/* Quick Slider Page Indicators */}
+            <div className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">
+              {deviceIndex + 1} / {devicesList.length}
+            </div>
+          </div>
+          <div className="h-0.5 bg-slate-100 w-full" />
+
+          {/* Carousel Layout wrapper */}
+          <div className="relative flex items-center justify-between gap-2 sm:gap-4 select-none">
+            {/* Left Prev Arrow Button */}
+            <button
+              onClick={handlePrevDevice}
+              className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
+              aria-label="이전 로봇 보기"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+
+            {/* Premium Cuttoon style main card */}
+            <div className="flex-1 min-w-0 bg-slate-50/50 border border-slate-200/60 rounded-2xl p-6 sm:p-8 transition-all duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                {/* Robot Image or Fallback container */}
+                <div className="md:col-span-4 flex justify-center">
+                  <div className="relative w-full max-w-[200px] h-[200px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
+                    {getDeviceImage(devicesList[deviceIndex].id) ? (
+                      <img
+                        src={getDeviceImage(devicesList[deviceIndex].id)}
+                        alt={devicesList[deviceIndex].name}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="text-center p-4 flex flex-col items-center justify-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
+                          <Bot className="w-6 h-6" />
+                        </div>
+                        <span className="text-[11px] font-bold text-slate-400 leading-normal">
+                          이미지 준비 중<br />({devicesList[deviceIndex].id})
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Robot Details contents */}
+                <div className="md:col-span-8 space-y-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
+                      {devicesList[deviceIndex].category}
+                    </span>
+                    <span className="text-xs text-slate-400 font-semibold">
+                      기기 코드: {devicesList[deviceIndex].id}
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl font-black text-slate-800">
+                    {devicesList[deviceIndex].name}
+                  </h3>
+
+                  <p className="text-sm text-slate-600 leading-relaxed font-semibold">
+                    {devicesList[deviceIndex].description}
+                  </p>
+
+                  <div className="bg-white border border-slate-100 rounded-xl p-4 space-y-3">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block mb-1">적용 대상자</span>
+                      <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                        {devicesList[deviceIndex].target}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <span className="text-xs font-bold text-emerald-600 block mb-1">👍 장점</span>
+                        <ul className="text-xs text-slate-500 font-semibold list-disc list-inside space-y-0.5">
+                          {devicesList[deviceIndex].pros.map((pro, idx) => (
+                            <li key={idx}>{pro}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-amber-600 block mb-1">⚠️ 유의사항</span>
+                        <ul className="text-xs text-slate-500 font-semibold list-disc list-inside space-y-0.5">
+                          {devicesList[deviceIndex].precautions.map((pre, idx) => (
+                            <li key={idx}>{pre}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+            {/* Right Next Arrow Button */}
+            <button
+              onClick={handleNextDevice}
+              className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm transition-all focus:outline-none shrink-0"
+              aria-label="다음 로봇 보기"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Dot navigation indicators */}
+          <div className="flex justify-center gap-1.5 pt-2">
+            {devicesList.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setDeviceIndex(idx)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  idx === deviceIndex ? 'w-5 bg-blue-600' : 'bg-slate-300 hover:bg-slate-400'
+                }`}
+                aria-label={`${idx + 1}번 로봇으로 이동`}
+              />
+            ))}
           </div>
         </section>
 

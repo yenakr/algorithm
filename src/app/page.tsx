@@ -7,25 +7,25 @@ export default function Home() {
   const algorithms = [
     {
       id: 'toileting',
-      title: '배설돌봄 알고리즘',
-      description: '배뇨와 배변 등 위생 관리가 필요한 상황에서 적합한 배설돌봄 로봇 유형을 판단하는 알고리즘입니다.',
-      buttonText: '배설돌봄 알고리즘 보기',
+      title: '배설돌봄',
+      description: '배뇨와 배변 등 위생 관리가 필요한 상황에서 대상자의 인지 및 신체 상태를 기반으로 알맞은 솔루션을 판단합니다.',
+      buttonText: '학습 시작하기',
       color: 'border-blue-200 hover:border-blue-400 bg-blue-50/30',
       tagColor: 'bg-blue-100 text-blue-800',
     },
     {
       id: 'feeding',
-      title: '식사돌봄 알고리즘',
-      description: '식사 보조가 필요한 상황에서 대상자의 기능과 돌봄 환경에 따라 적합한 식사돌봄 로봇 유형을 판단하는 알고리즘입니다.',
-      buttonText: '식사돌봄 알고리즘 보기',
+      title: '식사돌봄',
+      description: '식사 보조가 필요한 상황에서 대상자의 삼킴 장애 위험과 상지 조절 상태를 분석하여 적합한 보조 기기를 선별합니다.',
+      buttonText: '학습 시작하기',
       color: 'border-emerald-200 hover:border-emerald-400 bg-emerald-50/30',
       tagColor: 'bg-emerald-100 text-emerald-800',
     },
     {
       id: 'transfer',
-      title: '이승돌봄 알고리즘',
-      description: '침대, 의자, 휠체어 등으로 자리를 옮기는 상황에서 필요한 이승돌봄 로봇 유형을 판단하는 알고리즘입니다.',
-      buttonText: '이승돌봄 알고리즘 보기',
+      title: '이승돌봄',
+      description: '침대, 의자, 휠체어 등으로 자리를 옮길 때 대상자의 기립 균형과 상하체 근력을 평가하여 안전한 리프트 유형을 결정합니다.',
+      buttonText: '학습 시작하기',
       color: 'border-indigo-200 hover:border-indigo-400 bg-indigo-50/30',
       tagColor: 'bg-indigo-100 text-indigo-800',
     },
@@ -94,9 +94,6 @@ export default function Home() {
               className={`flex flex-col justify-between p-8 rounded-2xl border transition-all duration-300 shadow-sm hover:shadow-md ${algo.color}`}
             >
               <div className="space-y-4">
-                <span className={`px-2.5 py-1 text-xs font-bold rounded-md uppercase tracking-wider ${algo.tagColor}`}>
-                  Algorithm
-                </span>
                 <h3 className="text-xl font-bold text-slate-800">
                   {algo.title}
                 </h3>

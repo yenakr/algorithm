@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "돌봄로봇 알고리즘 학습",
+  title: "돌봄로봇 알고리즘",
   description: "대상자의 상태와 돌봄 환경을 바탕으로 상황에 맞는 배설돌봄, 식사돌봄, 이승돌봄 로봇 유형을 판단하는 알고리즘을 학습합니다."
 };
 

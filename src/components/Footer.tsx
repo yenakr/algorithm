@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-500 fill-current" />
             <span className="text-white font-bold text-sm tracking-wide">
-              돌봄로봇 알고리즘 학습
+              돌봄로봇 알고리즘
             </span>
           </div>
           <div className="text-xs text-slate-500 text-center md:text-right">
