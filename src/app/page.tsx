@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, BookOpen, GitMerge, HelpCircle, Trophy, Eye, CheckSquare } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function Home() {
   const algorithms = [
@@ -28,37 +28,6 @@ export default function Home() {
       buttonText: '학습 시작하기',
       color: 'border-indigo-200 hover:border-indigo-400 bg-indigo-50/30',
       tagColor: 'bg-indigo-100 text-indigo-800',
-    },
-  ];
-
-  const steps = [
-    {
-      step: 1,
-      title: '알고리즘 선택',
-      description: '학습할 돌봄로봇 알고리즘을 선택합니다.',
-      icon: BookOpen,
-      color: 'bg-blue-50 text-blue-600 border-blue-100',
-    },
-    {
-      step: 2,
-      title: '원본 알고리즘 트리 확인',
-      description: '제공된 알고리즘 트리 원본 이미지를 통해 전체 판단 흐름을 먼저 살펴봅니다.',
-      icon: Eye,
-      color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
-    },
-    {
-      step: 3,
-      title: '단계별 알고리즘 따라가기',
-      description: '클릭 가능한 질문 흐름을 따라가며 판단 기준을 익힙니다.',
-      icon: GitMerge,
-      color: 'bg-purple-50 text-purple-600 border-purple-100',
-    },
-    {
-      step: 4,
-      title: '사례 문제 풀이',
-      description: '실제 돌봄 상황을 바탕으로 알고리즘을 적용하는 연습을 합니다.',
-      icon: CheckSquare,
-      color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     },
   ];
 
@@ -112,40 +81,6 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Simple 4-Step Process Section */}
-      <section className="bg-slate-100/80 border-t border-slate-200/60 py-16 sm:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-              학습 흐름
-            </h2>
-            <div className="h-1 w-12 bg-blue-600 rounded mx-auto mt-2" />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.step} className="bg-white rounded-2xl p-6 border border-slate-200/50 shadow-sm relative group">
-                  <div className="absolute top-4 right-4 text-xs font-black text-slate-300">
-                    STEP 0{item.step}
-                  </div>
-                  <div className={`p-3 rounded-xl border w-fit mb-4 ${item.color}`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-slate-800 mb-2 leading-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold">
-                    {item.description}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </section>
     </div>
