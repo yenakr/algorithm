@@ -7,29 +7,29 @@ export default function Home() {
   const steps = [
     {
       step: 1,
-      title: '교육자료 학습',
-      description: '돌봄로봇의 기본 정의와 평가기준을 확인합니다.',
+      title: '기본 내용 학습',
+      description: '돌봄로봇의 개념과 활용 상황을 먼저 확인합니다.',
       icon: BookOpen,
       color: 'bg-blue-50 text-blue-600 border-blue-100',
     },
     {
       step: 2,
-      title: '알고리즘 학습',
-      description: '평가 질문에 답하며 최적의 매칭 경로를 파악합니다.',
+      title: '알고리즘 따라가기',
+      description: '대상자의 상태와 돌봄 환경에 대한 질문에 답하며 추천 경로를 살펴봅니다.',
       icon: GitMerge,
       color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     },
     {
       step: 3,
-      title: '사례 기반 테스트',
-      description: '실제 사례 문제를 해결하며 지식을 점검합니다.',
+      title: '사례 문제 풀기',
+      description: '실제 돌봄 상황을 바탕으로 어떤 로봇이 적합한지 점검합니다.',
       icon: HelpCircle,
       color: 'bg-amber-50 text-amber-600 border-amber-100',
     },
     {
       step: 4,
       title: '결과 확인',
-      description: '분석에 따른 최적의 추천 모델과 근거를 확인합니다.',
+      description: '선택 결과와 추천 이유를 확인하고, 필요한 내용을 다시 학습합니다.',
       icon: Trophy,
       color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     },
@@ -45,7 +45,8 @@ export default function Home() {
             돌봄로봇 교육 및 자가평가
           </h1>
           <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-100/90 leading-relaxed font-semibold">
-            이승돌봄과 배설돌봄 상황에 맞는 돌봄로봇을 이해하고, 나에게 필요한 유형을 확인해보세요.
+            이승돌봄과 배설돌봄에 활용되는 돌봄로봇을 알아보고,<br />
+            상황에 따라 어떤 유형이 적합한지 직접 확인해보세요.
           </p>
 
           {/* Direct Category Entry Buttons */}
@@ -54,14 +55,14 @@ export default function Home() {
               href="/transfer"
               className="px-8 py-4 rounded-xl bg-white text-primary hover:bg-slate-100 font-extrabold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              <span>이승돌봄 바로가기</span>
+              <span>이승돌봄</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/toileting"
               className="px-8 py-4 rounded-xl bg-primary-dark/40 text-white hover:bg-primary-dark/60 font-extrabold text-base border border-white/20 hover:border-white/50 backdrop-blur-md transition-all flex items-center justify-center gap-2"
             >
-              <span>배설돌봄 바로가기</span>
+              <span>배설돌봄</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -77,7 +78,7 @@ export default function Home() {
           </h2>
           <div className="h-1.5 w-16 bg-primary rounded" />
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed pt-2 font-medium">
-            이송과 위생 관리를 돕는 돌봄로봇의 특성을 이해하고, 환경과 대상자의 특성에 따른 최적의 대안을 확인할 수 있도록 지원합니다.
+            돌봄로봇은 대상자의 이동과 위생 관리를 돕고, 돌봄제공자의 부담을 줄이는 새로운 돌봄 도구로 활용되고 있습니다.
           </p>
         </div>
 
@@ -88,7 +89,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-slate-800">이승돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              침대, 의자, 휠체어 등으로 자리를 옮길 때 필요한 돌봄로봇
+              침대, 의자, 휠체어 등으로 자리를 옮기는 과정에서 사용할 수 있는 돌봄로봇입니다.
             </p>
             <Link href="/transfer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               이승돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
@@ -101,7 +102,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-slate-800">배설돌봄</h3>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              배뇨와 배변 등 위생 관리를 돕는 돌봄로봇
+              배뇨와 배변 등 위생 관리가 필요한 상황에서 사용할 수 있는 돌봄로봇입니다.
             </p>
             <Link href="/toileting" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline pt-2">
               배설돌봄 로봇 살펴보기 <ArrowRight className="w-4 h-4" />
@@ -116,7 +117,7 @@ export default function Home() {
           <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
             <span className="text-xs font-bold text-primary uppercase tracking-wider font-semibold">PROCESS</span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
-              Process
+              학습 흐름
             </h2>
           </div>
 
