@@ -30,7 +30,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "고정 설치형이므로 사용 장소가 제한될 수 있음"
       ],
       examples: [],
-      image: "/robot-types/transfer/ceiling-hoist.png"
+      image: "/images/transfer_lift.png"
     },
     {
       id: "mobile-lift",
@@ -51,7 +51,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "방향 전환이나 좁은 공간 사용 가능 여부 확인 필요"
       ],
       examples: [],
-      image: "/robot-types/transfer/mobile-lift.png"
+      image: "/images/mobile_sling_lift.png"
     },
     {
       id: "transfer-automatic",
@@ -73,7 +73,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "장비별 사용 조건과 보호자 조작 방법 확인 필요"
       ],
       examples: ["Sasuke", "Hug"],
-      image: "/robot-types/transfer/transfer-automatic.png"
+      image: "/images/standing_aid.png"
     }
   ],
   toileting: [
@@ -97,7 +97,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "대상자의 체형과 착용 가능 여부 확인 필요"
       ],
       examples: ["Care bidet", "intelligent incontinence cleaning robot"],
-      image: "/robot-types/toileting/toileting-auto-care.png"
+      image: "/images/excretion_robot.png"
     },
     {
       id: "smart-diaper-monitoring",
@@ -119,7 +119,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "실제 배설 처리 기능은 별도로 필요할 수 있음"
       ],
       examples: [],
-      image: "/robot-types/toileting/smart-diaper-monitoring.png"
+      image: "/images/smart_diaper_robot.png"
     },
     {
       id: "toileting-prediction",
@@ -141,7 +141,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "이동 보조가 필요한 경우 다른 돌봄 장비와 함께 고려 필요"
       ],
       examples: ["DFree"],
-      image: "/robot-types/toileting/toileting-prediction.png"
+      image: "/images/smart_diaper_robot.png"
     }
   ],
   feeding: [
@@ -165,7 +165,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "사용 중 보호자 관찰이 필요할 수 있음"
       ],
       examples: ["Obi", "Neater Eater Robotic"],
-      image: "/robot-types/feeding/feeding-automatic.png"
+      image: "/images/feeding_robot.png"
     },
     {
       id: "feeding-manual",
@@ -186,7 +186,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "식사 자세와 식기 위치 조정 필요"
       ],
       examples: ["Neater Eater"],
-      image: "/robot-types/feeding/feeding-manual.png"
+      image: "/images/feeding_robot.png"
     },
     {
       id: "feeding-semi-auto-arm-support",
@@ -207,7 +207,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "휠체어 또는 테이블과의 설치 호환성 확인 필요"
       ],
       examples: [],
-      image: "/robot-types/feeding/feeding-semi-auto-arm-support.png"
+      image: "/images/feeding_robot.png"
     },
     {
       id: "feeding-manual-arm-support",
@@ -228,7 +228,7 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "테이블 높이, 팔 위치, 식기 위치 조정 필요"
       ],
       examples: ["슬라이드형 팔 지지대", "어깨/팔꿈치 지지대"],
-      image: "/robot-types/feeding/feeding-manual-arm-support.png"
+      image: "/images/feeding_robot.png"
     }
   ]
 };
