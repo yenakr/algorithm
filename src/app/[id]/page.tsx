@@ -76,7 +76,7 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   const generateSessionQuizzes = () => {
     const rawQuizzes = algoData.quizzes || [];
-    if (algoId === 'transfer' && rawQuizzes.length > 0) {
+    if (rawQuizzes.length > 0) {
       const categories: Record<string, any[]> = { A: [], B: [], C: [], D: [], E: [] };
       rawQuizzes.forEach((q) => {
         const cat = q.category;
@@ -99,7 +99,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   useEffect(() => {
     setSessionQuizzes(generateSessionQuizzes());
     setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
-  }, [algoId]);
+  }, [algoId, algoData]);
 
   // Original image error tracking
   const [imageError, setImageError] = useState(false);
@@ -680,8 +680,8 @@ export default function AlgorithmPage({ params }: PageProps) {
                     </p>
                   </div>
 
-                  {/* Weakness analysis for transfer algorithm */}
-                  {algoId === 'transfer' && (
+                  {/* Weakness analysis for the algorithm */}
+                  {sessionQuizzes.length > 0 && (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-left space-y-6">
                       <h4 className="text-lg sm:text-xl font-black text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
                         <span>📊 영역별 진단 및 취약점 분석</span>
@@ -699,7 +699,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                           const isWeak = catScore < 2;
                           return (
                             <div key={cat.key} className={`p-4 rounded-xl border transition-all ${
-                              isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
+                                isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
                             }`}>
                               <div className="flex justify-between items-center mb-1.5">
                                 <span className="font-bold text-sm sm:text-base text-slate-800">{cat.name}</span>
@@ -734,22 +734,46 @@ export default function AlgorithmPage({ params }: PageProps) {
                               </p>
                             );
                           }
+
+                          // Commentary customized by algorithm
+                          const getCommentary = (catKey: string) => {
+                            if (algoId === 'toileting') {
+                              const toiletingMap: Record<string, string> = {
+                                A: "알고리즘 이해 영역이 부족합니다. 배뇨감 인지 ➔ 화장실 이동 ➔ 용변 후 청결로 순차 진행되는 의사결정 흐름을 복습해 보세요.",
+                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 요의 인지 어려움 수준이나 화장실 이동 가능 여부에 따라 뒤따르는 평가 단계를 꼼꼼히 확인해 보세요.",
+                                C: "장비 선택 영역이 부족합니다. 자동 배설처리로봇, 비데, 이동 변기 등 환자 상태별 최적 장비 매칭을 학습해 보세요.",
+                                D: "사례 적용 영역이 부족합니다. 복합적인 배설 장애 환자의 가상 시나리오에 알맞은 케어 방안을 적용하는 감각을 길러보세요.",
+                                E: "안전 및 환경 판단 영역이 부족합니다. 피부 손상, 낙상 위험, 요로감염 예방을 위한 소독/안전 지침을 확인해 보세요."
+                              };
+                              return toiletingMap[catKey];
+                            } else if (algoId === 'feeding') {
+                              const feedingMap: Record<string, string> = {
+                                A: "알고리즘 이해 영역이 부족합니다. 삼킴 기능(구강 섭취) 평가에서 시작하여 먹기/마시기 기능 ➔ 팔 근력 평가로 흐르는 흐름을 복습해 보세요.",
+                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 팔 근력의 등급(Grade III 기준)에 따른 세부 평가 기준을 다시 한번 읽어보세요.",
+                                C: "장비 선택 영역이 부족합니다. 전자동 식사돌봄로봇, 수동식 상지 지지대, 특수식사도구(경사식기 등)의 선정 기준을 학습해 보세요.",
+                                D: "사례 적용 영역이 부족합니다. 구강 섭취가 불가능해 경관 영양이 시급한 상황 등 구체적인 돌봄 사례에 대입해 보세요.",
+                                E: "안전 및 환경 판단 영역이 부족합니다. 오접식이나 오연(사래·기도 폐쇄) 방지를 위한 환자 자세 제어 및 긴급 대처법을 점검해 보세요."
+                              };
+                              return feedingMap[catKey];
+                            } else {
+                              const transferMap: Record<string, string> = {
+                                A: "알고리즘 이해 영역이 부족합니다. 기능평가 후 하지근력/체중지지/상체조절 순으로 이어지는 판단 흐름을 더 복습해 보세요.",
+                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
+                                C: "장비 선택 영역이 부족합니다. 기립보조, 슬링리프트, 슬라이딩 보드 등 환자의 역량에 알맞은 장비 매칭을 다져보세요.",
+                                D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요.",
+                                E: "안전 및 환경 판단 영역이 부족합니다. 천장 보강 가능 여부, 문턱 등의 물리적 주거 환경이나 비상 중단 등의 안전 수칙을 점검해 보세요."
+                              };
+                              return transferMap[catKey];
+                            }
+                          };
+
                           return (
                             <ul className="space-y-2 list-disc pl-4 text-xs sm:text-sm text-slate-650 font-semibold leading-relaxed">
-                              {weakCategories.map((catKey) => {
-                                const commentaryMap: Record<string, string> = {
-                                  A: "알고리즘 이해 영역이 부족합니다. 기능평가 후 하지근력/체중지지/상체조절 순으로 이어지는 판단 흐름을 더 복습해 보세요.",
-                                  B: "정보 판단 및 추가 평가 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
-                                  C: "장비 선택 영역이 부족합니다. 기립보조, 슬링리프트, 슬라이딩 보드 등 환자의 역량에 알맞은 장비 매칭을 다져보세요.",
-                                  D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요.",
-                                  E: "안전 및 환경 판단 영역이 부족합니다. 천장 보강 가능 여부, 문턱 등의 물리적 주거 환경이나 비상 중단 등의 안전 수칙을 점검해 보세요."
-                                };
-                                return (
-                                  <li key={catKey}>
-                                    {commentaryMap[catKey]}
-                                  </li>
-                                );
-                              })}
+                              {weakCategories.map((catKey) => (
+                                <li key={catKey}>
+                                  {getCommentary(catKey)}
+                                </li>
+                              ))}
                             </ul>
                           );
                         })()}
