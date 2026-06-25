@@ -1074,12 +1074,22 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
   // Node dimensions config
   const getNodeWidth = (id: string) => {
-    return 160;
+    const node = nodes[id];
+    if (node?.isResult) return 180;
+    const outgoingCount = edges.filter(e => e.from === id).length;
+    if (outgoingCount >= 5) return 300; // grid 2 columns or flex wrap
+    if (outgoingCount === 4) return 290;
+    if (outgoingCount === 3) return 240;
+    return 180;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 85;
-    return 145;
+    if (node?.isResult) return 90;
+    const outgoingCount = edges.filter(e => e.from === id).length;
+    if (outgoingCount >= 5) return 185;
+    if (outgoingCount === 4) return 175;
+    if (outgoingCount === 3) return 145;
+    return 130;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -1451,7 +1461,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           </div>
 
                           {!isResult && outgoingEdges.length > 0 && (
-                            <div className="flex gap-1.5 flex-wrap pt-1.5 border-t border-slate-100 mt-auto">
+                            <div 
+                              className={`pt-2 border-t border-slate-100 mt-auto ${
+                                outgoingEdges.length >= 4 
+                                  ? 'grid grid-cols-2 gap-1.5' 
+                                  : outgoingEdges.length === 3
+                                    ? 'grid grid-cols-3 gap-1' 
+                                    : 'flex gap-1.5'
+                              }`}
+                            >
                               {outgoingEdges.map((edge, eIdx) => {
                                 const isBranchSelected = answers[id] !== undefined && isEdgeActive(edge);
                                 return (
@@ -1464,7 +1482,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         handleSingleSelect(id, val);
                                       }
                                     }}
-                                    className={`px-2 py-1.5 rounded text-[12px] font-bold transition-all border cursor-pointer ${
+                                    className={`px-1.5 py-1 rounded text-[11px] font-bold transition-all border text-center leading-tight whitespace-normal break-words cursor-pointer flex items-center justify-center min-h-[30px] flex-1 ${
                                       isBranchSelected
                                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm font-black'
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
