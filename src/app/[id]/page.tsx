@@ -66,11 +66,40 @@ export default function AlgorithmPage({ params }: PageProps) {
   const [activeSection, setActiveSection] = useState('original-tree');
 
   // Quiz state
+  const [sessionQuizzes, setSessionQuizzes] = useState<any[]>([]);
+  const [categoryScores, setCategoryScores] = useState<Record<string, number>>({ A: 0, B: 0, C: 0, D: 0, E: 0 });
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+
+  const generateSessionQuizzes = () => {
+    const rawQuizzes = algoData.quizzes || [];
+    if (algoId === 'transfer' && rawQuizzes.length > 0) {
+      const categories: Record<string, any[]> = { A: [], B: [], C: [], D: [], E: [] };
+      rawQuizzes.forEach((q) => {
+        const cat = q.category;
+        if (cat && categories[cat]) {
+          categories[cat].push(q);
+        }
+      });
+
+      const selected: any[] = [];
+      ['A', 'B', 'C', 'D', 'E'].forEach((cat) => {
+        const list = categories[cat] || [];
+        const shuffled = [...list].sort(() => 0.5 - Math.random());
+        selected.push(...shuffled.slice(0, 2));
+      });
+      return selected;
+    }
+    return rawQuizzes;
+  };
+
+  useEffect(() => {
+    setSessionQuizzes(generateSessionQuizzes());
+    setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+  }, [algoId]);
 
   // Original image error tracking
   const [imageError, setImageError] = useState(false);
@@ -85,11 +114,17 @@ export default function AlgorithmPage({ params }: PageProps) {
   };
 
   const handleQuizSubmit = () => {
-    if (selectedOption === null) return;
+    if (selectedOption === null || sessionQuizzes.length === 0) return;
     
-    const currentQuiz = algoData.quizzes[quizIndex];
+    const currentQuiz = sessionQuizzes[quizIndex];
     if (selectedOption === currentQuiz.correctAnswerIndex) {
       setScore(prev => prev + 1);
+      if (currentQuiz.category) {
+        setCategoryScores(prev => ({
+          ...prev,
+          [currentQuiz.category]: (prev[currentQuiz.category] || 0) + 1
+        }));
+      }
     }
     setIsSubmitted(true);
   };
@@ -98,7 +133,7 @@ export default function AlgorithmPage({ params }: PageProps) {
     setSelectedOption(null);
     setIsSubmitted(false);
     
-    if (quizIndex + 1 < algoData.quizzes.length) {
+    if (quizIndex + 1 < sessionQuizzes.length) {
       setQuizIndex(prev => prev + 1);
     } else {
       setIsFinished(true);
@@ -112,6 +147,8 @@ export default function AlgorithmPage({ params }: PageProps) {
     setIsSubmitted(false);
     setScore(0);
     setIsFinished(false);
+    setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+    setSessionQuizzes(generateSessionQuizzes());
   };
 
   const devicesList = robotTypeInfo[algoId] || [];
@@ -514,56 +551,56 @@ export default function AlgorithmPage({ params }: PageProps) {
             <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
               <HelpCircle className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold text-slate-800">
+            <h2 className="text-2xl font-black text-slate-800">
               사례 기반 퀴즈
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
 
-          {algoData.quizzes && algoData.quizzes.length > 0 ? (
+          {sessionQuizzes && sessionQuizzes.length > 0 ? (
             <div className="space-y-6">
               {!isFinished ? (
                 <div className="space-y-6 animate-fade-in">
                   {/* Progress & Score */}
-                  <div className="flex justify-between items-center text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2">
-                    <span>진행률: {quizIndex + 1} / {algoData.quizzes.length} 문제</span>
-                    <span className="text-emerald-600 font-bold">현재 점수: {score}점</span>
+                  <div className="flex justify-between items-center text-sm sm:text-base font-bold text-slate-650 bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 shadow-inner">
+                    <span>진행률: <strong className="text-slate-800 text-lg">{quizIndex + 1}</strong> / <strong className="text-slate-800 text-lg">{sessionQuizzes.length}</strong> 문제</span>
+                    <span className="text-emerald-600 font-extrabold text-base sm:text-lg">현재 점수: {score}점</span>
                   </div>
 
                   {/* Scenario Card */}
-                  <div className="bg-slate-50 border-l-4 border-l-slate-900 border border-slate-200/60 rounded-r-xl p-5 sm:p-6 space-y-3">
-                    <span className="inline-block text-xs font-black bg-slate-900 text-white px-2 py-0.5 rounded">
+                  <div className="bg-slate-50 border-l-4 border-l-slate-900 border border-slate-200 rounded-xl p-6 sm:p-8 space-y-4">
+                    <span className="inline-block text-xs sm:text-sm font-black bg-slate-900 text-white px-3 py-1 rounded">
                       상황 사례
                     </span>
-                    <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-semibold max-w-4xl">
-                      {cleanInternalCodes(algoData.quizzes[quizIndex].scenario)}
+                    <p className="text-lg sm:text-xl md:text-2xl text-slate-800 leading-relaxed font-black max-w-4xl">
+                      {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)}
                     </p>
                   </div>
 
                   {/* Question */}
-                  <div className="p-4 bg-blue-50/40 border border-blue-100/60 rounded-xl">
-                    <h4 className="text-base sm:text-lg font-bold text-slate-800">
-                      Q. {cleanInternalCodes(algoData.quizzes[quizIndex].question)}
+                  <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-xl">
+                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-blue-900 leading-snug">
+                      Q. {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
                     </h4>
                   </div>
 
                   {/* Options */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {algoData.quizzes[quizIndex].options.map((option, idx) => {
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sessionQuizzes[quizIndex].options.map((option: string, idx: number) => {
                       const isSelected = selectedOption === idx;
-                      const isCorrect = idx === algoData.quizzes[quizIndex].correctAnswerIndex;
+                      const isCorrect = idx === sessionQuizzes[quizIndex].correctAnswerIndex;
                       
-                      let optionStyle = 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white';
+                      let optionStyle = 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white hover:border-slate-350';
                       if (isSelected) {
-                        optionStyle = 'border-blue-600 bg-blue-50 text-blue-900 ring-2 ring-blue-600/20';
+                        optionStyle = 'border-blue-600 bg-blue-50/70 text-blue-900 ring-2 ring-blue-600/30';
                       }
                       if (isSubmitted) {
                         if (isCorrect) {
-                          optionStyle = 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-600/20';
+                          optionStyle = 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-600/30';
                         } else if (isSelected) {
-                          optionStyle = 'border-rose-600 bg-rose-50 text-rose-900 ring-2 ring-rose-600/20';
+                          optionStyle = 'border-rose-600 bg-rose-50 text-rose-900 ring-2 ring-rose-600/30';
                         } else {
-                          optionStyle = 'border-slate-200 opacity-60 text-slate-400 bg-slate-50/20';
+                          optionStyle = 'border-slate-200 opacity-50 text-slate-400 bg-slate-50/20';
                         }
                       }
 
@@ -572,59 +609,59 @@ export default function AlgorithmPage({ params }: PageProps) {
                           key={idx}
                           disabled={isSubmitted}
                           onClick={() => handleQuizAnswer(idx)}
-                          className={`flex items-start gap-3 p-4 rounded-xl border text-left font-semibold text-sm transition-all duration-200 ${optionStyle}`}
+                          className={`flex items-start gap-4 p-5 sm:p-6 rounded-xl border text-left font-black text-base sm:text-lg md:text-xl transition-all duration-200 cursor-pointer shadow-sm ${optionStyle}`}
                         >
-                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 border ${
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 mt-0.5 border ${
                             isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-505'
                           }`}>
                             {idx + 1}
                           </span>
-                          <span>{cleanInternalCodes(option)}</span>
+                          <span className="leading-snug">{cleanInternalCodes(option)}</span>
                         </button>
                       );
                     })}
                   </div>
 
                   {/* Action buttons / Result description */}
-                  <div className="pt-4 flex flex-col sm:flex-row sm:justify-end gap-3">
+                  <div className="pt-4 flex flex-col sm:flex-row sm:justify-end gap-4">
                     {!isSubmitted ? (
                       <button
                         onClick={handleQuizSubmit}
                         disabled={selectedOption === null}
-                        className="px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="px-8 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="w-5 h-5" />
                         <span>정답 확인하기</span>
                       </button>
                     ) : (
                       <button
                         onClick={handleNextQuiz}
-                        className="px-6 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-500 font-bold text-sm transition-all flex items-center justify-center gap-2"
+                        className="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-base sm:text-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow"
                       >
-                        <span>{quizIndex + 1 === algoData.quizzes.length ? '결과 페이지 보기' : '다음 문제 풀기'}</span>
-                        <ChevronRight className="w-4 h-4" />
+                        <span>{quizIndex + 1 === sessionQuizzes.length ? '진단 결과 분석 보기' : '다음 문제 풀기'}</span>
+                        <ChevronRight className="w-5 h-5" />
                       </button>
                     )}
                   </div>
 
                   {/* Feedback explanation */}
                   {isSubmitted && (
-                    <div className={`p-5 rounded-xl border flex gap-3.5 ${
-                      selectedOption === algoData.quizzes[quizIndex].correctAnswerIndex
+                    <div className={`p-6 sm:p-8 rounded-xl border flex gap-4 ${
+                      selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex
                         ? 'bg-emerald-50/50 border-emerald-200' 
                         : 'bg-rose-50/50 border-rose-200'
                     }`}>
-                      <AlertCircle className={`w-5 h-5 shrink-0 mt-0.5 ${
-                        selectedOption === algoData.quizzes[quizIndex].correctAnswerIndex ? 'text-emerald-600' : 'text-rose-600'
+                      <AlertCircle className={`w-6 h-6 shrink-0 mt-0.5 ${
+                        selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-600' : 'text-rose-600'
                       }`} />
-                      <div className="space-y-1">
-                        <h5 className={`font-bold text-sm ${
-                          selectedOption === algoData.quizzes[quizIndex].correctAnswerIndex ? 'text-emerald-800' : 'text-rose-800'
+                      <div className="space-y-2 text-left">
+                        <h5 className={`font-black text-base sm:text-lg ${
+                          selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-800' : 'text-rose-800'
                         }`}>
-                          {selectedOption === algoData.quizzes[quizIndex].correctAnswerIndex ? '정답입니다!' : '오답입니다.'}
+                          {selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? '정답입니다!' : '오답입니다.'}
                         </h5>
-                        <p className="text-xs sm:text-sm text-slate-650 leading-relaxed font-semibold">
-                          {cleanInternalCodes(algoData.quizzes[quizIndex].explanation)}
+                        <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-bold">
+                          {cleanInternalCodes(sessionQuizzes[quizIndex].explanation)}
                         </p>
                       </div>
                     </div>
@@ -632,29 +669,107 @@ export default function AlgorithmPage({ params }: PageProps) {
                 </div>
               ) : (
                 /* Quiz Complete screen */
-                <div className="text-center py-10 space-y-6 max-w-md mx-auto animate-fade-in">
-                  <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mx-auto shadow-sm">
-                    <CheckCircle2 className="w-10 h-10" />
+                <div className="text-center py-10 space-y-8 max-w-2xl mx-auto animate-fade-in text-slate-800">
+                  <div className="w-24 h-24 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mx-auto shadow-sm">
+                    <CheckCircle2 className="w-12 h-12" />
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-800">모든 퀴즈를 완료했습니다!</h3>
-                    <p className="text-sm text-slate-500 font-medium">
-                      전체 {algoData.quizzes.length} 문제 중 <strong>{score}</strong> 문제를 맞추셨습니다.
+                  <div className="space-y-3">
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900">모든 퀴즈를 완료했습니다!</h3>
+                    <p className="text-lg sm:text-xl text-slate-600 font-bold">
+                      전체 {sessionQuizzes.length} 문제 중 <strong className="text-blue-600 text-2xl sm:text-3xl font-black">{score}</strong> 문제를 맞추셨습니다.
                     </p>
                   </div>
-                  <div className="flex gap-3 justify-center pt-4">
+
+                  {/* Weakness analysis for transfer algorithm */}
+                  {algoId === 'transfer' && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-left space-y-6">
+                      <h4 className="text-lg sm:text-xl font-black text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
+                        <span>📊 영역별 진단 및 취약점 분석</span>
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {[
+                          { key: 'A', name: 'A. 알고리즘 이해' },
+                          { key: 'B', name: 'B. 정보 판단 및 추가 평가' },
+                          { key: 'C', name: 'C. 장비 선택' },
+                          { key: 'D', name: 'D. 사례 적용' },
+                          { key: 'E', name: 'E. 안전 및 환경 판단' }
+                        ].map((cat) => {
+                          const catScore = categoryScores[cat.key] || 0;
+                          const isWeak = catScore < 2;
+                          return (
+                            <div key={cat.key} className={`p-4 rounded-xl border transition-all ${
+                              isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
+                            }`}>
+                              <div className="flex justify-between items-center mb-1.5">
+                                <span className="font-bold text-sm sm:text-base text-slate-800">{cat.name}</span>
+                                <span className={`text-xs sm:text-sm font-black px-2 py-0.5 rounded-full ${
+                                  isWeak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+                                }`}>
+                                  {catScore} / 2점
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    isWeak ? 'bg-rose-500' : 'bg-emerald-500'
+                                  }`}
+                                  style={{ width: `${(catScore / 2) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Weakness analysis commentary */}
+                      <div className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3.5">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">자가 학습 피드백 가이드</span>
+                        {(() => {
+                          const weakCategories = ['A', 'B', 'C', 'D', 'E'].filter(k => (categoryScores[k] || 0) < 2);
+                          if (weakCategories.length === 0) {
+                            return (
+                              <p className="text-emerald-700 font-bold text-base sm:text-lg leading-relaxed">
+                                🎉 모든 영역을 완벽하게 이해하고 계십니다! 알고리즘을 현업에 바로 적용하기에 충분한 전문성을 갖추셨습니다.
+                              </p>
+                            );
+                          }
+                          return (
+                            <ul className="space-y-2 list-disc pl-4 text-xs sm:text-sm text-slate-650 font-semibold leading-relaxed">
+                              {weakCategories.map((catKey) => {
+                                const commentaryMap: Record<string, string> = {
+                                  A: "알고리즘 이해 영역이 부족합니다. 기능평가 후 하지근력/체중지지/상체조절 순으로 이어지는 판단 흐름을 더 복습해 보세요.",
+                                  B: "정보 판단 및 추가 평가 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
+                                  C: "장비 선택 영역이 부족합니다. 기립보조, 슬링리프트, 슬라이딩 보드 등 환자의 역량에 알맞은 장비 매칭을 다져보세요.",
+                                  D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요.",
+                                  E: "안전 및 환경 판단 영역이 부족합니다. 천장 보강 가능 여부, 문턱 등의 물리적 주거 환경이나 비상 중단 등의 안전 수칙을 점검해 보세요."
+                                };
+                                return (
+                                  <li key={catKey}>
+                                    {commentaryMap[catKey]}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-4 justify-center pt-4">
                     <button
                       onClick={handleResetQuiz}
-                      className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-sm transition-all flex items-center gap-2"
+                      className="px-6 py-4 rounded-xl border border-slate-350 hover:bg-slate-50 text-slate-700 font-extrabold text-base transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                     >
-                      <RefreshCw className="w-4 h-4" />
-                      <span>다시 풀기</span>
+                      <RefreshCw className="w-5 h-5" />
+                      <span>처음부터 다시 풀기</span>
                     </button>
                     <Link
                       href="/"
-                      className="px-5 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-sm transition-all"
+                      className="px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-base transition-all shadow-sm"
                     >
-                      다른 알고리즘 선택
+                      다른 알고리즘 학습하기
                     </Link>
                   </div>
                 </div>
