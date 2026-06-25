@@ -24,6 +24,11 @@ const cleanInternalCodes = (text: string): string => {
     .replace(/도움 불필요/g, '도움 없이 진행 가능')
     .replace(/용변 후 처리 돕기/g, '용변 후 처리 보조')
     .replace(/화장실 이동 돕기/g, '화장실 이동 보조');
+    
+  // Strip off parenthesis descriptions for '예' or '아니오'
+  if (/^(예|아니오)\s*\(.*\)/.test(cleaned)) {
+    cleaned = cleaned.replace(/^((?:예|아니오))\s*\(.*\)/, '$1');
+  }
   return cleaned.trim();
 };
 
@@ -509,10 +514,10 @@ const transferEdges = [
   { from: 'q1', to: 'T-A', label: "0점", condition: (ans: any) => ans['q1'] === '0' },
   { from: 'q1', to: 'T-B', label: "1점", condition: (ans: any) => ans['q1'] === '1' },
   { from: 'q1', to: 'q2', label: "2점 이상", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
-  { from: 'q2', to: 'q3', label: "예 (지탱 불가)", condition: (ans: any) => ans['q2'] === 'yes' },
-  { from: 'q2', to: 'q4', label: "아니오 (지탱 가능)", condition: (ans: any) => ans['q2'] === 'no' },
-  { from: 'q4', to: 'T-C', label: "아니오 (상체 조절)", condition: (ans: any) => ans['q4'] === 'no' },
-  { from: 'q4', to: 'T-D', label: "예 (상체 조절 불가)", condition: (ans: any) => ans['q4'] === 'yes' },
+  { from: 'q2', to: 'q3', label: "예", condition: (ans: any) => ans['q2'] === 'yes' },
+  { from: 'q2', to: 'q4', label: "아니오", condition: (ans: any) => ans['q2'] === 'no' },
+  { from: 'q4', to: 'T-C', label: "아니오", condition: (ans: any) => ans['q4'] === 'no' },
+  { from: 'q4', to: 'T-D', label: "예", condition: (ans: any) => ans['q4'] === 'yes' },
   { from: 'q3', to: 'T-E', label: "천장식 단독", condition: (ans: any) => (ans['q3'] || []).includes('ceiling') && !(ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
   { from: 'q3', to: 'T-F', label: "벽식 단독", condition: (ans: any) => !(ans['q3'] || []).includes('ceiling') && (ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
   { from: 'q3', to: 'q3_1', label: "복수 환경 지원", condition: (ans: any) => {
@@ -565,10 +570,10 @@ const feedingEdges = [
   { from: 'q2_a', to: 'F-A', label: "0점 (양호)", condition: (ans: any) => ans['q2_a'] === '0' },
   { from: 'q2_a', to: 'F-B', label: "1~2점 (약간의 어려움)", condition: (ans: any) => ans['q2_a'] === '1' || ans['q2_a'] === '2' },
   { from: 'q2_a', to: 'q3_a', label: "3~4점 (심한 어려움)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 3 },
-  { from: 'q3_a', to: 'F-C', label: "예 (목 조절)", condition: (ans: any) => ans['q3_a'] === 'yes' },
-  { from: 'q3_a', to: 'F-D', label: "아니오 (조절불가)", condition: (ans: any) => ans['q3_a'] === 'no' },
-  { from: 'q2_b', to: 'F-D', label: "예 (인지 가능)", condition: (ans: any) => ans['q2_b'] === 'yes' },
-  { from: 'q2_b', to: 'F-E', label: "아니오 (인지장애)", condition: (ans: any) => ans['q2_b'] === 'no' },
+  { from: 'q3_a', to: 'F-C', label: "예", condition: (ans: any) => ans['q3_a'] === 'yes' },
+  { from: 'q3_a', to: 'F-D', label: "아니오", condition: (ans: any) => ans['q3_a'] === 'no' },
+  { from: 'q2_b', to: 'F-D', label: "예", condition: (ans: any) => ans['q2_b'] === 'yes' },
+  { from: 'q2_b', to: 'F-E', label: "아니오", condition: (ans: any) => ans['q2_b'] === 'no' },
 ];
 
 const getShortOptionText = (text: string) => {
@@ -786,6 +791,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (!nodeId || !wrapperRef.current) return;
     const node = nodes[nodeId];
     if (!node) return;
+    
+    // Do not auto-scroll if it's a result node, preventing unwanted page shift or empty spacing
+    if (node.isResult) return;
 
     const nodeW = getNodeWidth(nodeId);
     const nodeH = getNodeHeight(nodeId);
@@ -1440,8 +1448,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-2.5">
                           <div>
-                            <h4 className={`text-[15px] leading-snug font-bold text-left flex items-center justify-between gap-1.5 ${
-                              isHighlightedResult ? 'text-white' : 'text-slate-800'
+                            <h4 className={`text-base leading-snug font-black text-left flex items-center justify-between gap-1.5 ${
+                              isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
                               <span>{cleanInternalCodes(node.label)}</span>
                               {!isResult && (
