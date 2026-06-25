@@ -38,10 +38,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_50%)]" />
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-none">
-            돌봄로봇 알고리즘 학습
+            돌봄로봇 알고리즘
           </h1>
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
-            대상자의 상태와 돌봄 환경을 바탕으로, 상황에 맞는 돌봄로봇 유형을 판단하는 알고리즘을 학습합니다.
+            상황에 맞는 돌봄로봇 유형을 판단하는 알고리즘
           </p>
         </div>
       </section>
@@ -49,8 +49,7 @@ export default function Home() {
       {/* About Description Shortened */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium max-w-3xl mx-auto">
-          돌봄로봇은 대상자의 이동, 식사, 위생 관리를 돕고 돌봄제공자의 부담을 줄이는 새로운 돌봄 도구로 활용되고 있습니다.
-          이 사이트에서는 배설돌봄, 식사돌봄, 이승돌봄 상황에 맞는 알고리즘을 따라가며 대상자에게 적합한 돌봄로봇 유형을 판단하는 과정을 학습할 수 있습니다.
+          알고리즘을 통해 대상자에게 적합한 돌봄로봇 유형을 판단하는 과정을 학습할 수 있습니다.
         </p>
       </section>
 

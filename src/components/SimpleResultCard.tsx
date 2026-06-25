@@ -5,9 +5,9 @@ import HighlightText from './HighlightText';
 interface SimpleResultCardProps {
   robotName: string;            // 공식 돌봄로봇 명칭 (예: "이송보조장비")
   shortDescription: string;    // 한 줄 설명 (simpleDescription 또는 description)
-  reason: string;              // 왜 추천하나요?
-  whenToUse: string;           // 이럴 때 사용해요
-  precautions: string[];       // 조심하세요
+  reason: string;              // 추천하는 이유
+  whenToUse: string;           // 이럴 때 유용해요
+  precautions: string[];       // 주의사항
 }
 
 export default function SimpleResultCard({
@@ -35,11 +35,11 @@ export default function SimpleResultCard({
         )}
       </div>
 
-      {/* 2. 왜 추천하나요? */}
+      {/* 2. 추천하는 이유 */}
       <div className="bg-slate-50/50 rounded-2xl p-6 sm:p-8 space-y-2.5">
         <h4 className="text-base font-black text-amber-800 flex items-center gap-1.5">
           <Lightbulb className="w-5 h-5 text-amber-500 shrink-0" />
-          왜 추천하나요?
+          추천하는 이유
         </h4>
         <p className="text-lg text-slate-700 leading-relaxed font-semibold">
           <HighlightText text={reason} />
@@ -59,12 +59,12 @@ export default function SimpleResultCard({
         </div>
       )}
 
-      {/* 4. 조심하세요 */}
+      {/* 4. 주의사항 */}
       {precautions && precautions.length > 0 && (
         <div className="bg-orange-50/50 rounded-2xl p-6 sm:p-8 space-y-3.5">
           <h4 className="text-base font-black text-orange-950 flex items-center gap-1.5">
             <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0" />
-            조심하세요
+            주의사항
           </h4>
           <ul className="space-y-2.5 text-base text-slate-700 font-semibold list-none leading-relaxed">
             {precautions.map((tip, idx) => (

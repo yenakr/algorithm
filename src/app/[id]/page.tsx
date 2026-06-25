@@ -3,8 +3,8 @@
 import { useState, use, useEffect } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ArrowLeft, BookOpen, GitMerge, HelpCircle, CheckCircle2, 
+import {
+  ArrowLeft, BookOpen, GitMerge, HelpCircle, CheckCircle2,
   ChevronRight, ChevronLeft, RefreshCw, AlertCircle, FileText, Image as ImageIcon, Bot, ArrowUp
 } from 'lucide-react';
 
@@ -42,13 +42,13 @@ const cleanInternalCodes = (text: string): string => {
     .replace(/^[BTF]-[A-H]\.?\s*/gi, '')
     .replace(/\b[BTF]-[A-H]\.?\s*/gi, '')
     .replace(/["']?[BTF]-[A-H]["']?/gi, '');
-  
+
   cleaned = cleaned
     .replace(/도움 불필요\(위생 자립\)/g, '도움 없이 진행 가능')
     .replace(/도움 불필요/g, '도움 없이 진행 가능')
     .replace(/용변 후 처리 돕기/g, '용변 후 처리 보조')
     .replace(/화장실 이동 돕기/g, '화장실 이동 보조');
-    
+
   return cleaned.trim();
 };
 
@@ -118,7 +118,7 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   const handleQuizSubmit = () => {
     if (selectedOption === null || sessionQuizzes.length === 0) return;
-    
+
     const currentQuiz = sessionQuizzes[quizIndex];
     const isCorrect = selectedOption === currentQuiz.correctAnswerIndex;
     if (isCorrect) {
@@ -141,7 +141,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   const handleNextQuiz = () => {
     setSelectedOption(null);
     setIsSubmitted(false);
-    
+
     if (quizIndex + 1 < sessionQuizzes.length) {
       setQuizIndex(prev => prev + 1);
     } else {
@@ -234,11 +234,10 @@ export default function AlgorithmPage({ params }: PageProps) {
                 <Link
                   key={tab.id}
                   href={`/${tab.id}`}
-                  className={`px-3 py-1.5 rounded-full text-xs font-black transition-all duration-200 ${
-                    algoId === tab.id
+                  className={`px-3 py-1.5 rounded-full text-xs font-black transition-all duration-200 ${algoId === tab.id
                       ? 'bg-slate-950 text-white shadow-sm ring-1 ring-slate-900'
                       : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   {tab.name}
                 </Link>
@@ -251,20 +250,19 @@ export default function AlgorithmPage({ params }: PageProps) {
             {/* Section Anchors */}
             <div className="flex items-center gap-1.5 shrink-0">
               {[
-                 { id: 'original-tree', name: '원본 트리' },
-                 { id: 'algo-map', name: '알고리즘 지도' },
-                 { id: 'step-learning', name: '나에게 필요한 돌봄로봇은?' },
-                 { id: 'robot-types', name: '돌봄로봇 유형' },
-                 { id: 'quiz-section', name: '퀴즈' }
+                { id: 'original-tree', name: '원본 트리' },
+                { id: 'algo-map', name: '알고리즘 지도' },
+                { id: 'step-learning', name: '나에게 필요한 돌봄로봇은?' },
+                { id: 'robot-types', name: '돌봄로봇 유형' },
+                { id: 'quiz-section', name: '퀴즈' }
               ].map((sec) => (
                 <a
                   key={sec.id}
                   href={`#${sec.id}`}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${
-                    activeSection === sec.id
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${activeSection === sec.id
                       ? 'bg-blue-100 text-blue-800 border border-blue-200 shadow-sm'
                       : 'bg-slate-50 text-slate-505 border border-slate-200/60 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   {sec.name}
                 </a>
@@ -276,10 +274,10 @@ export default function AlgorithmPage({ params }: PageProps) {
 
       {/* Main Single Flow Column */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 space-y-16">
-        
+
         {/* Section 1: Original Algorithm Tree */}
-        <section 
-          id="original-tree" 
+        <section
+          id="original-tree"
           style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
@@ -322,7 +320,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         </section>
 
         {/* Section 2: Interactive Decision Map Explorer */}
-        <section 
+        <section
           id="algo-map"
           style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
@@ -332,16 +330,13 @@ export default function AlgorithmPage({ params }: PageProps) {
               <h2 className="text-2xl font-black text-slate-800">
                 알고리즘 지도
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                각 단계를 선택하면 판단 기준과 연결되는 돌봄로봇 유형을 확인할 수 있습니다.
-              </p>
             </div>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
-          
+
           <div className="w-full">
-            <AlgorithmRunner 
-              algorithm={algoData.algorithm} 
+            <AlgorithmRunner
+              algorithm={algoData.algorithm}
               mode="learning"
               uiMode="map"
             />
@@ -356,7 +351,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         </section>
 
         {/* Section 3: Interactive Q&A Algorithm Runner */}
-        <section 
+        <section
           id="step-learning"
           style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
@@ -367,10 +362,10 @@ export default function AlgorithmPage({ params }: PageProps) {
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
-          
+
           <div className="w-full">
-            <AlgorithmRunner 
-              algorithm={algoData.algorithm} 
+            <AlgorithmRunner
+              algorithm={algoData.algorithm}
               mode="learning"
               uiMode="simple"
             />
@@ -385,7 +380,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         </section>
 
         {/* Section 4: Related Care Robots Carousel Slider */}
-        <section 
+        <section
           id="robot-types"
           style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
@@ -396,7 +391,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                 돌봄로봇 유형 살펴보기
               </h2>
             </div>
-            
+
             {/* Quick Slider Page Indicators */}
             <div className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">
               {deviceIndex + 1} / {devicesList.length}
@@ -418,7 +413,7 @@ export default function AlgorithmPage({ params }: PageProps) {
             {/* Premium Cuttoon style main card */}
             <div className="flex-1 min-w-0 p-2 transition-all duration-300">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start">
-                
+
                 {/* Left Column: Device Title and Image (col-span-5) */}
                 <div className="md:col-span-5 flex flex-col items-center gap-4 w-full">
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 text-center w-full">
@@ -437,7 +432,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                         }}
                       />
                     ) : null}
-                    <div 
+                    <div
                       className="text-center p-4 flex flex-col items-center justify-center gap-3"
                       style={{ display: devicesList[deviceIndex]?.image ? 'none' : 'flex' }}
                     >
@@ -527,9 +522,8 @@ export default function AlgorithmPage({ params }: PageProps) {
               <button
                 key={idx}
                 onClick={() => setDeviceIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  idx === deviceIndex ? 'w-5 bg-blue-600' : 'bg-slate-300 hover:bg-slate-400'
-                }`}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === deviceIndex ? 'w-5 bg-blue-600' : 'bg-slate-300 hover:bg-slate-400'
+                  }`}
                 aria-label={`${idx + 1}번 로봇으로 이동`}
               />
             ))}
@@ -544,7 +538,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         </section>
 
         {/* Section 5: Case Study Quiz */}
-        <section 
+        <section
           id="quiz-section"
           style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
@@ -574,7 +568,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                       {Array.from({ length: sessionQuizzes.length }).map((_, idx) => {
                         const result = quizResults[idx];
                         const isCurrent = idx === quizIndex;
-                        
+
                         let segmentBg = 'bg-slate-200';
                         if (result === true) {
                           segmentBg = 'bg-emerald-500 shadow-sm shadow-emerald-200';
@@ -583,10 +577,10 @@ export default function AlgorithmPage({ params }: PageProps) {
                         } else if (isCurrent) {
                           segmentBg = 'bg-blue-400 animate-pulse';
                         }
-                        
+
                         return (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             className={`h-3 rounded-md transition-all duration-300 ${segmentBg}`}
                             title={`${idx + 1}번 문제`}
                           />
@@ -607,7 +601,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                     {sessionQuizzes[quizIndex].options.map((option: string, idx: number) => {
                       const isSelected = selectedOption === idx;
                       const isCorrect = idx === sessionQuizzes[quizIndex].correctAnswerIndex;
-                      
+
                       let optionStyle = 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white hover:border-slate-350';
                       if (isSelected) {
                         optionStyle = 'border-blue-600 bg-blue-50/70 text-blue-900 ring-2 ring-blue-600/30';
@@ -629,9 +623,8 @@ export default function AlgorithmPage({ params }: PageProps) {
                           key={idx}
                           disabled={isSubmitted}
                           onClick={() => handleQuizAnswer(idx)}
-                          className={`flex items-start p-4 sm:p-5 rounded-xl border font-semibold text-base sm:text-lg transition-all duration-200 cursor-pointer shadow-sm ${
-                            isTwoOptions ? 'justify-center text-center' : 'text-left'
-                          } ${optionStyle}`}
+                          className={`flex items-start p-4 sm:p-5 rounded-xl border font-semibold text-base sm:text-lg transition-all duration-200 cursor-pointer shadow-sm ${isTwoOptions ? 'justify-center text-center' : 'text-left'
+                            } ${optionStyle}`}
                         >
                           <span className="leading-snug">{cleanInternalCodes(option)}</span>
                         </button>
@@ -663,18 +656,15 @@ export default function AlgorithmPage({ params }: PageProps) {
 
                   {/* Feedback explanation */}
                   {isSubmitted && (
-                    <div className={`p-6 sm:p-8 rounded-xl border flex gap-4 ${
-                      selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex
-                        ? 'bg-emerald-50/50 border-emerald-200' 
+                    <div className={`p-6 sm:p-8 rounded-xl border flex gap-4 ${selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex
+                        ? 'bg-emerald-50/50 border-emerald-200'
                         : 'bg-rose-50/50 border-rose-200'
-                    }`}>
-                      <AlertCircle className={`w-6 h-6 shrink-0 mt-0.5 ${
-                        selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-600' : 'text-rose-600'
-                      }`} />
+                      }`}>
+                      <AlertCircle className={`w-6 h-6 shrink-0 mt-0.5 ${selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-600' : 'text-rose-600'
+                        }`} />
                       <div className="space-y-2 text-left">
-                        <h5 className={`font-black text-base sm:text-lg ${
-                          selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-800' : 'text-rose-800'
-                        }`}>
+                        <h5 className={`font-black text-base sm:text-lg ${selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? 'text-emerald-800' : 'text-rose-800'
+                          }`}>
                           {selectedOption === sessionQuizzes[quizIndex].correctAnswerIndex ? '정답입니다!' : '오답입니다.'}
                         </h5>
                         <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-bold">
@@ -703,7 +693,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                       <h4 className="text-lg sm:text-xl font-black text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
                         <span>📊 영역별 진단 및 취약점 분석</span>
                       </h4>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {[
                           { key: 'A', name: 'A. 알고리즘 이해' },
@@ -714,22 +704,19 @@ export default function AlgorithmPage({ params }: PageProps) {
                           const catScore = categoryScores[cat.key] || 0;
                           const isWeak = catScore < 2;
                           return (
-                            <div key={cat.key} className={`p-4 rounded-xl border transition-all ${
-                                isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
-                            }`}>
+                            <div key={cat.key} className={`p-4 rounded-xl border transition-all ${isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
+                              }`}>
                               <div className="flex justify-between items-center mb-1.5">
                                 <span className="font-bold text-sm sm:text-base text-slate-800">{cat.name}</span>
-                                <span className={`text-xs sm:text-sm font-black px-2 py-0.5 rounded-full ${
-                                  isWeak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
-                                }`}>
+                                <span className={`text-xs sm:text-sm font-black px-2 py-0.5 rounded-full ${isWeak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+                                  }`}>
                                   {catScore} / 3점
                                 </span>
                               </div>
                               <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                                <div 
-                                  className={`h-full rounded-full transition-all duration-500 ${
-                                    isWeak ? 'bg-rose-500' : 'bg-emerald-500'
-                                  }`}
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${isWeak ? 'bg-rose-500' : 'bg-emerald-500'
+                                    }`}
                                   style={{ width: `${(catScore / 3) * 100}%` }}
                                 />
                               </div>
@@ -746,7 +733,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                           if (weakCategories.length === 0) {
                             return (
                               <p className="text-emerald-700 font-bold text-base sm:text-lg leading-relaxed">
-                                🎉 모든 영역을 완벽하게 이해하고 계십니다! 알고리즘을 현업에 바로 적용하기에 충분한 전문성을 갖추셨습니다.
+                                🎉 모든 영역을 완벽하게 이해하고 계십니다!
                               </p>
                             );
                           }
@@ -756,7 +743,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                             if (algoId === 'toileting') {
                               const toiletingMap: Record<string, string> = {
                                 A: "알고리즘 이해 영역이 부족합니다. 배뇨감 인지 ➔ 화장실 이동 ➔ 용변 후 청결로 순차 진행되는 의사결정 흐름을 복습해 보세요.",
-                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 요의 인지 어려움 수준이나 화장실 이동 가능 여부에 따라 뒤따르는 평가 단계를 꼼꼼히 확인해 보세요.",
+                                B: "정보 판단 영역이 부족합니다. 요의 인지 어려움 수준이나 화장실 이동 가능 여부에 따라 뒤따르는 평가 단계를 꼼꼼히 확인해 보세요.",
                                 C: "장비 선택 영역이 부족합니다. 자동 배설처리로봇, 비데, 이동 변기 등 환자 상태별 최적 장비 매칭을 학습해 보세요.",
                                 D: "사례 적용 영역이 부족합니다. 복합적인 배설 장애 환자의 가상 시나리오에 알맞은 케어 방안을 적용하는 감각을 길러보세요."
                               };
@@ -764,7 +751,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                             } else if (algoId === 'feeding') {
                               const feedingMap: Record<string, string> = {
                                 A: "알고리즘 이해 영역이 부족합니다. 삼킴 기능(구강 섭취) 평가에서 시작하여 먹기/마시기 기능 ➔ 팔 근력 평가로 흐르는 흐름을 복습해 보세요.",
-                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 팔 근력의 등급(Grade III 기준)에 따른 세부 평가 기준을 다시 한번 읽어보세요.",
+                                B: "정보 판단 영역이 부족합니다. 팔 근력의 등급(Grade III 기준)에 따른 세부 평가 기준을 다시 한번 읽어보세요.",
                                 C: "장비 선택 영역이 부족합니다. 전자동 식사돌봄로봇, 수동식 상지 지지대, 특수식사도구(경사식기 등)의 선정 기준을 학습해 보세요.",
                                 D: "사례 적용 영역이 부족합니다. 구강 섭취가 불가능해 경관 영양이 시급한 상황 등 구체적인 돌봄 사례에 대입해 보세요."
                               };
@@ -772,7 +759,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                             } else {
                               const transferMap: Record<string, string> = {
                                 A: "알고리즘 이해 영역이 부족합니다. 기능평가 후 하지근력/체중지지/상체조절 순으로 이어지는 판단 흐름을 더 복습해 보세요.",
-                                B: "정보 판단 및 추가 평가 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
+                                B: "정보 판단 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
                                 C: "장비 선택 영역이 부족합니다. 기립보조, 슬링리프트, 슬라이딩 보드 등 환자의 역량에 알맞은 장비 매칭을 다져보세요.",
                                 D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요."
                               };
@@ -828,15 +815,15 @@ export default function AlgorithmPage({ params }: PageProps) {
 
       {/* Lightbox Modal */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in"
           onClick={() => setIsModalOpen(false)}
         >
           <div className="relative max-w-5xl w-full max-h-[90vh] bg-white rounded-2xl p-4 overflow-auto flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center w-full border-b pb-2">
               <h3 className="font-bold text-slate-800 text-base">{getOriginalTitle()} 크게 보기</h3>
-              <button 
-                onClick={() => setIsModalOpen(false)} 
+              <button
+                onClick={() => setIsModalOpen(false)}
                 className="text-slate-500 hover:text-slate-850 font-bold text-sm bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
               >
                 닫기
