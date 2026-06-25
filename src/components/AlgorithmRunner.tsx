@@ -922,6 +922,29 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const selectedResultInfo = selectedGuideQuestionId ? getMapResultInfo(selectedGuideQuestionId) : null;
 
   const handleSingleSelect = (qId: string, optionValue: string) => {
+    if (answers[qId] === optionValue) {
+      // Deselect if already selected
+      const currentAnswers = { ...answers };
+      const idx = history.indexOf(qId);
+      let currentHistory = [...history];
+      if (idx !== -1) {
+        currentHistory = history.slice(0, idx + 1);
+        history.slice(idx).forEach(id => {
+          delete currentAnswers[id];
+        });
+      } else {
+        delete currentAnswers[qId];
+      }
+      setAnswers(currentAnswers);
+      setHistory(currentHistory);
+      setResultId(null);
+      setCurrentQuestionId(qId);
+      if (onPathChange) {
+        onPathChange(currentHistory);
+      }
+      return;
+    }
+
     let currentHistory = [...history];
     let currentAnswers = { ...answers };
 
