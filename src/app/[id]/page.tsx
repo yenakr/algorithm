@@ -595,19 +595,15 @@ export default function AlgorithmPage({ params }: PageProps) {
                     </div>
                   </div>
 
-                  {/* Combined Scenario and Question Card */}
-                  <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 rounded-xl p-6 sm:p-8 space-y-5">
-                    <p className="text-lg sm:text-xl md:text-2xl text-slate-800 leading-relaxed font-black max-w-4xl">
-                      {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)}
+                  {/* Combined Problem Card */}
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-5 sm:p-6 text-left">
+                    <p className="text-base sm:text-lg text-slate-800 font-semibold leading-relaxed whitespace-normal break-keep">
+                      {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)} {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
                     </p>
-                    <div className="h-[1px] bg-slate-200 w-full" />
-                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-blue-900 leading-snug">
-                      Q. {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
-                    </h4>
                   </div>
 
                   {/* Options */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                     {sessionQuizzes[quizIndex].options.map((option: string, idx: number) => {
                       const isSelected = selectedOption === idx;
                       const isCorrect = idx === sessionQuizzes[quizIndex].correctAnswerIndex;
@@ -626,18 +622,17 @@ export default function AlgorithmPage({ params }: PageProps) {
                         }
                       }
 
+                      const isTwoOptions = sessionQuizzes[quizIndex].options.length === 2;
+
                       return (
                         <button
                           key={idx}
                           disabled={isSubmitted}
                           onClick={() => handleQuizAnswer(idx)}
-                          className={`flex items-start gap-4 p-5 sm:p-6 rounded-xl border text-left font-black text-base sm:text-lg md:text-xl transition-all duration-200 cursor-pointer shadow-sm ${optionStyle}`}
+                          className={`flex items-start p-4 sm:p-5 rounded-xl border font-semibold text-base sm:text-lg transition-all duration-200 cursor-pointer shadow-sm ${
+                            isTwoOptions ? 'justify-center text-center' : 'text-left'
+                          } ${optionStyle}`}
                         >
-                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 mt-0.5 border ${
-                            isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-505'
-                          }`}>
-                            {idx + 1}
-                          </span>
                           <span className="leading-snug">{cleanInternalCodes(option)}</span>
                         </button>
                       );
@@ -698,7 +693,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                   <div className="space-y-3">
                     <h3 className="text-2xl sm:text-3xl font-black text-slate-900">모든 퀴즈를 완료했습니다!</h3>
                     <p className="text-lg sm:text-xl text-slate-600 font-bold">
-                      전체 {sessionQuizzes.length} 문제 중 <strong className="text-blue-600 text-2xl sm:text-3xl font-black">{score}</strong> 문제를 맞추셨습니다.
+                      전체 {sessionQuizzes.length} 문제 중 <strong className="text-blue-600 text-2xl sm:text-3xl font-black">{score}</strong> 문제를 맞히셨습니다.
                     </p>
                   </div>
 
