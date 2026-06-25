@@ -181,7 +181,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['original-tree', 'algo-map', 'step-learning', 'robot-types', 'quiz-section'];
-      const scrollPosition = window.scrollY + 200;
+      const scrollPosition = window.scrollY + 110;
 
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -202,72 +202,64 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   return (
     <div className="flex-1 bg-slate-50 pb-20">
-      {/* Upper Navigation Bar */}
-      <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-650 hover:text-slate-900 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span>메인으로 돌아가기</span>
+      {/* Sticky Compact Navigation Header */}
+      <div className="sticky top-0 z-50 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur-md py-2.5">
+        <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-between gap-4">
+          {/* Logo / Home Link (Left aligned) */}
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-650 hover:text-slate-900 transition-colors shrink-0">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>메인</span>
           </Link>
-        </div>
-      </div>
 
-      {/* Intro section */}
-      <section className="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-[1400px] mx-auto text-center space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            {algoData.title}
-          </h1>
-          <p className="text-slate-350 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            {algoData.fullDescription}
-          </p>
-        </div>
-      </section>
+          {/* Unified horizontal scrollable pill bar (Centered) */}
+          <div className="flex-1 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+            {/* Algorithm Switchers */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {[
+                { id: 'toileting', name: '배설돌봄' },
+                { id: 'feeding', name: '식사돌봄' },
+                { id: 'transfer', name: '이승돌봄' }
+              ].map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={`/${tab.id}`}
+                  className={`px-3 py-1.5 rounded-full text-xs font-black transition-all duration-200 ${
+                    algoId === tab.id
+                      ? 'bg-slate-950 text-white shadow-sm ring-1 ring-slate-900'
+                      : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
+                  }`}
+                >
+                  {tab.name}
+                </Link>
+              ))}
+            </div>
 
-      {/* Sticky Dual Navigation Header */}
-      <div className="sticky top-16 z-45 bg-white/95 border-b border-slate-200 shadow-md backdrop-blur-md py-3.5 space-y-3">
-        {/* 1. Algorithm switching tabs */}
-        <div className="max-w-[1400px] mx-auto px-4 flex justify-center gap-2.5 flex-wrap">
-          {[
-            { id: 'toileting', name: '배설돌봄' },
-            { id: 'feeding', name: '식사돌봄' },
-            { id: 'transfer', name: '이승돌봄' }
-          ].map((tab) => (
-            <Link
-              key={tab.id}
-              href={`/${tab.id}`}
-              className={`px-4 py-1.5 rounded-full text-xs font-black transition-all duration-200 ${
-                algoId === tab.id
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
-              }`}
-            >
-              {tab.name}
-            </Link>
-          ))}
-        </div>
+            {/* Subtle Divider */}
+            <div className="h-5 w-[1px] bg-slate-300 mx-1 shrink-0" />
 
-        {/* 2. Section Navigation Bar */}
-        <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
-          {[
-            { id: 'original-tree', name: '원본 트리' },
-            { id: 'algo-map', name: '알고리즘 지도' },
-            { id: 'step-learning', name: '단계별 학습' },
-            { id: 'robot-types', name: '돌봄로봇 유형' },
-            { id: 'quiz-section', name: '사례 퀴즈' }
-          ].map((sec) => (
-            <a
-              key={sec.id}
-              href={`#${sec.id}`}
-              className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${
-                activeSection === sec.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-650 hover:bg-slate-200'
-              }`}
-            >
-              {sec.name}
-            </a>
-          ))}
+            {/* Section Anchors */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {[
+                { id: 'original-tree', name: '원본 트리' },
+                { id: 'algo-map', name: '알고리즘 지도' },
+                { id: 'step-learning', name: '단계별 학습' },
+                { id: 'robot-types', name: '돌봄로봇 유형' },
+                { id: 'quiz-section', name: '사례 퀴즈' }
+              ].map((sec) => (
+                <a
+                  key={sec.id}
+                  href={`#${sec.id}`}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${
+                    activeSection === sec.id
+                      ? 'bg-blue-100 text-blue-800 border border-blue-200 shadow-sm'
+                      : 'bg-slate-50 text-slate-505 border border-slate-200/60 hover:bg-slate-100'
+                  }`}
+                >
+                  {sec.name}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -277,7 +269,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 1: Original Algorithm Tree */}
         <section 
           id="original-tree" 
-          style={{ scrollMarginTop: '180px' }}
+          style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="text-center">
@@ -321,7 +313,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 2: Interactive Decision Map Explorer */}
         <section 
           id="algo-map"
-          style={{ scrollMarginTop: '180px' }}
+          style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -355,7 +347,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 3: Interactive Q&A Algorithm Runner */}
         <section 
           id="step-learning"
-          style={{ scrollMarginTop: '180px' }}
+          style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="space-y-1">
@@ -387,7 +379,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 4: Related Care Robots Carousel Slider */}
         <section 
           id="robot-types"
-          style={{ scrollMarginTop: '180px' }}
+          style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex justify-between items-center">
@@ -544,7 +536,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         {/* Section 5: Case Study Quiz */}
         <section 
           id="quiz-section"
-          style={{ scrollMarginTop: '180px' }}
+          style={{ scrollMarginTop: '90px' }}
           className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6"
         >
           <div className="flex items-center gap-3">
