@@ -8,7 +8,7 @@ export default function Home() {
     {
       id: 'toileting',
       title: '배설돌봄',
-      description: '배뇨와 배변 등 위생 관리가 필요한 상황에서 대상자의 인지 및 신체 상태를 기반으로 알맞은 솔루션을 판단합니다.',
+      image: '/images/excretion_robot.png',
       buttonText: '학습 시작하기',
       color: 'border-blue-200 hover:border-blue-400 bg-blue-50/30',
       tagColor: 'bg-blue-100 text-blue-800',
@@ -16,7 +16,7 @@ export default function Home() {
     {
       id: 'feeding',
       title: '식사돌봄',
-      description: '식사 보조가 필요한 상황에서 대상자의 삼킴 장애 위험과 상지 조절 상태를 분석하여 적합한 보조 기기를 선별합니다.',
+      image: '/images/feeding_robot.png',
       buttonText: '학습 시작하기',
       color: 'border-emerald-200 hover:border-emerald-400 bg-emerald-50/30',
       tagColor: 'bg-emerald-100 text-emerald-800',
@@ -24,7 +24,7 @@ export default function Home() {
     {
       id: 'transfer',
       title: '이승돌봄',
-      description: '침대, 의자, 휠체어 등으로 자리를 옮길 때 대상자의 기립 균형과 상하체 근력을 평가하여 안전한 리프트 유형을 결정합니다.',
+      image: '/images/transfer_lift.png',
       buttonText: '학습 시작하기',
       color: 'border-indigo-200 hover:border-indigo-400 bg-indigo-50/30',
       tagColor: 'bg-indigo-100 text-indigo-800',
@@ -62,22 +62,28 @@ export default function Home() {
               key={algo.id}
               className={`flex flex-col justify-between p-8 rounded-2xl border transition-all duration-300 shadow-sm hover:shadow-md ${algo.color}`}
             >
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-slate-800">
+              <div className="text-center">
+                <h3 className="text-2xl font-black text-slate-800">
                   {algo.title}
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {algo.description}
-                </p>
               </div>
               <div className="pt-6">
                 <Link
                   href={`/${algo.id}`}
-                  className="w-full inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-sm transition-colors duration-200 gap-2"
+                  className="w-full inline-flex items-center justify-center px-5 py-3.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-sm transition-colors duration-200 gap-2 shadow"
                 >
                   <span>{algo.buttonText}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
+              </div>
+
+              {/* Illustration Image under the button */}
+              <div className="mt-6 flex justify-center items-center w-full h-[180px] bg-white rounded-xl border border-slate-200/60 p-4 shadow-inner">
+                <img
+                  src={algo.image}
+                  alt={algo.title}
+                  className="max-h-full object-contain hover:scale-105 transition-transform duration-350"
+                />
               </div>
             </div>
           ))}
