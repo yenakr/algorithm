@@ -1212,7 +1212,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         ) : (
           // Question card in Simple Mode
           currentQuestion && (
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-fade-in flex flex-col text-left">
+            <div className="w-full space-y-6 animate-fade-in flex flex-col text-left">
               {/* Progress Bar & indicator */}
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">

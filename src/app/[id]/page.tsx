@@ -328,7 +328,7 @@ export default function AlgorithmPage({ params }: PageProps) {
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
           
-          <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-slate-50/50">
+          <div className="w-full">
             <AlgorithmRunner 
               algorithm={algoData.algorithm} 
               mode="learning"
@@ -354,13 +354,10 @@ export default function AlgorithmPage({ params }: PageProps) {
             <h2 className="text-2xl font-black text-slate-800">
               단계별 학습
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-              질문에 응답해가며 대상자에 맞는 돌봄로봇 유형을 판단합니다.
-            </p>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
           
-          <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-slate-50/50">
+          <div className="w-full">
             <AlgorithmRunner 
               algorithm={algoData.algorithm} 
               mode="learning"
@@ -408,11 +405,14 @@ export default function AlgorithmPage({ params }: PageProps) {
             </button>
 
             {/* Premium Cuttoon style main card */}
-            <div className="flex-1 min-w-0 bg-slate-50/50 border border-slate-200/60 rounded-2xl p-5 sm:p-6 transition-all duration-300">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+            <div className="flex-1 min-w-0 p-2 transition-all duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start">
                 
-                {/* Robot Image or Fallback container */}
-                <div className="md:col-span-5 flex justify-center self-center w-full">
+                {/* Left Column: Device Title and Image (col-span-5) */}
+                <div className="md:col-span-5 flex flex-col items-center gap-4 w-full">
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 text-center w-full">
+                    {cleanInternalCodes(devicesList[deviceIndex]?.name)}
+                  </h3>
                   <div className="relative w-full max-w-[280px] h-[280px] sm:max-w-[320px] sm:h-[320px] bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md flex items-center justify-center p-4">
                     {devicesList[deviceIndex]?.image ? (
                       <img
@@ -440,13 +440,10 @@ export default function AlgorithmPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Robot Details contents */}
+                {/* Right Column: Descriptions (col-span-7) */}
                 <div className="md:col-span-7 space-y-5 text-left">
                   <div>
-                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
-                      {cleanInternalCodes(devicesList[deviceIndex]?.name)}
-                    </h3>
-                    <p className="text-sm sm:text-base md:text-lg text-slate-700 font-extrabold mt-3 leading-relaxed border-l-4 border-blue-500 pl-3">
+                    <p className="text-sm sm:text-base md:text-lg text-slate-700 font-extrabold leading-relaxed border-l-4 border-blue-500 pl-3">
                       {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)
                         .replace(/(자동배설처리로봇|배설 케어 로봇|자동 식사 보조 로봇|이승 보조 장치|이승돌봄 장비)/g, '|$1|')
                         .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-blue-600 font-black">{chunk}</strong> : chunk)}

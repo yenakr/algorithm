@@ -18,10 +18,10 @@ export default function SimpleResultCard({
   precautions
 }: SimpleResultCardProps) {
   return (
-    <div className="flex flex-col gap-5 text-left w-full max-w-2xl mx-auto">
+    <div className="flex flex-col gap-4 text-left w-full max-w-2xl mx-auto">
 
       {/* 1. 추천 돌봄로봇 이름 + 짧은 설명 */}
-      <div className="bg-indigo-50/60 border-2 border-indigo-200 rounded-3xl p-7 sm:p-9 space-y-3">
+      <div className="bg-indigo-50/50 rounded-2xl p-6 sm:p-8 space-y-2.5">
         <p className="text-xs font-black text-indigo-600 uppercase tracking-widest">
           추천 돌봄로봇
         </p>
@@ -36,7 +36,7 @@ export default function SimpleResultCard({
       </div>
 
       {/* 2. 왜 추천하나요? */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-3">
+      <div className="bg-slate-50/50 rounded-2xl p-6 sm:p-8 space-y-2.5">
         <h4 className="text-base font-black text-amber-800 flex items-center gap-1.5">
           <Lightbulb className="w-5 h-5 text-amber-500 shrink-0" />
           왜 추천하나요?
@@ -48,7 +48,7 @@ export default function SimpleResultCard({
 
       {/* 3. 이럴 때 사용해요 */}
       {whenToUse && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-3">
+        <div className="bg-blue-50/30 rounded-2xl p-6 sm:p-8 space-y-2.5">
           <h4 className="text-base font-black text-indigo-800 flex items-center gap-1.5">
             <HelpCircle className="w-5 h-5 text-indigo-500 shrink-0" />
             이럴 때 사용해요
@@ -61,8 +61,8 @@ export default function SimpleResultCard({
 
       {/* 4. 조심하세요 */}
       {precautions && precautions.length > 0 && (
-        <div className="bg-orange-50/60 border-2 border-orange-200 rounded-3xl p-6 sm:p-8 space-y-4">
-          <h4 className="text-base font-black text-orange-900 flex items-center gap-1.5">
+        <div className="bg-orange-50/50 rounded-2xl p-6 sm:p-8 space-y-3.5">
+          <h4 className="text-base font-black text-orange-950 flex items-center gap-1.5">
             <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0" />
             조심하세요
           </h4>
