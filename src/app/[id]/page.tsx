@@ -563,14 +563,14 @@ export default function AlgorithmPage({ params }: PageProps) {
             <div className="space-y-6">
               {!isFinished ? (
                 <div className="space-y-6 animate-fade-in">
-                  {/* Progress & 10-Segment Score Indicator */}
+                  {/* Progress & 12-Segment Score Indicator */}
                   <div className="space-y-2.5">
                     <div className="flex justify-between items-center text-sm sm:text-base font-bold text-slate-600 px-1">
                       <span>진행률: <strong className="text-slate-800 text-lg">{quizIndex + 1}</strong> / <strong className="text-slate-800 text-lg">{sessionQuizzes.length}</strong> 문제</span>
                       <span className="text-emerald-600 font-extrabold text-base sm:text-lg">현재 점수: {score}점</span>
                     </div>
-                    {/* The 10-segment container */}
-                    <div className="grid grid-cols-10 gap-1.5 w-full bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    {/* The 12-segment container */}
+                    <div className="grid grid-cols-12 gap-1.5 w-full bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                       {Array.from({ length: sessionQuizzes.length }).map((_, idx) => {
                         const result = quizResults[idx];
                         const isCurrent = idx === quizIndex;
