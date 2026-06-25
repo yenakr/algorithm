@@ -67,7 +67,7 @@ export default function AlgorithmPage({ params }: PageProps) {
 
   // Quiz state
   const [sessionQuizzes, setSessionQuizzes] = useState<any[]>([]);
-  const [categoryScores, setCategoryScores] = useState<Record<string, number>>({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+  const [categoryScores, setCategoryScores] = useState<Record<string, number>>({ A: 0, B: 0, C: 0, D: 0 });
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -78,7 +78,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   const generateSessionQuizzes = () => {
     const rawQuizzes = algoData.quizzes || [];
     if (rawQuizzes.length > 0) {
-      const categories: Record<string, any[]> = { A: [], B: [], C: [], D: [], E: [] };
+      const categories: Record<string, any[]> = { A: [], B: [], C: [], D: [] };
       rawQuizzes.forEach((q) => {
         const cat = q.category;
         if (cat && categories[cat]) {
@@ -87,10 +87,10 @@ export default function AlgorithmPage({ params }: PageProps) {
       });
 
       const selected: any[] = [];
-      ['A', 'B', 'C', 'D', 'E'].forEach((cat) => {
+      ['A', 'B', 'C', 'D'].forEach((cat) => {
         const list = categories[cat] || [];
         const shuffled = [...list].sort(() => 0.5 - Math.random());
-        selected.push(...shuffled.slice(0, 2));
+        selected.push(...shuffled.slice(0, 3));
       });
       return selected;
     }
@@ -100,7 +100,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   useEffect(() => {
     const quizzes = generateSessionQuizzes();
     setSessionQuizzes(quizzes);
-    setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+    setCategoryScores({ A: 0, B: 0, C: 0, D: 0 });
     setQuizResults(Array(quizzes.length).fill(null));
   }, [algoId, algoData]);
 
@@ -156,7 +156,7 @@ export default function AlgorithmPage({ params }: PageProps) {
     setIsSubmitted(false);
     setScore(0);
     setIsFinished(false);
-    setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+    setCategoryScores({ A: 0, B: 0, C: 0, D: 0 });
     const quizzes = generateSessionQuizzes();
     setSessionQuizzes(quizzes);
     setQuizResults(Array(quizzes.length).fill(null));
@@ -709,8 +709,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                           { key: 'A', name: 'A. 알고리즘 이해' },
                           { key: 'B', name: 'B. 정보 판단 및 추가 평가' },
                           { key: 'C', name: 'C. 장비 선택' },
-                          { key: 'D', name: 'D. 사례 적용' },
-                          { key: 'E', name: 'E. 안전 및 환경 판단' }
+                          { key: 'D', name: 'D. 사례 적용' }
                         ].map((cat) => {
                           const catScore = categoryScores[cat.key] || 0;
                           const isWeak = catScore < 2;
@@ -723,7 +722,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                                 <span className={`text-xs sm:text-sm font-black px-2 py-0.5 rounded-full ${
                                   isWeak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
                                 }`}>
-                                  {catScore} / 2점
+                                  {catScore} / 3점
                                 </span>
                               </div>
                               <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
@@ -731,7 +730,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                                   className={`h-full rounded-full transition-all duration-500 ${
                                     isWeak ? 'bg-rose-500' : 'bg-emerald-500'
                                   }`}
-                                  style={{ width: `${(catScore / 2) * 100}%` }}
+                                  style={{ width: `${(catScore / 3) * 100}%` }}
                                 />
                               </div>
                             </div>
@@ -743,7 +742,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                       <div className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3.5">
                         <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">자가 학습 피드백 가이드</span>
                         {(() => {
-                          const weakCategories = ['A', 'B', 'C', 'D', 'E'].filter(k => (categoryScores[k] || 0) < 2);
+                          const weakCategories = ['A', 'B', 'C', 'D'].filter(k => (categoryScores[k] || 0) < 2);
                           if (weakCategories.length === 0) {
                             return (
                               <p className="text-emerald-700 font-bold text-base sm:text-lg leading-relaxed">
@@ -759,8 +758,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                                 A: "알고리즘 이해 영역이 부족합니다. 배뇨감 인지 ➔ 화장실 이동 ➔ 용변 후 청결로 순차 진행되는 의사결정 흐름을 복습해 보세요.",
                                 B: "정보 판단 및 추가 평가 영역이 부족합니다. 요의 인지 어려움 수준이나 화장실 이동 가능 여부에 따라 뒤따르는 평가 단계를 꼼꼼히 확인해 보세요.",
                                 C: "장비 선택 영역이 부족합니다. 자동 배설처리로봇, 비데, 이동 변기 등 환자 상태별 최적 장비 매칭을 학습해 보세요.",
-                                D: "사례 적용 영역이 부족합니다. 복합적인 배설 장애 환자의 가상 시나리오에 알맞은 케어 방안을 적용하는 감각을 길러보세요.",
-                                E: "안전 및 환경 판단 영역이 부족합니다. 피부 손상, 낙상 위험, 요로감염 예방을 위한 소독/안전 지침을 확인해 보세요."
+                                D: "사례 적용 영역이 부족합니다. 복합적인 배설 장애 환자의 가상 시나리오에 알맞은 케어 방안을 적용하는 감각을 길러보세요."
                               };
                               return toiletingMap[catKey];
                             } else if (algoId === 'feeding') {
@@ -768,8 +766,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                                 A: "알고리즘 이해 영역이 부족합니다. 삼킴 기능(구강 섭취) 평가에서 시작하여 먹기/마시기 기능 ➔ 팔 근력 평가로 흐르는 흐름을 복습해 보세요.",
                                 B: "정보 판단 및 추가 평가 영역이 부족합니다. 팔 근력의 등급(Grade III 기준)에 따른 세부 평가 기준을 다시 한번 읽어보세요.",
                                 C: "장비 선택 영역이 부족합니다. 전자동 식사돌봄로봇, 수동식 상지 지지대, 특수식사도구(경사식기 등)의 선정 기준을 학습해 보세요.",
-                                D: "사례 적용 영역이 부족합니다. 구강 섭취가 불가능해 경관 영양이 시급한 상황 등 구체적인 돌봄 사례에 대입해 보세요.",
-                                E: "안전 및 환경 판단 영역이 부족합니다. 오접식이나 오연(사래·기도 폐쇄) 방지를 위한 환자 자세 제어 및 긴급 대처법을 점검해 보세요."
+                                D: "사례 적용 영역이 부족합니다. 구강 섭취가 불가능해 경관 영양이 시급한 상황 등 구체적인 돌봄 사례에 대입해 보세요."
                               };
                               return feedingMap[catKey];
                             } else {
@@ -777,8 +774,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                                 A: "알고리즘 이해 영역이 부족합니다. 기능평가 후 하지근력/체중지지/상체조절 순으로 이어지는 판단 흐름을 더 복습해 보세요.",
                                 B: "정보 판단 및 추가 평가 영역이 부족합니다. 환자의 신체 등급이나 지탱력에 따라 추가적으로 확인해야 할 세부 정보를 정밀하게 복습해 보세요.",
                                 C: "장비 선택 영역이 부족합니다. 기립보조, 슬링리프트, 슬라이딩 보드 등 환자의 역량에 알맞은 장비 매칭을 다져보세요.",
-                                D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요.",
-                                E: "안전 및 환경 판단 영역이 부족합니다. 천장 보강 가능 여부, 문턱 등의 물리적 주거 환경이나 비상 중단 등의 안전 수칙을 점검해 보세요."
+                                D: "사례 적용 영역이 부족합니다. 여러 가지 환자 시나리오 사례에 장비를 대입하는 연습을 많이 해보세요."
                               };
                               return transferMap[catKey];
                             }
