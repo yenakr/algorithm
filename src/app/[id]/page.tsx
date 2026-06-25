@@ -412,13 +412,13 @@ export default function AlgorithmPage({ params }: PageProps) {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 
                 {/* Robot Image or Fallback container */}
-                <div className="md:col-span-4 flex justify-center self-center">
-                  <div className="relative w-full max-w-[180px] h-[180px] bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center p-3">
+                <div className="md:col-span-5 flex justify-center self-center w-full">
+                  <div className="relative w-full max-w-[280px] h-[280px] sm:max-w-[320px] sm:h-[320px] bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md flex items-center justify-center p-4">
                     {devicesList[deviceIndex]?.image ? (
                       <img
                         src={devicesList[deviceIndex].image}
                         alt={devicesList[deviceIndex].name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           (e.target as HTMLElement).style.display = 'none';
                           const sibling = (e.target as HTMLElement).nextElementSibling;
@@ -430,10 +430,10 @@ export default function AlgorithmPage({ params }: PageProps) {
                       className="text-center p-4 flex flex-col items-center justify-center gap-3"
                       style={{ display: devicesList[deviceIndex]?.image ? 'none' : 'flex' }}
                     >
-                      <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
-                        <Bot className="w-5 h-5" />
+                      <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
+                        <Bot className="w-8 h-8" />
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 leading-normal">
+                      <span className="text-xs font-bold text-slate-400 leading-normal">
                         이미지 준비 중
                       </span>
                     </div>
@@ -441,22 +441,28 @@ export default function AlgorithmPage({ params }: PageProps) {
                 </div>
 
                 {/* Robot Details contents */}
-                <div className="md:col-span-8 space-y-4">
+                <div className="md:col-span-7 space-y-5 text-left">
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-none">
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
                       {cleanInternalCodes(devicesList[deviceIndex]?.name)}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-650 font-bold mt-2 leading-relaxed">
-                      {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)}
+                    <p className="text-sm sm:text-base md:text-lg text-slate-700 font-extrabold mt-3 leading-relaxed border-l-4 border-blue-500 pl-3">
+                      {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)
+                        .replace(/(자동배설처리로봇|배설 케어 로봇|자동 식사 보조 로봇|이승 보조 장치|이승돌봄 장비)/g, '|$1|')
+                        .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-blue-600 font-black">{chunk}</strong> : chunk)}
                     </p>
                   </div>
 
                   {/* Applicability situations bullets */}
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-bold text-slate-400 block">적용 상황</span>
-                    <ul className="text-xs text-slate-650 font-bold list-disc list-inside space-y-0.5">
+                  <div className="space-y-2">
+                    <span className="text-xs sm:text-sm font-black text-slate-400 uppercase tracking-wider block">적용 상황</span>
+                    <ul className="text-sm sm:text-base text-slate-800 font-bold list-disc list-inside space-y-1 pl-1 leading-relaxed">
                       {devicesList[deviceIndex]?.situations.map((sit, i) => (
-                        <li key={i} className="leading-relaxed">{cleanInternalCodes(sit)}</li>
+                        <li key={i}>
+                          {cleanInternalCodes(sit)
+                            .replace(/(이동 보조|이승이 필요한|기저귀 교체|스스로 식사)/g, '|$1|')
+                            .split('|').map((chunk, i) => i % 2 === 1 ? <span key={i} className="text-slate-955 font-black bg-yellow-50 px-1 rounded">{chunk}</span> : chunk)}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -464,37 +470,33 @@ export default function AlgorithmPage({ params }: PageProps) {
                   {/* Left / Right Split Layout for Functions & Cautions */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                     {/* Functions Box */}
-                    <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-4">
-                      <span className="text-xs font-bold text-emerald-700 block mb-2">주요 기능</span>
-                      <ul className="text-[11px] sm:text-xs text-slate-650 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                    <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-xl p-4 sm:p-5">
+                      <span className="text-xs sm:text-sm font-black text-emerald-800 block mb-2.5">주요 기능</span>
+                      <ul className="text-xs sm:text-sm text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
                         {devicesList[deviceIndex]?.functions.map((func, idx) => (
-                          <li key={idx}>{cleanInternalCodes(func)}</li>
+                          <li key={idx} className="whitespace-normal break-keep">
+                            {cleanInternalCodes(func)
+                              .replace(/(이동을 보조|세정, 건조|자동화)/g, '|$1|')
+                              .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-emerald-700 font-black">{chunk}</strong> : chunk)}
+                          </li>
                         ))}
                       </ul>
                     </div>
 
                     {/* Cautions Box */}
-                    <div className="bg-amber-50/40 border border-amber-100 rounded-xl p-4">
-                      <span className="text-xs font-bold text-amber-700 block mb-2">확인할 점</span>
-                      <ul className="text-[11px] sm:text-xs text-slate-650 font-semibold list-disc list-inside space-y-1 leading-relaxed">
+                    <div className="bg-amber-50/50 border border-amber-100/80 rounded-xl p-4 sm:p-5">
+                      <span className="text-xs sm:text-sm font-black text-amber-800 block mb-2.5">확인할 점</span>
+                      <ul className="text-xs sm:text-sm text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
                         {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
-                          <li key={idx}>{cleanInternalCodes(caut)}</li>
+                          <li key={idx} className="whitespace-normal break-keep">
+                            {cleanInternalCodes(caut)
+                              .replace(/(설치 공간|주기적으로 확인|안전 확인)/g, '|$1|')
+                              .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-amber-700 font-black">{chunk}</strong> : chunk)}
+                          </li>
                         ))}
                       </ul>
                     </div>
                   </div>
-
-                  {/* Example devices chip list */}
-                  {devicesList[deviceIndex]?.examples && devicesList[deviceIndex].examples!.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <span className="text-[10px] font-bold text-slate-400">예시 기기:</span>
-                      {devicesList[deviceIndex].examples!.map((ex, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
-                          {ex}
-                        </span>
-                      ))}
-                    </div>
-                  )}
 
                 </div>
 
