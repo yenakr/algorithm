@@ -251,11 +251,11 @@ export default function AlgorithmPage({ params }: PageProps) {
             {/* Section Anchors */}
             <div className="flex items-center gap-1.5 shrink-0">
               {[
-                { id: 'original-tree', name: '원본 트리' },
-                { id: 'algo-map', name: '알고리즘 지도' },
-                { id: 'step-learning', name: '단계별 학습' },
-                { id: 'robot-types', name: '돌봄로봇 유형' },
-                { id: 'quiz-section', name: '퀴즈' }
+                 { id: 'original-tree', name: '원본 트리' },
+                 { id: 'algo-map', name: '알고리즘 지도' },
+                 { id: 'step-learning', name: '나에게 필요한 돌봄로봇은?' },
+                 { id: 'robot-types', name: '돌봄로봇 유형' },
+                 { id: 'quiz-section', name: '퀴즈' }
               ].map((sec) => (
                 <a
                   key={sec.id}
@@ -363,7 +363,7 @@ export default function AlgorithmPage({ params }: PageProps) {
         >
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-slate-800">
-              단계별 학습
+              나에게 필요한 돌봄로봇은?
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
