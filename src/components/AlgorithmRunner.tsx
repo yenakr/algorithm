@@ -32,6 +32,24 @@ const cleanInternalCodes = (text: string): string => {
   return cleaned.trim();
 };
 
+const cleanEdgeLabel = (label: string): string => {
+  if (!label) return '';
+  const labelMap: Record<string, string> = {
+    '0점': '양호',
+    '1점': '약간의 어려움',
+    '2점 이상': '어려움',
+    '0점 (양호)': '양호',
+    '1~2점 (약간의 어려움)': '약간의 어려움',
+    '3~4점 (심한 어려움)': '심한 어려움',
+    '0~1점 (양호)': '양호',
+    '2~4점 (어려움)': '어려움'
+  };
+  if (labelMap[label]) {
+    return labelMap[label];
+  }
+  return label;
+};
+
 const getRobotTypeForResult = (resultId: string) => {
   const mapping = resultToRobotTypeMap[resultId];
   if (!mapping) return null;
@@ -1496,7 +1514,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
                                     }`}
                                   >
-                                    {edge.label}
+                                    {cleanEdgeLabel(edge.label)}
                                   </button>
                                 );
                               })}

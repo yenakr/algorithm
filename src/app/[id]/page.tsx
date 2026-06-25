@@ -73,6 +73,7 @@ export default function AlgorithmPage({ params }: PageProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [quizResults, setQuizResults] = useState<(boolean | null)[]>([]);
 
   const generateSessionQuizzes = () => {
     const rawQuizzes = algoData.quizzes || [];
@@ -97,8 +98,10 @@ export default function AlgorithmPage({ params }: PageProps) {
   };
 
   useEffect(() => {
-    setSessionQuizzes(generateSessionQuizzes());
+    const quizzes = generateSessionQuizzes();
+    setSessionQuizzes(quizzes);
     setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+    setQuizResults(Array(quizzes.length).fill(null));
   }, [algoId, algoData]);
 
   // Original image error tracking
@@ -117,7 +120,8 @@ export default function AlgorithmPage({ params }: PageProps) {
     if (selectedOption === null || sessionQuizzes.length === 0) return;
     
     const currentQuiz = sessionQuizzes[quizIndex];
-    if (selectedOption === currentQuiz.correctAnswerIndex) {
+    const isCorrect = selectedOption === currentQuiz.correctAnswerIndex;
+    if (isCorrect) {
       setScore(prev => prev + 1);
       if (currentQuiz.category) {
         setCategoryScores(prev => ({
@@ -126,6 +130,11 @@ export default function AlgorithmPage({ params }: PageProps) {
         }));
       }
     }
+    setQuizResults(prev => {
+      const next = [...prev];
+      next[quizIndex] = isCorrect;
+      return next;
+    });
     setIsSubmitted(true);
   };
 
@@ -148,7 +157,9 @@ export default function AlgorithmPage({ params }: PageProps) {
     setScore(0);
     setIsFinished(false);
     setCategoryScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
-    setSessionQuizzes(generateSessionQuizzes());
+    const quizzes = generateSessionQuizzes();
+    setSessionQuizzes(quizzes);
+    setQuizResults(Array(quizzes.length).fill(null));
   };
 
   const devicesList = robotTypeInfo[algoId] || [];
@@ -244,7 +255,7 @@ export default function AlgorithmPage({ params }: PageProps) {
                 { id: 'algo-map', name: '알고리즘 지도' },
                 { id: 'step-learning', name: '단계별 학습' },
                 { id: 'robot-types', name: '돌봄로봇 유형' },
-                { id: 'quiz-section', name: '사례 퀴즈' }
+                { id: 'quiz-section', name: '퀴즈' }
               ].map((sec) => (
                 <a
                   key={sec.id}
@@ -543,7 +554,7 @@ export default function AlgorithmPage({ params }: PageProps) {
               <HelpCircle className="w-5 h-5" />
             </div>
             <h2 className="text-2xl font-black text-slate-800">
-              사례 기반 퀴즈
+              퀴즈
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
@@ -552,24 +563,44 @@ export default function AlgorithmPage({ params }: PageProps) {
             <div className="space-y-6">
               {!isFinished ? (
                 <div className="space-y-6 animate-fade-in">
-                  {/* Progress & Score */}
-                  <div className="flex justify-between items-center text-sm sm:text-base font-bold text-slate-650 bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 shadow-inner">
-                    <span>진행률: <strong className="text-slate-800 text-lg">{quizIndex + 1}</strong> / <strong className="text-slate-800 text-lg">{sessionQuizzes.length}</strong> 문제</span>
-                    <span className="text-emerald-600 font-extrabold text-base sm:text-lg">현재 점수: {score}점</span>
+                  {/* Progress & 10-Segment Score Indicator */}
+                  <div className="space-y-2.5">
+                    <div className="flex justify-between items-center text-sm sm:text-base font-bold text-slate-600 px-1">
+                      <span>진행률: <strong className="text-slate-800 text-lg">{quizIndex + 1}</strong> / <strong className="text-slate-800 text-lg">{sessionQuizzes.length}</strong> 문제</span>
+                      <span className="text-emerald-600 font-extrabold text-base sm:text-lg">현재 점수: {score}점</span>
+                    </div>
+                    {/* The 10-segment container */}
+                    <div className="grid grid-cols-10 gap-1.5 w-full bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                      {Array.from({ length: sessionQuizzes.length }).map((_, idx) => {
+                        const result = quizResults[idx];
+                        const isCurrent = idx === quizIndex;
+                        
+                        let segmentBg = 'bg-slate-200';
+                        if (result === true) {
+                          segmentBg = 'bg-emerald-500 shadow-sm shadow-emerald-200';
+                        } else if (result === false) {
+                          segmentBg = 'bg-rose-500 shadow-sm shadow-rose-200';
+                        } else if (isCurrent) {
+                          segmentBg = 'bg-blue-400 animate-pulse';
+                        }
+                        
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`h-3 rounded-md transition-all duration-300 ${segmentBg}`}
+                            title={`${idx + 1}번 문제`}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {/* Scenario Card */}
-                  <div className="bg-slate-50 border-l-4 border-l-slate-900 border border-slate-200 rounded-xl p-6 sm:p-8 space-y-4">
-                    <span className="inline-block text-xs sm:text-sm font-black bg-slate-900 text-white px-3 py-1 rounded">
-                      상황 사례
-                    </span>
+                  {/* Combined Scenario and Question Card */}
+                  <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 rounded-xl p-6 sm:p-8 space-y-5">
                     <p className="text-lg sm:text-xl md:text-2xl text-slate-800 leading-relaxed font-black max-w-4xl">
                       {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)}
                     </p>
-                  </div>
-
-                  {/* Question */}
-                  <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-xl">
+                    <div className="h-[1px] bg-slate-200 w-full" />
                     <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-blue-900 leading-snug">
                       Q. {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
                     </h4>
