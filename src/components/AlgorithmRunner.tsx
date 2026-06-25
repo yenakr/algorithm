@@ -1124,8 +1124,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
 
   const isEdgeActive = (edge: typeof edges[0]) => {
-    if (uiMode === 'map') return false;
-    if (!history.includes(edge.from)) return false;
+    if (answers[edge.from] === undefined) return false;
     return edge.condition(answers);
   };
 
@@ -1416,7 +1415,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     const endX = toNode.x + childW / 2;
                     const endY = toNode.y;
                     const active = isEdgeActive(edge);
-                    const highlighted = uiMode === 'map' ? isEdgeHighlighted(edge.from, edge.to) : active;
+                    const highlighted = uiMode === 'map' ? (isEdgeHighlighted(edge.from, edge.to) || active) : active;
                     return (
                       <g key={`${edge.from}-${edge.to}-${idx}`}>
                         <path
