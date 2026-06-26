@@ -1030,18 +1030,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const nodes = isTransfer ? transferNodes : (isFeeding ? feedingNodes : toiletingNodes);
   const edges = isTransfer ? transferEdges : (isFeeding ? feedingEdges : toiletingEdges);
 
-  const maxCoords = (() => {
-    let maxX = 0;
-    let maxY = 0;
-    Object.entries(nodes).forEach(([id, n]) => {
-      const w = getNodeWidth(id);
-      const h = getNodeHeight(id);
-      if (n.x + w > maxX) maxX = n.x + w;
-      if (n.y + h > maxY) maxY = n.y + h;
-    });
-    return { width: maxX + 40, height: maxY + 40 };
-  })();
-
   const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
 
   // Keep selected guide synced with active question
@@ -1308,6 +1296,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (outgoingCount === 3) return 155;
     return 145;
   };
+
+  const maxCoords = (() => {
+    let maxX = 0;
+    let maxY = 0;
+    Object.entries(nodes).forEach(([id, n]) => {
+      const w = getNodeWidth(id);
+      const h = getNodeHeight(id);
+      if (n.x + w > maxX) maxX = n.x + w;
+      if (n.y + h > maxY) maxY = n.y + h;
+    });
+    return { width: maxX + 40, height: maxY + 40 };
+  })();
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
     const controlY = y1 + (y2 - y1) * 0.45;

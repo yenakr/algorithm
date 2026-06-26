@@ -28,3 +28,11 @@ export default async function Page({ params }: PageProps) {
   
   return <AlgorithmClientPage algoId={id} quizzes={quizzes} />;
 }
+
+export async function generateStaticParams() {
+  return [
+    { id: 'toileting' },
+    { id: 'feeding' },
+    { id: 'transfer' },
+  ];
+}
