@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft, HelpCircle, CheckCircle2,
-  ChevronRight, ChevronLeft, RefreshCw, AlertCircle, Image as ImageIcon, Bot, ArrowUp
+  ChevronRight, ChevronLeft, RefreshCw, AlertCircle, Image as ImageIcon, Bot, ArrowUp, Download
 } from 'lucide-react';
 
 // Data layers
@@ -82,11 +82,14 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
       });
 
       const selected: CaseStudy[] = [];
-      ['A', 'B', 'C', 'D'].forEach((cat) => {
+      ['A', 'B', 'C'].forEach((cat) => {
         const list = categories[cat] || [];
         const shuffled = [...list].sort(() => 0.5 - Math.random());
         selected.push(...shuffled.slice(0, 3));
       });
+      const listD = categories['D'] || [];
+      const shuffledD = [...listD].sort(() => 0.5 - Math.random());
+      selected.push(...shuffledD.slice(0, 6)); // Select 6 from category D (사례) to make 15 questions
       return selected;
     }
     return rawQuizzes;
@@ -672,7 +675,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                 </div>
               ) : (
                 /* Quiz Complete screen */
-                <div className="text-center py-10 space-y-8 max-w-2xl mx-auto animate-fade-in text-slate-800">
+                <div id="quiz-result-print-area" className="text-center py-10 space-y-8 max-w-2xl mx-auto animate-fade-in text-slate-800">
                   <div className="w-24 h-24 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mx-auto shadow-sm">
                     <CheckCircle2 className="w-12 h-12" />
                   </div>
@@ -698,7 +701,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                           { key: 'D', name: 'D. 사례 적용' }
                         ].map((cat) => {
                           const catScore = categoryScores[cat.key] || 0;
-                          const isWeak = catScore < 2;
+                          const catTotal = sessionQuizzes.filter((q) => q.category === cat.key).length;
+                          const isWeak = catScore < (catTotal * 0.6);
                           return (
                             <div key={cat.key} className={`p-4 rounded-xl border transition-all ${isWeak ? 'bg-rose-50/40 border-rose-100' : 'bg-emerald-50/40 border-emerald-100'
                               }`}>
@@ -706,14 +710,14 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                                 <span className="font-bold text-sm sm:text-base text-slate-800">{cat.name}</span>
                                 <span className={`text-xs sm:text-sm font-black px-2 py-0.5 rounded-full ${isWeak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
                                   }`}>
-                                  {catScore} / 3점
+                                  {catScore} / {catTotal}점
                                 </span>
                               </div>
                               <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all duration-500 ${isWeak ? 'bg-rose-500' : 'bg-emerald-500'
                                     }`}
-                                  style={{ width: `${(catScore / 3) * 100}%` }}
+                                  style={{ width: `${(catTotal > 0 ? catScore / catTotal : 0) * 100}%` }}
                                 />
                               </div>
                             </div>
@@ -725,7 +729,11 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                       <div className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3.5">
                         <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">자가 학습 피드백 가이드</span>
                         {(() => {
-                          const weakCategories = ['A', 'B', 'C', 'D'].filter(k => (categoryScores[k] || 0) < 2);
+                          const weakCategories = ['A', 'B', 'C', 'D'].filter(k => {
+                            const catScore = categoryScores[k] || 0;
+                            const catTotal = sessionQuizzes.filter((q) => q.category === k).length;
+                            return catScore < (catTotal * 0.6);
+                          });
                           if (weakCategories.length === 0) {
                             return (
                               <p className="text-emerald-700 font-bold text-base sm:text-lg leading-relaxed">
@@ -777,17 +785,24 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                     </div>
                   )}
 
-                  <div className="flex gap-4 justify-center pt-4">
+                  <div id="quiz-result-print-actions" className="flex gap-4 justify-center pt-4">
                     <button
                       onClick={handleResetQuiz}
-                      className="px-6 py-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-extrabold text-base transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                      className="px-5 py-3.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-extrabold text-base transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                     >
                       <RefreshCw className="w-5 h-5" />
                       <span>처음부터 다시 풀기</span>
                     </button>
+                    <button
+                      onClick={() => window.print()}
+                      className="px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <Download className="w-5 h-5" />
+                      <span>PDF로 결과 저장</span>
+                    </button>
                     <Link
                       href="/"
-                      className="px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-base transition-all shadow-sm"
+                      className="px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-base transition-all shadow-sm flex items-center justify-center"
                     >
                       다른 알고리즘 학습하기
                     </Link>

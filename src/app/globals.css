@@ -20,3 +20,24 @@ body {
   min-height: 100vh;
 }
 
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #quiz-result-print-area, #quiz-result-print-area * {
+    visibility: visible;
+  }
+  #quiz-result-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    padding: 24px;
+    border: none !important;
+  }
+  #quiz-result-print-actions {
+    display: none !important;
+  }
+}
+
