@@ -7,15 +7,15 @@ export const feedingCareAlgorithm = {
   questions: {
     q1: {
       id: 'q1',
-      title: '삼킴 기능 평가 (구강 섭취 가능 여부)',
+      title: '구강 섭취가 가능한가',
       simpleTitle: '입으로 직접 음식을 안전하게 삼키고 섭취할 수 있나요?',
-      description: '구강 섭취가 가능한 상태인지 혹은 경관영양이나 TPN(정맥 영양)이 필요한 상태인지 평가합니다.',
+      description: '구강 섭취가 가능한 상태인지 혹은 경관영양이나 정맥 영양이 필요한 상태인지 평가합니다.',
       simpleDescription: '튜브나 콧줄 등을 통한 영양이 아닌, 입으로 직접 음식을 드실 수 있는지 확인합니다.',
       iconType: 'safety',
       type: 'single',
       options: [
-        { id: 'q1_yes', text: '예, 구강 섭취가 가능합니다', simpleText: '네, 입으로 음식을 직접 먹을 수 있어요', value: 'yes' },
-        { id: 'q1_no', text: '아니오, 구강 섭취가 불가능합니다 (경관영양/TPN)', simpleText: '아니오, 삼키지 못해 튜브나 콧줄, 영양 수액 등을 사용해야 해요', value: 'no' },
+        { id: 'q1_yes', text: '예', simpleText: '네, 입으로 음식을 직접 먹을 수 있어요', value: 'yes' },
+        { id: 'q1_no', text: '아니오', simpleText: '아니오, 삼키지 못해 튜브나 콧줄, 영양 수액 등을 사용해야 해요', value: 'no' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q1'];
@@ -55,15 +55,15 @@ export const feedingCareAlgorithm = {
 
     q3: {
       id: 'q3',
-      title: '팔 근력 평가 (MMT Grade)',
+      title: '팔 근력 평가 (근력 등급)',
       simpleTitle: '양쪽 팔을 스스로 중력을 이겨내며 들어 올릴 수 있나요?',
-      description: '식사용 숟가락이나 컵을 들기 위해 필요한 상지 대근육의 중력 극복 기능(MMT 3등급 기준)을 평가합니다.',
+      description: '식사용 숟가락이나 컵을 들기 위해 필요한 상지 대근육의 중력 극복 기능(3등급 기준)을 평가합니다.',
       simpleDescription: '팔을 책상 위나 입 높이까지 스스로 들어 올릴 수 있는지 근력 상태를 체크합니다.',
       iconType: 'balance',
       type: 'single',
       options: [
-        { id: 'q3_low', text: '들기 불가능 (Grade 0 ~ 2)', simpleText: '중력을 이기지 못해 팔을 위로 들어 올릴 수 없어요', value: 'low' },
-        { id: 'q3_high', text: '들기 가능 (Grade 3 ~ 5)', simpleText: '팔을 스스로 들 수는 있지만, 버티는 힘이 약하거나 수저 조작이 서툴러요', value: 'high' }
+        { id: 'q3_low', text: '들기 불가능 (0 ~ 2등급)', simpleText: '중력을 이기지 못해 팔을 위로 들어 올릴 수 없어요', value: 'low' },
+        { id: 'q3_high', text: '들기 가능 (3 ~ 5등급)', simpleText: '팔을 스스로 들 수는 있지만, 버티는 힘이 약하거나 수저 조작이 서툴러요', value: 'high' }
       ],
       resultId: (answers: Record<string, any>) => {
         const val = answers['q3'];
@@ -89,22 +89,22 @@ export const feedingCareAlgorithm = {
       id: 'F-B',
       title: '전자동 식사돌봄로봇 추천',
       simpleTitle: '전자동 식사돌봄로봇',
-      description: '구강 섭취와 삼킴은 가능하지만, 양쪽 상지 마비나 극심한 약화(MMT Grade < 3)로 수저를 전혀 들 수 없는 상태입니다.',
+      description: '구강 섭취와 삼킴은 가능하지만, 양쪽 상지 마비나 극심한 약화(근력 3등급 미만)로 수저를 전혀 들 수 없는 상태입니다.',
       simpleDescription: '양팔을 전혀 사용하기 어려우나 목과 머리를 움직여 섭취가 가능한 상태로, 기계식 로봇팔이 반찬과 밥을 떠서 입 앞까지 배달해 주는 전동형 식사로봇이 필요합니다.',
       recommendation: '버튼, 턱 스위치, 음성/시선 인식 등의 컨트롤러로 밥과 반찬을 자동 공급받는 전자동 식사돌봄로봇을 적용합니다.',
       simpleRecommendation: '스스로의 버튼 조작이나 타이머에 맞춰 로봇이 밥을 입 앞까지 가져다주는 전자동 식사로봇 사용을 권장합니다.',
-      reason: '팔 근력(MMT Grade)이 3등급 미만으로 중력을 이겨내고 팔을 들 수 없는 상태이므로, 완전한 기계 보조(전자동) 방식이 적합합니다.',
+      reason: '팔 근력(근력 등급)이 3등급 미만으로 중력을 이겨내고 팔을 들 수 없는 상태이므로, 완전한 기계 보조(전자동) 방식이 적합합니다.',
       simpleResultSummary: '상지 근력 상실로 식사 동작은 불가능하지만 고개 조작 및 구강 섭취가 가능하므로 전자동 식사보조 로봇을 추천합니다.'
     } as Result,
     'F-C': {
       id: 'F-C',
       title: '부분보조기기 또는 반자동로봇 추천 (근력 수준에 따라)',
       simpleTitle: '부분보조기기 또는 반자동로봇',
-      description: '중력을 이겨내고 스스로 팔은 들어 올릴 수 있으나(MMT Grade 3 이상), 정밀한 수저 조작이 어렵거나 식사 시 피로도가 심한 상태입니다.',
+      description: '중력을 이겨내고 스스로 팔은 들어 올릴 수 있으나(근력 3등급 이상), 정밀한 수저 조작이 어렵거나 식사 시 피로도가 심한 상태입니다.',
       simpleDescription: '스스로 팔은 들 수 있으나 식사하는 동안 버티는 힘이 부족한 분을 위해, 팔의 무게를 덜어주는 반자동 팔 지지 장치나 스프링 장치를 사용해 섭취를 돕습니다.',
       recommendation: '상지 현수형 서포트 기기 및 동력 보조형 반자동 팔 지지 장치 사용을 제안합니다.',
       simpleRecommendation: '팔을 공중에 띄워 무겁지 않게 받쳐주는 스프링식/반자동 팔 지지 서포터를 사용하여 식사를 지원합니다.',
-      reason: '팔을 들 힘(MMT Grade 3 이상)은 충분하므로 기계식 전자동 로봇 대신 환자의 잔존 동작을 보조하고 활성화하는 반자동/부분보조형 서포터가 바람직합니다.',
+      reason: '팔을 들 힘(근력 3등급 이상)은 충분하므로 기계식 전자동 로봇 대신 환자의 잔존 동작을 보조하고 활성화하는 반자동/부분보조형 서포터가 바람직합니다.',
       simpleResultSummary: '팔을 어느 정도 스스로 들어 올릴 수 있으므로, 팔을 받쳐주어 적은 힘으로 숟가락을 유도하게 돕는 반자동/스프링 지지 기기를 권장합니다.'
     } as Result,
     'F-D': {

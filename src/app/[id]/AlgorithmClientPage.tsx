@@ -327,7 +327,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
           <div className="flex justify-between items-center">
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-slate-800">
-                알고리즘 지도 - 전문가용 (판단기준 포함)
+                알고리즘 지도
               </h2>
             </div>
           </div>
