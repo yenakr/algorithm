@@ -600,12 +600,12 @@ const toiletingEdges = [
 
 const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
   q1: { x: 500, y: 0, label: "삼킴 기능 평가 (구강 섭취 가능 여부)", typeLabel: "삼킴 평가" },
-  q2: { x: 400, y: 200, label: "먹기/마시기 기능 평가", typeLabel: "동작 평가" },
-  q3: { x: 600, y: 400, label: "팔 근력 평가 (MMT Grade)", typeLabel: "근력 평가" },
-  'F-A': { x: 100, y: 600, label: "특수식사도구 및 수동형 팔 지지대", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-B': { x: 400, y: 600, label: "전자동 식사돌봄로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-C': { x: 700, y: 600, label: "부분보조기기 또는 반자동로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'F-D': { x: 1000, y: 600, label: "비구강영양 지원 (의료진 지시 필수)", isResult: true, typeLabel: "의료 관리" },
+  q2: { x: 200, y: 250, label: "먹기/마시기 기능 평가", typeLabel: "동작 평가" },
+  q3: { x: 500, y: 500, label: "팔 근력 평가 (MMT Grade)", typeLabel: "근력 평가" },
+  'F-A': { x: 100, y: 750, label: "특수식사도구 및 수동형 팔 지지대", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-B': { x: 380, y: 750, label: "전자동 식사돌봄로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-C': { x: 660, y: 750, label: "부분보조기기 또는 반자동로봇", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'F-D': { x: 940, y: 750, label: "비구강영양 지원 (의료진 지시 필수)", isResult: true, typeLabel: "의료 관리" },
 };
 
 const feedingEdges = [
@@ -1251,21 +1251,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 155;
+    if (node?.isResult) return 230;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 260; // grid 2 columns or flex wrap
-    if (outgoingCount === 4) return 240;
-    if (outgoingCount === 3) return 220;
-    return 175;
+    if (outgoingCount >= 5) return 280;
+    if (outgoingCount === 4) return 260;
+    if (outgoingCount === 3) return 240;
+    return 220;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 90;
+    if (node?.isResult) return 110;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 200;
-    if (outgoingCount === 4) return 195;
-    if (outgoingCount === 3) return 155;
-    return 145;
+    if (outgoingCount >= 5) return 220;
+    if (outgoingCount === 4) return 210;
+    if (outgoingCount === 3) return 175;
+    return 165;
   };
 
   const maxCoords = (() => {
@@ -1567,7 +1567,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             <div 
               ref={wrapperRef}
               className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
-              style={{ maxHeight: isTransfer ? '950px' : '800px' }}
+              style={{ maxHeight: '950px' }}
             >
               <div
                 style={{
