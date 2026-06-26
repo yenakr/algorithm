@@ -549,17 +549,16 @@ const transferNodes: Record<string, { x: number; y: number; label: string; isRes
   q1: { x: 450, y: 0, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
   q2: { x: 775, y: 200, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
   q4: { x: 500, y: 400, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
-  q3: { x: 1050, y: 400, label: "사용자의 환경은 어떤가요?", typeLabel: "설치 환경" },
-  q3_1: { x: 1050, y: 600, label: "우선순위가 어떻게 되나요?", typeLabel: "가치 선별" },
-  q3_2: { x: 1300, y: 800, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
-  'T-A': { x: 0, y: 1000, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-B': { x: 200, y: 1000, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-C': { x: 400, y: 1000, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-D': { x: 600, y: 1000, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-E': { x: 800, y: 1000, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-F': { x: 1000, y: 1000, label: "벽 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-H': { x: 1200, y: 1000, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
-  'T-G': { x: 1400, y: 1000, label: "이동식 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  q3: { x: 1050, y: 400, label: "환경적 요소 고려", typeLabel: "설치 환경" },
+  q3_2: { x: 1250, y: 600, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
+  'T-A': { x: 0, y: 800, label: "도움 없이 진행 가능", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-B': { x: 200, y: 800, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-C': { x: 400, y: 800, label: "전동형 기립보조리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-D': { x: 600, y: 800, label: "비전동형 기립보조기기", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-E': { x: 800, y: 800, label: "천장 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-F': { x: 1000, y: 800, label: "벽 고정형 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-H': { x: 1200, y: 800, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
+  'T-G': { x: 1400, y: 800, label: "이동식 리프트", isResult: true, typeLabel: "돌봄로봇 추천" },
 };
 
 const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
@@ -588,19 +587,9 @@ const transferEdges = [
   { from: 'q2', to: 'q4', label: "아니오", condition: (ans: any) => ans['q2'] === 'no' },
   { from: 'q4', to: 'T-C', label: "아니오", condition: (ans: any) => ans['q4'] === 'no' },
   { from: 'q4', to: 'T-D', label: "예", condition: (ans: any) => ans['q4'] === 'yes' },
-  { from: 'q3', to: 'T-E', label: "천장식 단독", condition: (ans: any) => (ans['q3'] || []).includes('ceiling') && !(ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
-  { from: 'q3', to: 'T-F', label: "벽식 단독", condition: (ans: any) => !(ans['q3'] || []).includes('ceiling') && (ans['q3'] || []).includes('wall') && !(ans['q3'] || []).includes('movable') },
-  { from: 'q3', to: 'q3_1', label: "복수 환경 지원", condition: (ans: any) => {
-      const sel = ans['q3'] || [];
-      const hasCeil = sel.includes('ceiling');
-      const hasWall = sel.includes('wall');
-      const hasMovable = sel.includes('movable');
-      return (hasCeil ? 1 : 0) + (hasWall ? 1 : 0) >= 2 || (((hasCeil ? 1 : 0) + (hasWall ? 1 : 0) >= 1) && hasMovable);
-    }},
-  { from: 'q3', to: 'q3_2', label: "천장/벽 공사 불가", condition: (ans: any) => !(ans['q3'] || []).includes('ceiling') && !(ans['q3'] || []).includes('wall') },
-  { from: 'q3_1', to: 'T-E', label: "편의성", condition: (ans: any) => ans['q3_1'] === 'convenience' },
-  { from: 'q3_1', to: 'T-F', label: "비용 절감", condition: (ans: any) => ans['q3_1'] === 'cost' },
-  { from: 'q3_1', to: 'q3_2', label: "공사 최소화", condition: (ans: any) => ans['q3_1'] === 'minimal' },
+  { from: 'q3', to: 'T-E', label: "천장식", condition: (ans: any) => ans['q3'] === 'ceiling' },
+  { from: 'q3', to: 'T-F', label: "벽식", condition: (ans: any) => ans['q3'] === 'wall' },
+  { from: 'q3', to: 'q3_2', label: "이동식", condition: (ans: any) => ans['q3'] === 'movable' },
   { from: 'q3_2', to: 'T-H', label: "프레임 가능", condition: (ans: any) => ans['q3_2'] === 'yes' },
   { from: 'q3_2', to: 'T-G', label: "프레임 불가", condition: (ans: any) => ans['q3_2'] === 'no' }
 ];
@@ -1596,7 +1585,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             <div 
               ref={wrapperRef}
               className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
-              style={{ maxHeight: isTransfer ? '1250px' : '800px' }}
+              style={{ maxHeight: isTransfer ? '950px' : '800px' }}
             >
               <div
                 style={{

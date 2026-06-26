@@ -89,74 +89,26 @@ export const transferCareAlgorithm = {
     } as Question,
     q3: {
       id: 'q3',
-      title: '사용 환경은 어떤가요?',
-      simpleTitle: '장비를 설치하고 작동할 공간의 상태는 어떤가요?',
-      description: '(복수 선택 가능)',
-      simpleDescription: '방이나 거실, 천장 구조에 해당하는 내용을 모두 선택해 주세요.',
+      title: '환경적 요소 고려',
+      simpleTitle: '장비를 설치할 주거 환경의 가공 가능 여부를 선택해 주세요.',
+      description: '',
+      simpleDescription: '설치하고 작동할 공간에 천장/벽면 고정형 장비를 달 수 있는지 또는 이동식이 필요한지 선택해 주세요.',
       iconType: 'safety',
-      type: 'multi',
+      type: 'single',
       options: [
         { id: 'q3_ceiling', text: '천장에 장비 설치가 가능하다', simpleText: '천장에 장비를 달기 위한 공사를 할 수 있어요', value: 'ceiling' },
         { id: 'q3_wall', text: '벽면에 장비 설치가 가능하다', simpleText: '방에 단단한 콘크리트 벽이 있어 고정할 수 있어요', value: 'wall' },
         { id: 'q3_movable', text: '고정식 설치는 어렵고 이동식 장비가 필요하다', simpleText: '공사를 할 수 없어 바퀴로 끄는 이동식이 필요해요', value: 'movable' },
-        { id: 'q3_narrow', text: '침대 주변 공간이 좁다', simpleText: '침대 주변이나 방 공간이 좁은 편이에요', value: 'narrow' },
-        { id: 'q3_home', text: '가정 환경이다', simpleText: '집(가정 환경)에서 사용할 예정이에요', value: 'home' },
-        { id: 'q3_facility', text: '병원 또는 요양시설 환경이다', simpleText: '병원이나 요양시설에서 사용할 예정이에요', value: 'facility' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
-        const selected: string[] = answers['q3'] || [];
-        const hasCeiling = selected.includes('ceiling');
-        const hasWall = selected.includes('wall');
-        const hasMovable = selected.includes('movable');
-
-        const fixedCount = [hasCeiling, hasWall].filter(Boolean).length;
-        if (fixedCount >= 2 || (fixedCount >= 1 && hasMovable)) {
-          return 'q3_1';
-        }
-        
-        if (!hasCeiling && !hasWall) {
-          return 'q3_2';
-        }
-
+        const val = answers['q3'];
+        if (val === 'movable') return 'q3_2';
         return null;
       },
       resultId: (answers: Record<string, any>) => {
-        const selected: string[] = answers['q3'] || [];
-        const hasCeiling = selected.includes('ceiling');
-        const hasWall = selected.includes('wall');
-        const hasMovable = selected.includes('movable');
-
-        if (hasCeiling && !hasWall && !hasMovable) {
-          return 'T-E';
-        }
-        if (hasWall && !hasCeiling && !hasMovable) {
-          return 'T-F';
-        }
-        return null;
-      }
-    } as Question,
-    q3_1: {
-      id: 'q3_1',
-      title: '우선순위가 어떻게 되나요?',
-      simpleTitle: '장비를 설치할 때 가장 중요하게 고려하시는 가치는 무엇인가요?',
-      description: '',
-      simpleDescription: '설치 시 편리함과 사용 편의성, 혹은 초기 비용 등 우선적으로 고려할 가치를 선택해 주세요.',
-      iconType: 'caregiver',
-      type: 'single',
-      options: [
-        { id: 'q3_1_convenience', text: '설치 후 사용 편의성 및 효율성', simpleText: '쓰기 편리하고 힘이 적게 드는 것', value: 'convenience' },
-        { id: 'q3_1_cost', text: '설치 비용 절감', simpleText: '설치에 드는 비용을 최대한 줄이는 것', value: 'cost' },
-        { id: 'q3_1_minimal', text: '공사 과정 최소화 및 이동성', simpleText: '집 공사를 최소한으로 줄이고 이동이 쉬운 것', value: 'minimal' },
-      ],
-      nextQuestionId: (answers: Record<string, any>) => {
-        const val = answers['q3_1'];
-        if (val === 'minimal') return 'q3_2';
-        return null;
-      },
-      resultId: (answers: Record<string, any>) => {
-        const val = answers['q3_1'];
-        if (val === 'convenience') return 'T-E';
-        if (val === 'cost') return 'T-F';
+        const val = answers['q3'];
+        if (val === 'ceiling') return 'T-E';
+        if (val === 'wall') return 'T-F';
         return null;
       }
     } as Question,
