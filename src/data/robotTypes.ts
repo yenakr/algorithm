@@ -7,6 +7,7 @@ export interface RobotType {
   cautions: string[];
   examples?: string[];
   image: string;
+  intendedImage?: string;
 }
 
 export const robotTypeInfo: Record<string, RobotType[]> = {
@@ -141,7 +142,8 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "이동 보조가 필요한 경우 다른 돌봄 장비와 함께 고려 필요"
       ],
       examples: ["DFree"],
-      image: "/images/smart_diaper_robot.png"
+      image: "",
+      intendedImage: "/images/toileting_prediction.png"
     }
   ],
   feeding: [
@@ -186,7 +188,8 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "식사 자세와 식기 위치 조정 필요"
       ],
       examples: ["Neater Eater"],
-      image: "/images/feeding_robot.png"
+      image: "",
+      intendedImage: "/images/feeding_manual.png"
     },
     {
       id: "feeding-semi-auto-arm-support",
@@ -207,7 +210,8 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "휠체어 또는 테이블과의 설치 호환성 확인 필요"
       ],
       examples: [],
-      image: "/images/feeding_robot.png"
+      image: "",
+      intendedImage: "/images/feeding_semi_auto_arm_support.png"
     },
     {
       id: "feeding-manual-arm-support",
@@ -228,7 +232,8 @@ export const robotTypeInfo: Record<string, RobotType[]> = {
         "테이블 높이, 팔 위치, 식기 위치 조정 필요"
       ],
       examples: ["슬라이드형 팔 지지대", "어깨/팔꿈치 지지대"],
-      image: "/images/feeding_robot.png"
+      image: "",
+      intendedImage: "/images/feeding_manual_arm_support.png"
     }
   ]
 };

@@ -1030,6 +1030,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       return {
         deviceName: robotType.name,
         image: robotType.image,
+        intendedImage: robotType.intendedImage,
         whenToUse: robotType.situations.join(', '),
         situations: robotType.situations,
         pros: robotType.functions,
@@ -1041,6 +1042,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (legacy) {
       return {
         ...legacy,
+        intendedImage: (legacy as any).intendedImage,
         situations: legacy.whenToUse.split(', '),
       };
     }
@@ -2121,8 +2123,17 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                             </div>
                           </div>
                         ) : (
-                          <div className="mx-auto w-44 h-44 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-350 text-xs">
-                            이미지 준비 중
+                          <div className="mx-auto w-44 h-44 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center p-3 text-slate-400 gap-2">
+                            <Bot className="w-6 h-6 text-slate-300" />
+                            <span className="text-xs font-black text-slate-550">이미지 준비 중</span>
+                            {robotType.intendedImage && (
+                              <div className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2.5 py-1.5 rounded border border-slate-200/80 leading-normal max-w-full text-center break-all">
+                                파일명: <span className="text-blue-600">{robotType.intendedImage.split('/').pop()}</span>
+                                <div className="text-[9px] text-slate-400 font-normal mt-0.5">
+                                  경로: {robotType.intendedImage}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -2494,13 +2505,26 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     </h3>
                   </div>
                   
-                  {selectedResultInfo.image && (
+                   {selectedResultInfo.image ? (
                     <div className="relative mx-auto w-36 h-36 rounded-2xl bg-slate-55 border border-slate-100 flex items-center justify-center p-2">
                       <img
                         src={selectedResultInfo.image}
                         alt={selectedResultInfo.deviceName}
                         className="object-contain max-h-full"
                       />
+                    </div>
+                  ) : (
+                    <div className="mx-auto w-44 h-44 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center p-3 text-slate-400 gap-2">
+                      <Bot className="w-6 h-6 text-slate-300" />
+                      <span className="text-xs font-black text-slate-550">이미지 준비 중</span>
+                      {(selectedResultInfo as any).intendedImage && (
+                        <div className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2.5 py-1.5 rounded border border-slate-200/80 leading-normal max-w-full text-center break-all">
+                          파일명: <span className="text-blue-600">{(selectedResultInfo as any).intendedImage.split('/').pop()}</span>
+                          <div className="text-[9px] text-slate-400 font-normal mt-0.5">
+                            경로: {(selectedResultInfo as any).intendedImage}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 

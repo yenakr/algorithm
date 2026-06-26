@@ -432,15 +432,23 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                       />
                     ) : null}
                     <div
-                      className="text-center p-4 flex flex-col items-center justify-center gap-3"
+                      className="text-center p-4 flex flex-col items-center justify-center gap-2.5"
                       style={{ display: devicesList[deviceIndex]?.image ? 'none' : 'flex' }}
                     >
-                      <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shadow-inner">
-                        <Bot className="w-8 h-8" />
+                      <div className="w-14 h-14 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner border border-slate-100">
+                        <Bot className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-slate-400 leading-normal">
+                      <span className="text-sm font-black text-slate-500">
                         이미지 준비 중
                       </span>
+                      {devicesList[deviceIndex]?.intendedImage && (
+                        <div className="mt-1 text-[11px] font-mono font-bold text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200 leading-normal whitespace-normal break-all max-w-[240px]">
+                          파일명: <span className="text-blue-600">{devicesList[deviceIndex].intendedImage.split('/').pop()}</span>
+                          <div className="text-[10px] text-slate-400 font-normal mt-0.5">
+                            경로: {devicesList[deviceIndex].intendedImage}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
