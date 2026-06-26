@@ -446,9 +446,9 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                 </div>
 
                 {/* Right Column: Descriptions (col-span-7) */}
-                <div className="md:col-span-7 space-y-5 text-left">
+                <div className="md:col-span-7 space-y-6 text-left">
                   <div>
-                    <p className="text-base sm:text-lg md:text-xl text-slate-800 font-black leading-relaxed border-l-4 border-blue-500 pl-3">
+                    <p className="text-lg sm:text-xl md:text-2xl text-slate-800 font-black leading-relaxed border-l-4 border-blue-500 pl-3">
                       {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)
                         .replace(/(자동배설처리로봇|배설 케어 로봇|자동 식사 보조 로봇|이승 보조 장치|이승돌봄 장비)/g, '|$1|')
                         .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-blue-600 font-black">{chunk}</strong> : chunk)}
@@ -457,8 +457,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
 
                   {/* Applicability situations bullets */}
                   <div className="space-y-2">
-                    <span className="text-xs sm:text-sm font-black text-slate-400 uppercase tracking-wider block">적용 상황</span>
-                    <ul className="text-base sm:text-lg text-slate-800 font-bold list-disc list-inside space-y-1.5 pl-1 leading-relaxed">
+                    <span className="text-sm sm:text-base font-black text-slate-400 uppercase tracking-wider block">적용 상황</span>
+                    <ul className="text-lg sm:text-xl md:text-2xl text-slate-800 font-black list-disc list-inside space-y-2 pl-1 leading-relaxed">
                       {devicesList[deviceIndex]?.situations.map((sit, i) => (
                         <li key={i}>
                           {cleanInternalCodes(sit)
@@ -469,35 +469,18 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                     </ul>
                   </div>
 
-                  {/* Left / Right Split Layout for Functions & Cautions */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    {/* Functions Box */}
-                    <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-xl p-4 sm:p-5">
-                      <span className="text-sm sm:text-base font-black text-emerald-800 block mb-2.5">주요 기능</span>
-                      <ul className="text-sm sm:text-base text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
-                        {devicesList[deviceIndex]?.functions.map((func, idx) => (
-                          <li key={idx} className="whitespace-normal break-keep">
-                            {cleanInternalCodes(func)
-                              .replace(/(이동을 보조|세정, 건조|자동화)/g, '|$1|')
-                              .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-emerald-700 font-black">{chunk}</strong> : chunk)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Cautions Box */}
-                    <div className="bg-amber-50/50 border border-amber-100/80 rounded-xl p-4 sm:p-5">
-                      <span className="text-sm sm:text-base font-black text-amber-800 block mb-2.5">확인할 점</span>
-                      <ul className="text-sm sm:text-base text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
-                        {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
-                          <li key={idx} className="whitespace-normal break-keep">
-                            {cleanInternalCodes(caut)
-                              .replace(/(설치 공간|주기적으로 확인|안전 확인)/g, '|$1|')
-                              .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-amber-700 font-black">{chunk}</strong> : chunk)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  {/* Large Cautions Box (주요 기능 removed) */}
+                  <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-5 sm:p-6 w-full shadow-sm">
+                    <span className="text-base sm:text-lg md:text-xl font-black text-amber-800 block mb-3">확인할 점</span>
+                    <ul className="text-base sm:text-lg md:text-xl text-slate-800 font-bold list-disc list-inside space-y-2 leading-relaxed">
+                      {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
+                        <li key={idx} className="whitespace-normal break-keep">
+                          {cleanInternalCodes(caut)
+                            .replace(/(설치 공간|주기적으로 확인|안전 확인)/g, '|$1|')
+                            .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-amber-700 font-black">{chunk}</strong> : chunk)}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
                 </div>
@@ -562,8 +545,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                       <span>진행률: <strong className="text-slate-800 text-lg">{quizIndex + 1}</strong> / <strong className="text-slate-800 text-lg">{sessionQuizzes.length}</strong> 문제</span>
                       <span className="text-emerald-600 font-extrabold text-base sm:text-lg">현재 점수: {score}점</span>
                     </div>
-                    {/* The 12-segment container */}
-                    <div className="grid grid-cols-12 gap-1.5 w-full bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    {/* The flex segment container for single-line 15-way split */}
+                    <div className="flex gap-1.5 w-full bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                       {Array.from({ length: sessionQuizzes.length }).map((_, idx) => {
                         const result = quizResults[idx];
                         const isCurrent = idx === quizIndex;
@@ -580,7 +563,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                         return (
                           <div
                             key={idx}
-                            className={`h-3 rounded-md transition-all duration-300 ${segmentBg}`}
+                            className={`h-3 flex-1 rounded-md transition-all duration-300 ${segmentBg}`}
                             title={`${idx + 1}번 문제`}
                           />
                         );
@@ -588,11 +571,16 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                     </div>
                   </div>
 
-                  {/* Combined Problem Card */}
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-5 sm:p-6 text-left">
-                    <p className="text-base sm:text-lg text-slate-800 font-semibold leading-relaxed whitespace-normal break-keep">
-                      {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)} {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
-                    </p>
+                  {/* Combined Problem Card with enlarged question text and separate scenario block */}
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-5 sm:p-6 text-left space-y-3.5">
+                    {sessionQuizzes[quizIndex].scenario && (
+                      <div className="text-sm sm:text-base text-slate-650 font-bold bg-white/80 px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm inline-block whitespace-normal break-keep">
+                        {cleanInternalCodes(sessionQuizzes[quizIndex].scenario)}
+                      </div>
+                    )}
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-relaxed whitespace-normal break-keep">
+                      {cleanInternalCodes(sessionQuizzes[quizIndex].question)}
+                    </h3>
                   </div>
 
                   {/* Options */}

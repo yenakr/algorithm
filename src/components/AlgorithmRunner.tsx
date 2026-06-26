@@ -2097,7 +2097,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           <h2 className="text-2xl sm:text-3xl font-black text-slate-800 pt-1 tracking-tight leading-snug">
                             {robotType.name}
                           </h2>
-                          <p className="text-xs sm:text-sm text-slate-650 font-bold leading-normal">
+                          <p className="text-sm sm:text-base md:text-lg text-slate-850 font-extrabold leading-normal">
                             {robotType.oneLine}
                           </p>
                         </div>
@@ -2127,50 +2127,37 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         )}
 
                         {/* Details Layout */}
-                        <div className="grid grid-cols-1 gap-4 text-xs">
+                        <div className="grid grid-cols-1 gap-4 text-sm sm:text-base">
                           {/* Applicability situations */}
                           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">적용 상황</h5>
-                            <ul className="space-y-1 text-slate-700 font-bold list-disc pl-4 leading-relaxed">
+                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-xs sm:text-sm">적용 상황</h5>
+                            <ul className="space-y-1.5 text-slate-800 font-extrabold list-disc pl-5 leading-relaxed">
                               {robotType.situations.map((sit, i) => (
                                 <li key={i}>{sit}</li>
                               ))}
                             </ul>
                           </div>
 
-                          {/* Split layout: Functions & Cautions */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-5 space-y-2">
-                              <h5 className="font-bold text-emerald-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
-                                주요 기능
-                              </h5>
-                              <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
-                                {robotType.functions.map((func, idx) => (
-                                  <li key={idx}>{func}</li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="bg-amber-50/40 border border-amber-100 rounded-2xl p-5 space-y-2">
-                              <h5 className="font-bold text-amber-700 tracking-wide uppercase text-[10px] flex items-center gap-1 font-extrabold">
-                                확인할 점
-                              </h5>
-                              <ul className="space-y-1 text-slate-600 font-semibold list-disc pl-4 leading-relaxed">
-                                {robotType.cautions.map((caut, idx) => (
-                                  <li key={idx}>{caut}</li>
-                                ))}
-                              </ul>
-                            </div>
+                          {/* Full-width Cautions Box (주요 기능 removed) */}
+                          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2 w-full">
+                            <h5 className="font-bold text-amber-800 tracking-wide uppercase text-xs sm:text-sm flex items-center gap-1 font-black">
+                              확인할 점
+                            </h5>
+                            <ul className="space-y-1.5 text-slate-800 font-bold list-disc pl-5 leading-relaxed">
+                              {robotType.cautions.map((caut, idx) => (
+                                <li key={idx}>{caut}</li>
+                              ))}
+                            </ul>
                           </div>
                         </div>
 
                         {/* Examples & clinical reasons */}
-                        <div className="space-y-4 border-t border-slate-100 pt-6 text-xs leading-normal">
+                        <div className="space-y-4 border-t border-slate-100 pt-6 text-sm leading-normal">
                           {robotType.examples && robotType.examples.length > 0 && (
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[10px] font-bold text-slate-400">예시 기기:</span>
+                              <span className="text-xs font-bold text-slate-400">예시 기기:</span>
                               {robotType.examples.map((ex, i) => (
-                                <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
+                                <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-bold">
                                   {ex}
                                 </span>
                               ))}
@@ -2178,8 +2165,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           )}
 
                           <div className="space-y-1">
-                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">판단 사유 / 임상 근거</h5>
-                            <p className="text-slate-600 font-semibold leading-relaxed bg-slate-55 p-3 rounded-xl border border-slate-100">
+                            <h5 className="font-bold text-slate-400 tracking-wide uppercase text-xs sm:text-sm">판단 사유 / 임상 근거</h5>
+                            <p className="text-slate-800 font-bold leading-relaxed bg-slate-55 p-3 rounded-xl border border-slate-100">
                               {algorithm.results[resultId]?.reason}
                             </p>
                           </div>
@@ -2517,25 +2504,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     </div>
                   )}
 
-                  <div className="space-y-1.5 text-xs">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">적용 상황</h5>
-                    <p className="text-slate-700 font-bold leading-relaxed">
+                   <div className="space-y-3 text-sm sm:text-base">
+                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-xs sm:text-sm">적용 상황</h5>
+                    <p className="text-slate-800 font-extrabold leading-relaxed text-base sm:text-lg">
                       {selectedResultInfo.whenToUse}
                     </p>
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주요 장점</h5>
-                    <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
-                      {selectedResultInfo.pros.map((pro, idx) => (
-                        <li key={idx}>{pro}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                    <h5 className="font-bold text-slate-400 tracking-wide uppercase text-[10px]">주의 및 확인할 점</h5>
-                    <ul className="space-y-1 text-slate-650 font-semibold list-disc pl-4 leading-relaxed">
+                  <div className="space-y-3 pt-3 border-t border-slate-100 text-sm sm:text-base">
+                    <h5 className="font-bold text-amber-800 tracking-wide uppercase text-xs sm:text-sm flex items-center gap-1 font-black">
+                      주의 및 확인할 점
+                    </h5>
+                    <ul className="space-y-1.5 text-slate-800 font-bold list-disc pl-5 leading-relaxed text-base sm:text-lg">
                       {selectedResultInfo.precautions.map((pre, idx) => (
                         <li key={idx}>{pre}</li>
                       ))}
