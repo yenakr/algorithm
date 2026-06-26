@@ -772,6 +772,110 @@ export function getDisplayText<T extends Record<string, any>>(
   return String(item[field] || '');
 }
 
+const renderCriteriaTable = (algorithmId: string, qId: string) => {
+  if (algorithmId === 'toileting') {
+    return (
+      <div className="mt-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-200/80 text-xs text-slate-700 space-y-4 text-left">
+        <h5 className="font-black text-blue-900 flex items-center gap-1.5 text-sm sm:text-base border-b border-blue-100 pb-2">
+          <Info className="w-4 h-4 text-blue-600 shrink-0" />
+          <span>배설(배뇨/배변) 조절하기 기능 평가 기준표 (ICF 기준)</span>
+        </h5>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 leading-relaxed">
+          <div className="space-y-2">
+            <span className="font-extrabold text-blue-800 text-xs sm:text-sm block">■ 배뇨/배변 조절 관련 자기관리 평가 항목</span>
+            <ul className="list-decimal pl-5 font-bold space-y-1.5 text-xs sm:text-[13px] text-slate-650">
+              <li>배뇨감 또는 배변감 인지하기</li>
+              <li>배뇨 또는 배변에 적절한 장소를 선택하여 들어가기</li>
+              <li>적절한 자세 취하기 (변기 안착 및 자세 유지)</li>
+              <li>배뇨 또는 배변 전후 옷 입고 벗기</li>
+              <li>배뇨 또는 배변 후 자신을 청결하게 하기</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <span className="font-extrabold text-blue-800 text-xs sm:text-sm block">■ 기능 평가 기준 및 판단 등급</span>
+            <div className="space-y-1.5 font-bold text-xs sm:text-[13px] text-slate-650">
+              <div className="flex items-start gap-1.5"><strong className="text-blue-900 font-extrabold bg-blue-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">0점</strong><span>문제 없음 (자립 수준)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-blue-900 font-extrabold bg-blue-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">1점</strong><span>가벼운 정도의 어려움 (견딜만한 정도)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-blue-900 font-extrabold bg-blue-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">2점</strong><span>중간 정도의 어려움 (일상생활에 지장을 초래할 정도)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-blue-900 font-extrabold bg-blue-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">3점</strong><span>심한 정도의 어려움 (일상생활을 부분적으로 방해)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-blue-900 font-extrabold bg-blue-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">4점</strong><span>극심한 정도의 어려움 (일상생활을 완전히 방해)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (algorithmId === 'feeding') {
+    return (
+      <div className="mt-4 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-200/80 text-xs text-slate-700 space-y-4 text-left">
+        <h5 className="font-black text-emerald-900 flex items-center gap-1.5 text-sm sm:text-base border-b border-emerald-100 pb-2">
+          <Info className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>식사돌봄(먹기/마시기) 기능 및 근력 평가 기준표 (ICF/MRC 기준)</span>
+        </h5>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 leading-relaxed">
+          <div className="space-y-2">
+            <span className="font-extrabold text-emerald-800 text-xs sm:text-sm block">■ 먹기/마시기 기능 평가 기준</span>
+            <div className="space-y-1.5 font-bold text-xs sm:text-[13px] text-slate-650">
+              <div className="flex items-start gap-1.5"><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">0점</strong><span>문제 없음 (삼킴 및 식사에 전혀 문제 없음)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">1점</strong><span>가벼운 정도의 어려움 (가끔 흘리거나 사래 걸림)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">2점</strong><span>중간 정도의 어려움 (보조기구가 있어야 식사 가능)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">3점</strong><span>심한 정도의 어려움 (대부분을 떠먹여 줘야 식사 가능)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">4점</strong><span>극심한 정도의 어려움 (삼키지 못해 콧줄/튜브 사용)</span></div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <span className="font-extrabold text-emerald-800 text-xs sm:text-sm block">■ 상지(팔) 근력 평가 방법 (MRC Grade)</span>
+            <div className="space-y-1 font-bold text-xs sm:text-[13px] text-slate-650">
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade 0</strong>근육 수축도 안 보임 (완전 마비)</div>
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade I</strong>관절은 안 움직이나 미세한 수축 보임</div>
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade II</strong>중력 제거 상태(바닥 등)에서 팔을 쓸 수 있음</div>
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade III</strong>중력을 극복하고 팔을 들어 올릴 수 있음</div>
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade IV</strong>들어 올린 후 외부 저항을 어느 정도 버팀</div>
+              <div><strong className="text-emerald-900 font-extrabold bg-emerald-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade V</strong>완전한 정상 근력</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (algorithmId === 'transfer') {
+    return (
+      <div className="mt-4 p-5 bg-indigo-50/50 rounded-2xl border border-indigo-200/80 text-xs text-slate-700 space-y-4 text-left">
+        <h5 className="font-black text-indigo-900 flex items-center gap-1.5 text-sm sm:text-base border-b border-indigo-100 pb-2">
+          <Info className="w-4 h-4 text-indigo-600 shrink-0" />
+          <span>이승(자리이동) 기능 및 하지 근력 평가 기준표 (ICF/MRC 기준)</span>
+        </h5>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 leading-relaxed">
+          <div className="space-y-2">
+            <span className="font-extrabold text-indigo-800 text-xs sm:text-sm block">■ 자리이동하기 기능 평가 기준</span>
+            <div className="space-y-1.5 font-bold text-xs sm:text-[13px] text-slate-650">
+              <div className="flex items-start gap-1.5"><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">0점</strong><span>문제 없음 (자력으로 안전한 침대-휠체어 이동)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">1점</strong><span>가벼운 정도의 어려움 (균형 불안이나 피로감 있음)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">2점</strong><span>중간 정도의 어려움 (보조기구나 가벼운 도움 필요)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">3점</strong><span>심한 정도의 어려움 (자력 이동 불가, 전적인 보조 필요)</span></div>
+              <div className="flex items-start gap-1.5"><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">4점</strong><span>극심한 정도의 어려움 (기계장치나 여러 명의 부축 필수)</span></div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <span className="font-extrabold text-indigo-800 text-xs sm:text-sm block">■ 하지(다리) 근력 평가 방법 (MRC Grade)</span>
+            <div className="space-y-1 font-bold text-xs sm:text-[13px] text-slate-650">
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade 0</strong>완전 마비. 근육 수축도 없음</div>
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade I</strong>관절 운동은 없으나 미세한 수축 보임</div>
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade II</strong>중력 제거 상태에서 다리를 움직일 수 있음</div>
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade III</strong>다리를 수직으로 들지만 외부 저항을 못 버팀</div>
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade IV</strong>약간의 근력 약화가 있으나 혼자 보행 가능</div>
+              <div><strong className="text-indigo-900 font-extrabold bg-indigo-100/70 px-1.5 py-0.5 rounded text-[10px] mr-1.5 shrink-0">Grade V</strong>완전한 정상 근력</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', onPathChange, onLearnMore }: AlgorithmRunnerProps) {
   const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(uiMode === 'map' ? null : algorithm.startQuestionId);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -1124,21 +1228,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 180;
+    if (node?.isResult) return 210;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 300; // grid 2 columns or flex wrap
-    if (outgoingCount === 4) return 290;
-    if (outgoingCount === 3) return 240;
-    return 180;
+    if (outgoingCount >= 5) return 350; // grid 2 columns or flex wrap
+    if (outgoingCount === 4) return 330;
+    if (outgoingCount === 3) return 280;
+    return 220;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 90;
+    if (node?.isResult) return 100;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 185;
-    if (outgoingCount === 4) return 175;
-    if (outgoingCount === 3) return 145;
-    return 130;
+    if (outgoingCount >= 5) return 220;
+    if (outgoingCount === 4) return 210;
+    if (outgoingCount === 3) return 170;
+    return 155;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -1281,6 +1385,22 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     💡 {getDisplayText(currentQuestion, 'description', uiMode)}
                   </p>
                 )}
+
+                {/* Collapsible Judgment Criteria Accordion */}
+                <div className="mt-3 text-left">
+                  <details className="group border border-slate-200 rounded-xl bg-white overflow-hidden transition-all duration-200">
+                    <summary className="flex items-center justify-between p-3.5 text-sm font-black text-slate-700 bg-slate-50/50 cursor-pointer hover:bg-slate-50 select-none">
+                      <span className="flex items-center gap-1.5">
+                        <Info className="w-4 h-4 text-blue-600" />
+                        <span>💡 판단 기준표 보기</span>
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-slate-400 transition-transform duration-200 group-open:rotate-180" />
+                    </summary>
+                    <div className="p-4 border-t border-slate-100 bg-white">
+                      {renderCriteriaTable(algorithm.id, currentQuestion.id)}
+                    </div>
+                  </details>
+                </div>
               </div>
 
               {/* Render Options as Large Button Cards */}
@@ -1488,7 +1608,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-2.5">
                           <div>
-                            <h4 className={`text-base leading-snug font-black text-left flex items-center justify-between gap-1.5 ${
+                            <h4 className={`text-lg font-bold sm:text-[17px] sm:font-black leading-snug text-left flex items-center justify-between gap-1.5 ${
                               isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
                               <span>{cleanInternalCodes(node.label)}</span>
@@ -1502,7 +1622,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                   className="p-0.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 shrink-0 transition-colors cursor-pointer"
                                   title="기준 설명 보기"
                                 >
-                                  <HelpCircle className="w-3.5 h-3.5" />
+                                  <HelpCircle className="w-4 h-4" />
                                 </button>
                               )}
                             </h4>
@@ -1530,7 +1650,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         handleSingleSelect(id, val);
                                       }
                                     }}
-                                    className={`px-1.5 py-1 rounded text-[11px] font-bold transition-all border text-center leading-tight whitespace-normal break-words cursor-pointer flex items-center justify-center min-h-[30px] flex-1 ${
+                                    className={`px-1.5 py-1 rounded text-[13px] sm:text-[12px] font-black transition-all border text-center leading-tight whitespace-normal break-words cursor-pointer flex items-center justify-center min-h-[35px] flex-1 ${
                                       isBranchSelected
                                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm font-black'
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
@@ -1640,6 +1760,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             )}
           </div>
         </div>
+
+        {/* Full judgment criteria table reference */}
+        {renderCriteriaTable(algorithm.id, '')}
       </div>
     );
   }
