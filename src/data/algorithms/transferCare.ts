@@ -50,7 +50,6 @@ export const transferCareAlgorithm = {
       iconType: 'transfer',
       type: 'single',
       options: [
-        { id: 'q1_0', text: '0점: 문제 없음', simpleText: '아니요, 혼자서 아주 잘해요', score: 0, value: '0' },
         { id: 'q1_1', text: '1점: 가벼운 어려움', simpleText: '혼자 할 수는 있지만 약간 불안해요', score: 1, value: '1' },
         { id: 'q1_2', text: '2점: 중간 정도의 어려움', simpleText: '일어서거나 탈 때 약간 도와주어야 해요', score: 2, value: '2' },
         { id: 'q1_3', text: '3점: 심한 어려움', simpleText: '다치지 않게 많이 붙잡아 주어야 해요', score: 3, value: '3' },
@@ -63,7 +62,6 @@ export const transferCareAlgorithm = {
       },
       resultId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q1'] || '0');
-        if (val === 0) return 'T-A';
         if (val === 1) return 'T-B';
         return null;
       }
@@ -151,17 +149,6 @@ export const transferCareAlgorithm = {
     } as Question,
   },
   results: {
-    'T-A': {
-      id: 'T-A',
-      title: '현재 이승돌봄로봇 필요도 낮음',
-      simpleTitle: '혼자서 안전하게 이동 가능',
-      description: '현재 혼자서 안전하게 자리를 이동할 수 있어 관련 로봇의 필요도가 매우 낮은 수준입니다.',
-      simpleDescription: '현재 혼자서 안전하게 침대와 휠체어 등을 오갈 수 있으므로, 별도의 이송 지원 기기는 필요하지 않습니다.',
-      recommendation: '현재 상태를 유지하는 것을 권장합니다.',
-      simpleRecommendation: '현재 신체 기능을 유지하기 위해 걷기 등 가벼운 일상 활동을 계속 장려합니다.',
-      reason: '자리이동하기 기능평가 결과, 일상생활에 지장을 초래하지 않는 가벼운 수준이거나 어려움이 관찰되지 않았습니다.',
-      simpleResultSummary: '스스로 자리를 옮기실 수 있어, 현재는 별도의 이송 기기가 필요하지 않은 상태입니다.'
-    },
     'T-B': {
       id: 'T-B',
       title: '이승보조장비 고려',
