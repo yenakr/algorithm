@@ -676,6 +676,14 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                     <CheckCircle2 className="w-12 h-12" />
                   </div>
                   <div className="space-y-3">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-black text-sm sm:text-base">
+                        {algoData.title} 퀴즈
+                      </span>
+                      <span className="text-xs sm:text-sm text-slate-400 font-semibold">
+                        {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} {new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
                     <h3 className="text-2xl sm:text-3xl font-black text-slate-900">모든 퀴즈를 완료했습니다!</h3>
                     <p className="text-lg sm:text-xl text-slate-600 font-bold">
                       전체 {sessionQuizzes.length} 문제 중 <strong className="text-blue-600 text-2xl sm:text-3xl font-black">{score}</strong> 문제를 맞히셨습니다.
