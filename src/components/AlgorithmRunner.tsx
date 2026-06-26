@@ -1638,12 +1638,22 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       <div
                         key={id}
                         onClick={() => handleNodeClick(id)}
-                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${dimOpacity} ${
-                          isHighlightedResult
-                            ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
-                            : isActive
-                              ? 'border-2 border-primary bg-primary/5 shadow-md ring-4 ring-primary/20 scale-[1.02] z-20 cursor-default'
-                              : 'border-sky-300 bg-sky-50 text-slate-800 shadow-sm cursor-pointer hover:shadow-md hover:border-sky-400'
+                        className={`absolute pointer-events-auto flex flex-col justify-between p-4 select-none transition-all duration-300 ${dimOpacity} ${
+                          isResult
+                            ? `rounded-2xl border-2 ${
+                                isHighlightedResult
+                                  ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-emerald-600/20'
+                                  : isActive
+                                    ? 'border-emerald-500 bg-emerald-50 text-slate-800 shadow-md ring-4 ring-emerald-500/20 scale-[1.02] z-20 cursor-default'
+                                    : 'border-emerald-300 bg-emerald-50/50 text-slate-850 shadow-sm cursor-pointer hover:shadow-md hover:border-emerald-400'
+                              }`
+                            : `rounded-xl border-2 ${
+                                isHighlightedResult
+                                  ? 'border-blue-600 bg-blue-600 text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-blue-600/20'
+                                  : isActive
+                                    ? 'border-blue-500 bg-blue-50 text-slate-850 shadow-md ring-4 ring-blue-500/20 scale-[1.02] z-20 cursor-default'
+                                    : 'border-slate-300 bg-white text-slate-800 shadow-sm cursor-pointer hover:shadow-md hover:border-primary/50'
+                              }`
                         }`}
                         style={{
                           left: `${node.x}px`,
@@ -1654,7 +1664,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-2.5">
                           <div>
-                            <h4 className={`text-[20px] sm:text-[19px] font-black leading-snug text-left ${
+                            {/* Card Top Label */}
+                            <div className="flex justify-between items-center w-full mb-1.5">
+                              <span className={`text-[10px] font-black uppercase tracking-wider ${
+                                isHighlightedResult ? 'text-white/80' : isActive ? 'text-primary' : 'text-slate-400'
+                              }`}>
+                                {node.typeLabel}
+                              </span>
+
+                              {/* Diamond Icon for Decision Nodes */}
+                              {!isResult && (
+                                <span className={`flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${
+                                  isHighlightedResult 
+                                    ? 'bg-blue-700/50 text-white border-blue-500/30' 
+                                    : 'bg-blue-50 text-blue-600 border-blue-200'
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rotate-45 transform inline-block ${isHighlightedResult ? 'bg-white' : 'bg-blue-600'}`} />
+                                  판단 지점
+                                </span>
+                              )}
+                            </div>
+                            <h4 className={`text-sm sm:text-base font-black leading-snug text-left ${
                               isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
                               {cleanInternalCodes(node.label)}
