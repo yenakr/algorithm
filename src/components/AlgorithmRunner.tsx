@@ -50,6 +50,58 @@ const cleanEdgeLabel = (label: string): string => {
   return label;
 };
 
+const getCustomEdgeLabel = (fromId: string, toId: string, originalLabel: string): string => {
+  // Toileting Care
+  if (fromId === 'q1') {
+    if (originalLabel.includes('양호') || originalLabel.includes('0~1점')) return '아니오';
+    return '예';
+  }
+  if (fromId === 'q2_a' || fromId === 'q2_b') {
+    if (originalLabel.includes('양호') || originalLabel.includes('0~1점')) return '아니오';
+    return '예';
+  }
+  if (fromId === 'q3_a1' || fromId === 'q3_a2' || fromId === 'q3_b1' || fromId === 'q3_b2') {
+    if (originalLabel.includes('양호') || originalLabel.includes('0~1점') || originalLabel.includes('0점')) return '예';
+    return '아니오';
+  }
+
+  // Feeding Care
+  if (fromId === 'q1') {
+    if (originalLabel.includes('양호') || originalLabel.includes('0~1점')) return '아니오';
+    return '예';
+  }
+  if (fromId === 'q2_a') {
+    if (originalLabel.includes('0점') || originalLabel.includes('양호')) return '예 (자립)';
+    if (originalLabel.includes('1~2점') || originalLabel.includes('약간')) return '일부 도움';
+    return '아니오 (불가)';
+  }
+  if (fromId === 'q2_b') {
+    if (originalLabel.includes('예') || originalLabel.includes('yes')) return '예';
+    return '아니오';
+  }
+  if (fromId === 'q3_a') {
+    if (originalLabel.includes('예') || originalLabel.includes('yes')) return '예';
+    return '아니오';
+  }
+
+  // Transfer Care
+  if (fromId === 'q1') {
+    if (originalLabel === '0점' || originalLabel.includes('양호')) return '아니오';
+    if (originalLabel === '1점' || originalLabel.includes('약간')) return '가벼운 어려움';
+    return '예 (심함)';
+  }
+  if (fromId === 'q2') {
+    if (originalLabel === '예' || originalLabel.includes('yes')) return '예';
+    return '아니오';
+  }
+  if (fromId === 'q4') {
+    if (originalLabel === '예' || originalLabel.includes('yes')) return '예';
+    return '아니오';
+  }
+
+  return cleanEdgeLabel(originalLabel);
+};
+
 const getRobotTypeForResult = (resultId: string) => {
   const mapping = resultToRobotTypeMap[resultId];
   if (!mapping) return null;
@@ -979,13 +1031,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const edges = isTransfer ? transferEdges : (isFeeding ? feedingEdges : toiletingEdges);
 
   const maxCoords = (() => {
-    let maxX = 1000;
-    let maxY = 700;
-    Object.values(nodes).forEach(n => {
-      if (n.x > maxX) maxX = n.x;
-      if (n.y > maxY) maxY = n.y;
+    let maxX = 0;
+    let maxY = 0;
+    Object.entries(nodes).forEach(([id, n]) => {
+      const w = getNodeWidth(id);
+      const h = getNodeHeight(id);
+      if (n.x + w > maxX) maxX = n.x + w;
+      if (n.y + h > maxY) maxY = n.y + h;
     });
-    return { width: maxX + 280, height: maxY + 200 };
+    return { width: maxX + 40, height: maxY + 40 };
   })();
 
   const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
@@ -1238,21 +1292,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 210;
+    if (node?.isResult) return 155;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 350; // grid 2 columns or flex wrap
-    if (outgoingCount === 4) return 330;
-    if (outgoingCount === 3) return 280;
-    return 220;
+    if (outgoingCount >= 5) return 260; // grid 2 columns or flex wrap
+    if (outgoingCount === 4) return 240;
+    if (outgoingCount === 3) return 220;
+    return 175;
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return 100;
+    if (node?.isResult) return 90;
     const outgoingCount = edges.filter(e => e.from === id).length;
-    if (outgoingCount >= 5) return 220;
-    if (outgoingCount === 4) return 210;
-    if (outgoingCount === 3) return 170;
-    return 155;
+    if (outgoingCount >= 5) return 200;
+    if (outgoingCount === 4) return 195;
+    if (outgoingCount === 3) return 155;
+    return 145;
   };
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -1675,7 +1729,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
                                     }`}
                                   >
-                                    {cleanEdgeLabel(edge.label)}
+                                    {getCustomEdgeLabel(edge.from, edge.to, edge.label)}
                                   </button>
                                 );
                               })}
