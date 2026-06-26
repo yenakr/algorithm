@@ -978,6 +978,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const nodes = isTransfer ? transferNodes : (isFeeding ? feedingNodes : toiletingNodes);
   const edges = isTransfer ? transferEdges : (isFeeding ? feedingEdges : toiletingEdges);
 
+  const maxCoords = (() => {
+    let maxX = 1000;
+    let maxY = 700;
+    Object.values(nodes).forEach(n => {
+      if (n.x > maxX) maxX = n.x;
+      if (n.y > maxY) maxY = n.y;
+    });
+    return { width: maxX + 280, height: maxY + 200 };
+  })();
+
   const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
 
   // Keep selected guide synced with active question
@@ -1534,16 +1544,25 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
               style={{ maxHeight: '600px' }}
             >
-              <div 
-                ref={containerRef}
-                className="relative select-none origin-top-left"
-                style={{ 
-                  width: '1650px', 
-                  height: isTransfer ? '1100px' : '700px',
-                  transform: `scale(${zoom})`,
-                  transition: 'transform 0.15s ease-out'
+              <div
+                style={{
+                  width: `${maxCoords.width * zoom}px`,
+                  height: `${maxCoords.height * zoom}px`,
+                  overflow: 'hidden',
+                  transition: 'width 0.15s ease-out, height 0.15s ease-out'
                 }}
               >
+                <div 
+                  ref={containerRef}
+                  className="relative select-none origin-top-left"
+                  style={{ 
+                    width: `${maxCoords.width}px`, 
+                    height: `${maxCoords.height}px`,
+                    transform: `scale(${zoom})`,
+                    transformOrigin: '0 0',
+                    transition: 'transform 0.15s ease-out'
+                  }}
+                >
                 {/* SVG Connections */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
                   {edges.map((edge, idx) => {
@@ -1608,7 +1627,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-2.5">
                           <div>
-                            <h4 className={`text-lg font-bold sm:text-[17px] sm:font-black leading-snug text-left flex items-center justify-between gap-1.5 ${
+                            <h4 className={`text-[20px] sm:text-[19px] font-black leading-snug text-left flex items-center justify-between gap-1.5 ${
                               isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
                               <span>{cleanInternalCodes(node.label)}</span>
@@ -1650,7 +1669,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                         handleSingleSelect(id, val);
                                       }
                                     }}
-                                    className={`px-1.5 py-1 rounded text-[13px] sm:text-[12px] font-black transition-all border text-center leading-tight whitespace-normal break-words cursor-pointer flex items-center justify-center min-h-[35px] flex-1 ${
+                                    className={`px-1.5 py-1 rounded text-[14px] sm:text-[13px] font-black transition-all border text-center leading-tight whitespace-normal break-words cursor-pointer flex items-center justify-center min-h-[35px] flex-1 ${
                                       isBranchSelected
                                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm font-black'
                                         : 'bg-white border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900'
@@ -1670,6 +1689,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               </div>
             </div>
           </div>
+        </div>
 
           {/* Right Column: Details Panel */}
           <div className="hidden">

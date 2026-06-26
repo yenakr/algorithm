@@ -412,7 +412,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
 
                 {/* Left Column: Device Title and Image (col-span-5) */}
                 <div className="md:col-span-5 flex flex-col items-center gap-4 w-full">
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 text-center w-full">
+                  <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 text-center w-full">
                     {cleanInternalCodes(devicesList[deviceIndex]?.name)}
                   </h3>
                   <div className="relative w-full max-w-[280px] h-[280px] sm:max-w-[320px] sm:h-[320px] bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-md flex items-center justify-center p-4">
@@ -445,7 +445,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                 {/* Right Column: Descriptions (col-span-7) */}
                 <div className="md:col-span-7 space-y-5 text-left">
                   <div>
-                    <p className="text-sm sm:text-base md:text-lg text-slate-700 font-extrabold leading-relaxed border-l-4 border-blue-500 pl-3">
+                    <p className="text-base sm:text-lg md:text-xl text-slate-800 font-black leading-relaxed border-l-4 border-blue-500 pl-3">
                       {cleanInternalCodes(devicesList[deviceIndex]?.oneLine)
                         .replace(/(자동배설처리로봇|배설 케어 로봇|자동 식사 보조 로봇|이승 보조 장치|이승돌봄 장비)/g, '|$1|')
                         .split('|').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-blue-600 font-black">{chunk}</strong> : chunk)}
@@ -455,7 +455,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                   {/* Applicability situations bullets */}
                   <div className="space-y-2">
                     <span className="text-xs sm:text-sm font-black text-slate-400 uppercase tracking-wider block">적용 상황</span>
-                    <ul className="text-sm sm:text-base text-slate-800 font-bold list-disc list-inside space-y-1 pl-1 leading-relaxed">
+                    <ul className="text-base sm:text-lg text-slate-800 font-bold list-disc list-inside space-y-1.5 pl-1 leading-relaxed">
                       {devicesList[deviceIndex]?.situations.map((sit, i) => (
                         <li key={i}>
                           {cleanInternalCodes(sit)
@@ -470,8 +470,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                     {/* Functions Box */}
                     <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-xl p-4 sm:p-5">
-                      <span className="text-xs sm:text-sm font-black text-emerald-800 block mb-2.5">주요 기능</span>
-                      <ul className="text-xs sm:text-sm text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
+                      <span className="text-sm sm:text-base font-black text-emerald-800 block mb-2.5">주요 기능</span>
+                      <ul className="text-sm sm:text-base text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
                         {devicesList[deviceIndex]?.functions.map((func, idx) => (
                           <li key={idx} className="whitespace-normal break-keep">
                             {cleanInternalCodes(func)
@@ -484,8 +484,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
 
                     {/* Cautions Box */}
                     <div className="bg-amber-50/50 border border-amber-100/80 rounded-xl p-4 sm:p-5">
-                      <span className="text-xs sm:text-sm font-black text-amber-800 block mb-2.5">확인할 점</span>
-                      <ul className="text-xs sm:text-sm text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
+                      <span className="text-sm sm:text-base font-black text-amber-800 block mb-2.5">확인할 점</span>
+                      <ul className="text-sm sm:text-base text-slate-700 font-bold list-disc list-inside space-y-1.5 leading-relaxed">
                         {devicesList[deviceIndex]?.cautions.map((caut, idx) => (
                           <li key={idx} className="whitespace-normal break-keep">
                             {cleanInternalCodes(caut)
