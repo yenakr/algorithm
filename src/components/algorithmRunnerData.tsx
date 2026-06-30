@@ -692,47 +692,47 @@ export interface CriteriaTable {
 
 export const criteriaTables: Record<string, CriteriaTable> = {
   toileting: {
-    title: '배설(배뇨/배변) 조절하기 기능 평가 기준표 (ICF 기준)',
+    title: '배뇨/배변 조절하기 기능 평가 항목',
     themeColor: 'blue',
     leftSection: {
-      title: '■ 배뇨/배변 조절 관련 자기관리 평가 항목',
+      title: '■ 배뇨/배변 조절하기 기능 평가 항목',
       type: 'list',
       items: [
         '배뇨감 또는 배변감 인지하기',
         '배뇨 또는 배변에 적절한 장소를 선택하여 들어가기',
-        '적절한 자세 취하기 (변기 안착 및 자세 유지)',
+        '적절한 자세 취하기',
         '배뇨 또는 배변 전후 옷 입고 벗기',
         '배뇨 또는 배변 후 자신을 청결하게 하기'
       ]
     },
     rightSection: {
-      title: '■ 기능 평가 기준 및 판단 등급',
+      title: '■ 배뇨/배변 조절하기 기능 평가 기준',
       type: 'grades',
       items: [
-        { label: '0점', text: '문제 없음 (자립 수준)' },
+        { label: '0점', text: '문제 없음' },
         { label: '1점', text: '가벼운 정도의 어려움 (견딜만한 정도)' },
         { label: '2점', text: '중간 정도의 어려움 (일상생활에 지장을 초래할 정도)' },
-        { label: '3점', text: '심한 정도의 어려움 (일상생활을 부분적으로 방해)' },
-        { label: '4점', text: '극심한 정도의 어려움 (일상생활을 완전히 방해)' }
+        { label: '3점', text: '심한 정도의 어려움 (일상생활을 부분적으로 방해할 정도)' },
+        { label: '4점', text: '극심한 정도의 어려움 (일상생활을 완전히 방해할 정도)' }
       ]
     }
   },
   feeding: {
-    title: '식사돌봄(먹기/마시기) 기능 및 근력 평가 기준표 (ICF/MRC 기준)',
+    title: '먹기, 마시기 기능평가 기준',
     themeColor: 'emerald',
     leftSection: {
-      title: '■ 먹기/마시기 기능 평가 기준',
+      title: '■ 먹기, 마시기 기능평가 기준',
       type: 'grades',
       items: [
-        { label: '0점', text: '문제 없음 (삼킴 및 식사에 전혀 문제 없음)' },
-        { label: '1점', text: '가벼운 정도의 어려움 (가끔 흘리거나 사래 걸림)' },
-        { label: '2점', text: '중간 정도의 어려움 (보조기구가 있어야 식사 가능)' },
-        { label: '3점', text: '심한 정도의 어려움 (대부분을 떠먹여 줘야 식사 가능)' },
-        { label: '4점', text: '극심한 정도의 어려움 (삼키지 못해 콧줄/튜브 사용)' }
+        { label: '0점', text: '문제 없음' },
+        { label: '1점', text: '가벼운 정도의 어려움 (견딜만한 정도)' },
+        { label: '2점', text: '중간 정도의 어려움 (일상생활에 지장을 초래할 정도)' },
+        { label: '3점', text: '심한 정도의 어려움 (일상생활을 부분적으로 방해할 정도)' },
+        { label: '4점', text: '극심한 정도의 어려움 (일상생활을 완전히 방해할 정도)' }
       ]
     },
     rightSection: {
-      title: '■ 상지(팔) 근력 평가 방법\n(※ 식사할 때 주로 사용하는 팔을 기준으로 평가)',
+      title: '■ 팔의 근력 평가 방법\n(※ 식사할 때 주로 사용하는 팔을 기준으로 평가)',
       type: 'grades',
       items: [
         { label: 'Grade 0', text: '근육의 수축도 보이지 않음 (완전 마비)' },
@@ -745,21 +745,21 @@ export const criteriaTables: Record<string, CriteriaTable> = {
     }
   },
   transfer: {
-    title: '자리이동 기능 및 하지 근력 평가 기준표 (ICF/MRC 기준)',
+    title: '자리이동하기 기능평가 기준',
     themeColor: 'indigo',
     leftSection: {
       title: '■ 자리이동하기 기능 평가 기준',
       type: 'grades',
       items: [
-        { label: '0점', text: '문제 없음 (자력으로 안전한 침대-휠체어 이동)' },
-        { label: '1점', text: '가벼운 정도의 어려움 (균형 불안이나 피로감 있음)' },
-        { label: '2점', text: '중간 정도의 어려움 (보조기구나 가벼운 도움 필요)' },
-        { label: '3점', text: '심한 정도의 어려움 (자력 이동 불가, 전적인 보조 필요)' },
-        { label: '4점', text: '극심한 정도의 어려움 (기계장치나 여러 명의 부축 필수)' }
+        { label: '0점', text: '문제 없음' },
+        { label: '1점', text: '가벼운 정도의 어려움 (견딜만한 정도)' },
+        { label: '2점', text: '중간 정도의 어려움 (일상생활에 지장을 초래할 정도)' },
+        { label: '3점', text: '심한 정도의 어려움 (일상생활을 부분적으로 방해할 정도)' },
+        { label: '4점', text: '극심한 정도의 어려움 (일상생활을 완전히 방해할 정도)' }
       ]
     },
     rightSection: {
-      title: '■ 하지(다리) 근력 평가 방법\n(※ 하지 근력으로 체중을 지탱할 수 있는지를 기준으로 평가)',
+      title: '■ 하지 근력 평가 방법\n(※ 하지 근력으로 체중을 지탱할 수 있는지를 기준으로 평가)',
       type: 'grades',
       items: [
         { label: 'Grade 0', text: '완전 마비. 근육의 기능이 전혀 없음' },
@@ -767,7 +767,7 @@ export const criteriaTables: Record<string, CriteriaTable> = {
         { label: 'Grade II', text: '다리를 들어올릴 수 없으며 중력에 버티지 못하고 떨어뜨림' },
         { label: 'Grade III', text: '다리를 들어올릴 수 있지만 저항을 이기지 못하고 떨어뜨림' },
         { label: 'Grade IV', text: '약간의 약화를 느끼지만 혼자서 보행 가능함' },
-        { label: 'Grade V', text: '근력이 완전' }
+        { label: 'Grade V', text: '근력이 완전함' }
       ]
     }
   }
