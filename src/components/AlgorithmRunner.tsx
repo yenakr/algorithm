@@ -141,7 +141,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   const [tempMultiSelect, setTempMultiSelect] = useState<string[]>([]);
 
   // Detailed mode map collapsible & zoom states
-  const [showDecisionMap, setShowDecisionMap] = useState(false);
+  const [showDecisionMap, setShowDecisionMap] = useState(true);
   const [zoom, setZoom] = useState(0.75);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -166,9 +166,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (!nodeId || !wrapperRef.current) return;
     const node = nodes[nodeId];
     if (!node) return;
-    
-    // Do not auto-scroll if it's a result node
-    if (node.isResult) return;
 
     const nodeW = getNodeWidth(nodeId);
     const nodeH = getNodeHeight(nodeId);
@@ -183,6 +180,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       behavior: 'smooth'
     });
   };
+
+  // Auto scroll map to focus on the active question or result node
+  useEffect(() => {
+    if (showDecisionMap) {
+      const timer = setTimeout(() => {
+        focusNode(currentQuestionId || resultId);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [currentQuestionId, resultId, zoom, showDecisionMap]);
 
   useEffect(() => {
     if (uiMode === 'map') {

@@ -82,14 +82,11 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
       });
 
       const selected: CaseStudy[] = [];
-      ['A', 'B', 'C'].forEach((cat) => {
+      ['A', 'B', 'C', 'D'].forEach((cat) => {
         const list = categories[cat] || [];
         const shuffled = [...list].sort(() => 0.5 - Math.random());
         selected.push(...shuffled.slice(0, 3));
       });
-      const listD = categories['D'] || [];
-      const shuffledD = [...listD].sort(() => 0.5 - Math.random());
-      selected.push(...shuffledD.slice(0, 6)); // Select 6 from category D (사례) to make 15 questions
       // Shuffle the final selected list so categories are completely randomized
       return selected.sort(() => 0.5 - Math.random());
     }

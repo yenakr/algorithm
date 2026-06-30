@@ -123,16 +123,16 @@ export const toiletingCases: CaseStudy[] = [
     question: '화장실 이동과 용변 후 청결 모두 중간 이상 어려움인 경우 우선 고려할 수 있는 것은?',
     options: ['자동 배설처리로봇', '비데', '일반 이동 변기', '목발'],
     correctAnswerIndex: 0,
-    explanation: '이동과 청결 처리 둘 다 힘든 와상 상태인 경우 자동 배설처리로봇이 적합한 보조 수단입니다.',
+    explanation: '이동 및 세정 활동이 둘 다 원활하지 않을 시 자동 배설처리로봇 도입이 권장됩니다.',
     category: 'C'
   },
   {
     id: 'toileting_case_q14',
     scenario: '',
-    question: '화장실 이동은 가능하나 용변 후 청결에 중간 이상 어려움이 있는 경우 적합한 방법은?',
+    question: '화장실 이동은 가능하나 용변 후 청결에 중간 이상 어려움인 경우 적합한 방법은?',
     options: ['용변 후 처리 돕기 (비데 등)', '자동 배설처리로봇', '침상 배설', '배변 프로그램만'],
     correctAnswerIndex: 0,
-    explanation: '거동은 양호하지만 위생 처리가 힘든 경우 비데 사용이나 세정 보조 장치를 활용합니다.',
+    explanation: '이동은 가능하나 뒤처리가 어려운 경우, 변기 주변 세정 장치(비데 등)를 우선 활용합니다.',
     category: 'C'
   },
   {
@@ -141,7 +141,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '시간에 맞춘 배뇨훈련 또는 배변 프로그램은 배설 관리의 기본 방법이다.',
     options: ['예 (O)', '아니오 (X)'],
     correctAnswerIndex: 0,
-    explanation: '규칙적인 요의 조절을 돕는 배뇨/배변 훈련은 장비 매칭 이전의 가장 기본적인 케어 기법입니다.',
+    explanation: '주기적 배뇨 훈련은 약물 투약 외에 대표적으로 활용되는 비약물성 관리 기법입니다.',
     category: 'C'
   },
   {
@@ -155,7 +155,7 @@ export const toiletingCases: CaseStudy[] = [
       '식이 조절만'
     ],
     correctAnswerIndex: 0,
-    explanation: '이동이 어려운 대상자의 경우 이동 지원이나 침상 배설 기기, 또는 이동식 간이 변기를 주로 사용합니다.',
+    explanation: '거동 장애 시에는 이동 보조 장비나 이동식 간이 변기 활용이 주로 선택됩니다.',
     category: 'C'
   },
   {
@@ -169,7 +169,7 @@ export const toiletingCases: CaseStudy[] = [
       '모든 기능 정상'
     ],
     correctAnswerIndex: 0,
-    explanation: '스스로 이동하여 위생 처리를 할 수 없는 중증 누워 지내는 상태일 때 자동 배설처리로봇 적용 대상이 됩니다.',
+    explanation: '화장실 이동 및 청결 관리가 둘 다 극히 불가능한 와상 상황에서 자동 배설처리로봇을 권장합니다.',
     category: 'C'
   },
   {
@@ -178,7 +178,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '배뇨감 인지 평가가 정상인 대상자에게 자동 배설처리로봇을 우선 추천하는 것은 적절하다.',
     options: ['예 (O)', '아니오 (X)'],
     correctAnswerIndex: 1,
-    explanation: '배뇨감을 스스로 느끼는 경우 굳이 자동 배설처리로봇을 우선하여 적용하지 않는 것이 원칙입니다.',
+    explanation: '스스로 배설 시점을 아는 사람에게 자동 배설처리로봇을 우선 장착하는 것은 권장되지 않습니다.',
     category: 'C'
   },
   // D. 사례 적용
