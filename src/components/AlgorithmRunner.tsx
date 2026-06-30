@@ -808,21 +808,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       <div className="w-full max-w-4xl mx-auto py-10 px-6 sm:px-8 space-y-10 bg-gradient-to-br from-blue-50/30 via-emerald-50/10 to-white rounded-3xl border border-slate-200/80 shadow-xl min-h-[600px] flex flex-col justify-between">
         {/* Top Header Row */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-slate-200/60 pb-6">
-            <div className="text-left space-y-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-150">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                보호자/일반인용 자가진단
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
-                {friendlyName}
-              </h2>
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xl sm:text-2xl font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-4 py-1.5 rounded-2xl shadow-sm">
-                {displayCurrentPage} / {displayTotalPages} 페이지
-              </span>
-            </div>
+          <div className="flex justify-center items-center pb-4 border-b border-slate-200/60">
+            <span className="text-xl sm:text-2xl font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-6 py-2 rounded-2xl shadow-sm">
+              {displayCurrentPage} / {displayTotalPages}
+            </span>
           </div>
 
           {/* Simple Progress Bar */}
@@ -932,25 +921,19 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             /* Question Wizard Page */
             currentQuestion && (
               <div className="space-y-10 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
-                <div className="space-y-3">
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-800 leading-snug">
-                    {getDisplayText(currentQuestion, 'title', 'simple')}
-                  </h3>
-                  {getDisplayText(currentQuestion, 'description', 'simple') && (
-                    <p className="text-sm sm:text-base text-slate-500 font-extrabold leading-relaxed bg-blue-50/30 px-5 py-3 rounded-2xl border border-blue-100/30 inline-block">
+                {getDisplayText(currentQuestion, 'description', 'simple') && (
+                  <div className="text-center">
+                    <p className="text-base sm:text-lg text-slate-500 font-extrabold leading-relaxed bg-blue-50/30 px-5 py-3 rounded-2xl border border-blue-100/30 inline-block">
                       💡 {getDisplayText(currentQuestion, 'description', 'simple')}
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Local Decision Tree Flowchart */}
                 <div className="flex flex-col items-center py-2 select-none w-full">
                   {/* Root Node: Current Question */}
-                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/30 border-2 border-blue-200 rounded-2xl p-5 max-w-md w-full shadow-sm text-center ring-4 ring-blue-100/10">
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-widest">
-                      현재 질문 단계
-                    </span>
-                    <h4 className="text-base sm:text-lg font-black text-slate-805 leading-snug">
+                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/30 border-2 border-blue-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-md text-center ring-4 ring-blue-100/10">
+                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 leading-snug">
                       {getDisplayText(currentQuestion, 'title', 'simple')}
                     </h4>
                   </div>
@@ -995,14 +978,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
                     {groupList.map((group) => {
                       return (
-                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow transition-all space-y-4">
-                          {/* Destination Header (➔ 다음: ... / 💡 추천: ... ) */}
-                          <div className="bg-blue-50/70 text-blue-800 text-xs font-black py-2 px-3 rounded-xl border border-blue-100/60 text-center">
-                            {group.label}
-                          </div>
-                          
+                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow transition-all space-y-5">
                           {/* Options in this group */}
-                          <div className="space-y-2.5 flex-1 flex flex-col justify-center">
+                          <div className="space-y-3 flex-1 flex flex-col justify-center">
                             {group.options.map((opt) => {
                               const isSelected = currentQuestion.type === 'multi'
                                 ? tempMultiSelect.includes(opt.value)
@@ -1018,23 +996,28 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                       handleSimpleOptionClick(opt.value);
                                     }
                                   }}
-                                  className={`w-full text-left rounded-xl border transition-all duration-250 p-4 flex items-center justify-between cursor-pointer group ${
+                                  className={`w-full text-left rounded-xl border transition-all duration-250 p-5 flex items-center justify-between cursor-pointer group ${
                                     isSelected
                                       ? 'border-emerald-500 bg-emerald-50/30 text-emerald-950 ring-2 ring-emerald-500/20'
                                       : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50/50 text-slate-700'
                                   }`}
                                 >
-                                  <span className="text-sm sm:text-base font-bold leading-snug">
+                                  <span className="text-base sm:text-lg md:text-xl font-bold leading-snug">
                                     {getDisplayText(opt, 'text', 'simple')}
                                   </span>
-                                  <div className={`rounded-full border-2 transition-all shrink-0 w-5 h-5 flex items-center justify-center ${
+                                  <div className={`rounded-full border-2 transition-all shrink-0 w-6 h-6 flex items-center justify-center ${
                                     isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-350 bg-white'
                                   }`}>
-                                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[3.5]" />}
                                   </div>
                                 </button>
                               );
                             })}
+                          </div>
+
+                          {/* Destination Footer (➔ 다음: ... / 💡 추천: ... ) */}
+                          <div className="bg-blue-50/70 text-blue-800 text-sm sm:text-base font-black py-2.5 px-3.5 rounded-xl border border-blue-100/60 text-center">
+                            {group.label}
                           </div>
                         </div>
                       );
