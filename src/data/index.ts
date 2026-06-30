@@ -6,13 +6,8 @@ import { toiletingCases } from './cases/toiletingCases';
 import { transferCases } from './cases/transferCases';
 import { feedingCases } from './cases/feedingCases';
 
-import { toiletingEducationData } from './education/toiletingEducation';
-import { transferEducationData } from './education/transferEducation';
-import { feedingEducationData } from './education/feedingEducation';
-
 import { Question, Result } from './algorithms/transferCare';
 import { CaseStudy } from './cases/transferCases';
-import { EducationData } from './education/transferEducation';
 
 export interface AlgorithmData {
   id: string;
@@ -22,7 +17,6 @@ export interface AlgorithmData {
   diagramImage: string;
   algorithm: typeof transferCareAlgorithm;
   quizzes: CaseStudy[];
-  education: EducationData;
   status: string;
 }
 
@@ -35,7 +29,6 @@ export const algorithmsData: Record<string, AlgorithmData> = {
     diagramImage: '/algorithm-trees/toileting-original.png',
     algorithm: toiletingCareAlgorithm as any,
     quizzes: toiletingCases,
-    education: toiletingEducationData,
     status: 'active'
   },
   feeding: {
@@ -46,7 +39,6 @@ export const algorithmsData: Record<string, AlgorithmData> = {
     diagramImage: '/algorithm-trees/feeding-original.png',
     algorithm: feedingCareAlgorithm as any,
     quizzes: feedingCases,
-    education: feedingEducationData,
     status: 'active'
   },
   transfer: {
@@ -57,11 +49,10 @@ export const algorithmsData: Record<string, AlgorithmData> = {
     diagramImage: '/algorithm-trees/transfer-original.png',
     algorithm: transferCareAlgorithm as any,
     quizzes: transferCases,
-    education: transferEducationData,
     status: 'active'
   }
 };
-export type { Question, Result, CaseStudy, EducationData };
+export type { Question, Result, CaseStudy };
 export { toiletingCareAlgorithm, transferCareAlgorithm, feedingCareAlgorithm };
 
 export * from './robotTypes';

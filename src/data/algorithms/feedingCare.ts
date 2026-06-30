@@ -8,14 +8,12 @@ export const feedingCareAlgorithm = {
     q1: {
       id: 'q1',
       title: '구강 섭취가 가능한가',
-      simpleTitle: '입으로 직접 음식을 안전하게 삼키고 섭취할 수 있나요?',
-      description: '구강 섭취가 가능한 상태인지 혹은 경관영양이나 정맥 영양이 필요한 상태인지 평가합니다.',
-      simpleDescription: '튜브나 콧줄 등을 통한 영양이 아닌, 입으로 직접 음식을 드실 수 있는지 확인합니다.',
+      simpleTitle: '입으로 직접 음식을 삼키고 섭취할 수 있나요?',
       iconType: 'safety',
       type: 'single',
       options: [
         { id: 'q1_yes', text: '예', simpleText: '네, 입으로 음식을 직접 먹을 수 있어요', value: 'yes' },
-        { id: 'q1_no', text: '아니오', simpleText: '아니오, 삼키지 못해 튜브나 콧줄, 영양 수액 등을 사용해야 해요', value: 'no' },
+        { id: 'q1_no', text: '아니오', simpleText: '아니오, 입으로 먹기 어려워요', value: 'no' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q1'];
@@ -33,13 +31,11 @@ export const feedingCareAlgorithm = {
       id: 'q2',
       title: '먹기/마시기 기능 평가',
       simpleTitle: '음식을 숟가락이나 도구로 떠서 직접 드시는 데 어느 정도 어려움이 있나요?',
-      description: '음식을 입으로 직접 가져가서 섭취하는 전반적인 운동 기능의 저하 정도를 평가합니다.',
-      simpleDescription: '손이나 팔 움직임 제한 등으로 인해 스스로 식사 도구를 조작하기 어려운 정도를 평가합니다.',
       iconType: 'transfer',
       type: 'single',
       options: [
-        { id: 'q2_light', text: '가벼운 어려움 (또는 어려움 없음)', simpleText: '혼자 드실 수는 있지만 약간 서툴거나 손이 조금 떨려요', value: 'light' },
-        { id: 'q2_heavy', text: '중간 이상의 어려움', simpleText: '숟가락질이 많이 어렵거나 스스로 도구를 쓰지 못해요', value: 'heavy' },
+        { id: 'q2_light', text: '가벼운 어려움/어려움 없음', simpleText: '혼자 드실 수는 있지만 약간 서툴거나 손이 조금 떨려요', value: 'light' },
+        { id: 'q2_heavy', text: '중간 정도 이상의 어려움', simpleText: '숟가락질이 많이 어렵거나 스스로 도구를 쓰지 못해요', value: 'heavy' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q2'];
@@ -55,15 +51,13 @@ export const feedingCareAlgorithm = {
 
     q3: {
       id: 'q3',
-      title: '팔 근력 평가 (근력 등급)',
-      simpleTitle: '양쪽 팔을 스스로 중력을 이겨내며 들어 올릴 수 있나요?',
-      description: '식사용 숟가락이나 컵을 들기 위해 필요한 상지 대근육의 중력 극복 기능(3등급 기준)을 평가합니다.',
-      simpleDescription: '팔을 책상 위나 입 높이까지 스스로 들어 올릴 수 있는지 근력 상태를 체크합니다.',
+      title: '팔의 근력 평가 (팔을 들지 못하는가)',
+      simpleTitle: '스스로 팔을 들어 올릴 수 있나요?',
       iconType: 'balance',
       type: 'single',
       options: [
-        { id: 'q3_low', text: '들기 불가능 (0 ~ 2등급)', simpleText: '중력을 이기지 못해 팔을 위로 들어 올릴 수 없어요', value: 'low' },
-        { id: 'q3_high', text: '들기 가능 (3 ~ 5등급)', simpleText: '팔을 스스로 들 수는 있지만, 버티는 힘이 약하거나 수저 조작이 서툴러요', value: 'high' }
+        { id: 'q3_low', text: '아니오 (<Grade III)', simpleText: '팔을 위로 들어 올릴 수 없어요', value: 'low' },
+        { id: 'q3_high', text: '예', simpleText: '팔을 스스로 들 수는 있지만, 버티는 힘이 약하거나 수저 조작이 서툴러요', value: 'high' }
       ],
       resultId: (answers: Record<string, any>) => {
         const val = answers['q3'];
@@ -76,7 +70,7 @@ export const feedingCareAlgorithm = {
   results: {
     'F-A': {
       id: 'F-A',
-      title: '특수식사도구 및 수동형 팔 지지대 추천',
+      title: '특수식사도구 및 수동형 팔 지지대',
       simpleTitle: '특수식사도구 + 수동형 팔 지지대',
       description: '삼킴은 문제가 없으나 손가락 관절염이나 가벼운 관절 약화 등으로 수저질이 약간 불편한 상태입니다.',
       simpleDescription: '가벼운 손떨림이나 그립력 부족을 메워주는 두꺼운 수저, 미끄럼 방지 식기 및 수동 팔 지지대를 권장합니다.',
@@ -87,7 +81,7 @@ export const feedingCareAlgorithm = {
     } as Result,
     'F-B': {
       id: 'F-B',
-      title: '전자동 식사돌봄로봇 추천',
+      title: '전자동 식사돌봄로봇',
       simpleTitle: '전자동 식사돌봄로봇',
       description: '구강 섭취와 삼킴은 가능하지만, 양쪽 상지 마비나 극심한 약화(근력 3등급 미만)로 수저를 전혀 들 수 없는 상태입니다.',
       simpleDescription: '양팔을 전혀 사용하기 어려우나 목과 머리를 움직여 섭취가 가능한 상태로, 기계식 로봇팔이 반찬과 밥을 떠서 입 앞까지 배달해 주는 전동형 식사로봇이 필요합니다.',
@@ -98,7 +92,7 @@ export const feedingCareAlgorithm = {
     } as Result,
     'F-C': {
       id: 'F-C',
-      title: '부분보조기기 또는 반자동로봇 추천 (근력 수준에 따라)',
+      title: '부분보조기기 또는 반자동로봇 (근력 수준에 따라)',
       simpleTitle: '부분보조기기 또는 반자동로봇',
       description: '중력을 이겨내고 스스로 팔은 들어 올릴 수 있으나(근력 3등급 이상), 정밀한 수저 조작이 어렵거나 식사 시 피로도가 심한 상태입니다.',
       simpleDescription: '스스로 팔은 들 수 있으나 식사하는 동안 버티는 힘이 부족한 분을 위해, 팔의 무게를 덜어주는 반자동 팔 지지 장치나 스프링 장치를 사용해 섭취를 돕습니다.',
@@ -109,7 +103,7 @@ export const feedingCareAlgorithm = {
     } as Result,
     'F-D': {
       id: 'F-D',
-      title: '비구강영양 지원 (의료진 지시 필수)',
+      title: '비경구영양)',
       simpleTitle: '비구강영양 지원 및 의료진 상의',
       description: '구강을 통한 삼킴과 기침 조절이 절대 불가능하여, 입으로 식사할 시 흡인성 폐렴이나 기도 폐색의 위험이 매우 높은 상태입니다.',
       simpleDescription: '구강 섭취가 불가능해 콧줄/위루관(경관영양) 또는 정맥영양(TPN)을 사용 중이며, 식사 중 사래나 기침이 나면 물을 포함한 모든 구강 공급을 중단하고 의료진과 즉시 상의해야 합니다.',

@@ -90,7 +90,8 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
       const listD = categories['D'] || [];
       const shuffledD = [...listD].sort(() => 0.5 - Math.random());
       selected.push(...shuffledD.slice(0, 6)); // Select 6 from category D (사례) to make 15 questions
-      return selected;
+      // Shuffle the final selected list so categories are completely randomized
+      return selected.sort(() => 0.5 - Math.random());
     }
     return rawQuizzes;
   };

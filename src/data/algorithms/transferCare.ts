@@ -45,8 +45,6 @@ export const transferCareAlgorithm = {
       id: 'q1',
       title: '자리이동에 어려움이 있나요?',
       simpleTitle: '침대에서 일어나거나 의자로 옮겨 앉을 때 도움이 필요한가요?',
-      description: '',
-      simpleDescription: '혼자 몸을 일으키거나 앉는 자세로 바꾸기 어려운지 확인합니다.',
       iconType: 'transfer',
       type: 'single',
       options: [
@@ -70,8 +68,6 @@ export const transferCareAlgorithm = {
       id: 'q2',
       title: '다리 힘으로 체중을 지탱할 수 없는가?',
       simpleTitle: '보호자가 부축해 주었을 때, 환자분이 본인의 다리 힘으로 서 계실 수 있나요?',
-      description: '',
-      simpleDescription: '보호자가 양손으로 부축하여 서 있게 도울 때, 다리로 버텨 지탱할 수 있는지 판단해 주세요.',
       iconType: 'balance',
       type: 'single',
       options: [
@@ -89,8 +85,6 @@ export const transferCareAlgorithm = {
       id: 'q3',
       title: '환경적 요소 고려',
       simpleTitle: '장비를 설치할 주거 환경의 가공 가능 여부를 선택해 주세요.',
-      description: '',
-      simpleDescription: '설치하고 작동할 공간에 천장/벽면 고정형 장비를 달 수 있는지 또는 이동식이 필요한지 선택해 주세요.',
       iconType: 'safety',
       type: 'single',
       options: [
@@ -114,8 +108,6 @@ export const transferCareAlgorithm = {
       id: 'q3_2',
       title: '독립 지지대 설치가 가능한가요?',
       simpleTitle: '벽이나 천장 공사는 어렵지만, 침실 바닥에 문 모양의 큰 조립 지지대를 세워둘 공간이 있나요?',
-      description: '',
-      simpleDescription: '바닥 공간 여유를 파악하여 A자형 철제 프레임 기둥을 배치할 수 있는지 여부를 선택합니다.',
       iconType: 'safety',
       type: 'single',
       options: [
@@ -132,8 +124,6 @@ export const transferCareAlgorithm = {
       id: 'q4',
       title: '스스로 상체를 일으킬 수 없는가?',
       simpleTitle: '환자분이 앉은 상태에서 스스로 상체(허리와 목)를 세우거나 손잡이를 꽉 잡을 수 있나요?',
-      description: '',
-      simpleDescription: '기립 시 스스로 앉은 자세를 유지하고 손으로 당겨 지지할 수 있는지 판단해 주세요.',
       iconType: 'balance',
       type: 'single',
       options: [

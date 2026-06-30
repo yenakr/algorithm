@@ -24,19 +24,17 @@ export default function CareSafetyCard({ items, checkedItems, onToggle }: CareSa
           <div
             key={item.id}
             onClick={() => onToggle(item.id)}
-            className={`group relative bg-white border-2 rounded-2xl p-5 shadow-sm hover:shadow transition-all duration-300 cursor-pointer flex flex-col justify-between select-none ${
-              isChecked 
-                ? 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-50/10' 
-                : 'border-slate-200 hover:border-slate-300'
-            }`}
+            className={`group relative bg-white border-2 rounded-2xl p-5 shadow-sm hover:shadow transition-all duration-300 cursor-pointer flex flex-col justify-between select-none ${isChecked
+              ? 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-50/10'
+              : 'border-slate-200 hover:border-slate-300'
+              }`}
           >
             {/* Checkbox badge in top-right */}
             <div className="absolute top-4 right-4 z-20">
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                isChecked
-                  ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20'
-                  : 'border-slate-350 bg-white group-hover:border-slate-400'
-              }`}>
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isChecked
+                ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20'
+                : 'border-slate-350 bg-white group-hover:border-slate-400'
+                }`}>
                 {isChecked && <Check className="w-4 h-4 stroke-[3]" />}
               </div>
             </div>

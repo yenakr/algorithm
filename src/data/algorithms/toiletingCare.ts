@@ -9,16 +9,14 @@ export const toiletingCareAlgorithm = {
       id: 'q1',
       title: '배뇨감 및 배변감을 인지하고 조절하는 데 어려움이 있나요?',
       simpleTitle: '화장실에 가고 싶다는 느낌을 잘 알 수 있나요?',
-      description: '',
-      simpleDescription: '소변이나 대변이 마려운 느낌을 알고, 화장실에 갈 때까지 어느 정도 참을 수 있는지 확인합니다.',
       iconType: 'toilet',
       type: 'single',
       options: [
         { id: 'q1_0', text: '0점: 문제 없음', simpleText: '네, 대소변 신호를 알고 잘 조절해요', score: 0, value: '0' },
-        { id: 'q1_1', text: '1점: 가벼운 어려움', simpleText: '가끔 실수하시지만 스스로 알아차려요', score: 1, value: '1' },
+        { id: 'q1_1', text: '1점: 가벼운 정도의 어려움', simpleText: '가끔 실수하시지만 스스로 알아차려요', score: 1, value: '1' },
         { id: 'q1_2', text: '2점: 중간 정도의 어려움', simpleText: '신호를 가끔 모르시거나 대소변 실수가 잦아요', score: 2, value: '2' },
-        { id: 'q1_3', text: '3점: 심한 어려움', simpleText: '참지 못하고 기저귀나 이불에 실례를 자주 해요', score: 3, value: '3' },
-        { id: 'q1_4', text: '4점: 극심한 어려움', simpleText: '신호를 전혀 느끼지 못해 기저귀에 의존해요', score: 4, value: '4' },
+        { id: 'q1_3', text: '3점: 심한 정도의 어려움', simpleText: '참지 못하고 기저귀나 이불에 실례를 자주 해요', score: 3, value: '3' },
+        { id: 'q1_4', text: '4점: 극심한 정도의 어려움', simpleText: '신호를 전혀 느끼지 못해 기저귀에 의존해요', score: 4, value: '4' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q1'] || '0');
@@ -30,17 +28,15 @@ export const toiletingCareAlgorithm = {
     q2_a: {
       id: 'q2_a',
       title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
-      simpleTitle: '스스로 침실방에서 화장실 변기까지 안전하게 이동하실 수 있나요?',
-      description: '',
-      simpleDescription: '화장실까지 걸어가거나 휠체어로 안전하게 이동이 가능하신지 체크합니다.',
+      simpleTitle: '스스로 화장실까지 안전하게 이동하실 수 있나요?',
       iconType: 'walking',
       type: 'single',
       options: [
         { id: 'q2a_0', text: '0점: 문제 없음', simpleText: '네, 혼자 걸어가실 수 있어요', score: 0, value: '0' },
-        { id: 'q2a_1', text: '1점: 가벼운 어려움', simpleText: '약간 흔들리시지만 혼자 이동하세요', score: 1, value: '1' },
+        { id: 'q2a_1', text: '1점: 가벼운 정도의 어려움', simpleText: '약간 흔들리시지만 혼자 이동하세요', score: 1, value: '1' },
         { id: 'q2a_2', text: '2점: 중간 정도의 어려움', simpleText: '안전을 위해 보행기를 짚거나 부축해야 해요', score: 2, value: '2' },
-        { id: 'q2a_3', text: '3점: 심한 어려움', simpleText: '다리 힘이 약해 주로 휠체어를 타고 부축받아야 해요', score: 3, value: '3' },
-        { id: 'q2a_4', text: '4점: 극심한 어려움', simpleText: '화장실 거동이 안 되어 방 변기나 침상에서 해야 해요', score: 4, value: '4' },
+        { id: 'q2a_3', text: '3점: 심한 정도의 어려움', simpleText: '다리 힘이 약해 주로 휠체어를 타고 부축받아야 해요', score: 3, value: '3' },
+        { id: 'q2a_4', text: '4점: 극심한 정도의 어려움', simpleText: '화장실 거동이 안 되어 방 변기나 침상에서 해야 해요', score: 4, value: '4' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q2_a'] || '0');
@@ -51,10 +47,8 @@ export const toiletingCareAlgorithm = {
 
     q3_a1: {
       id: 'q3_a1',
-      title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
+      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
       simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
-      description: '',
-      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
       iconType: 'caregiver',
       type: 'single',
       options: [
@@ -73,10 +67,8 @@ export const toiletingCareAlgorithm = {
 
     q3_a2: {
       id: 'q3_a2',
-      title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
+      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
       simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
-      description: '',
-      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
       iconType: 'caregiver',
       type: 'single',
       options: [
@@ -97,8 +89,6 @@ export const toiletingCareAlgorithm = {
       id: 'q2_b',
       title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
       simpleTitle: '스스로 침실방에서 화장실 변기까지 안전하게 이동하실 수 있나요?',
-      description: '',
-      simpleDescription: '대소변 실수가 다소 잦은 상황에서, 화장실 변기까지 걸어갈 수 있는 능력을 확인합니다.',
       iconType: 'walking',
       type: 'single',
       options: [
@@ -117,10 +107,8 @@ export const toiletingCareAlgorithm = {
 
     q3_b1: {
       id: 'q3_b1',
-      title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
+      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
       simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
-      description: '',
-      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
       iconType: 'caregiver',
       type: 'single',
       options: [
@@ -139,10 +127,8 @@ export const toiletingCareAlgorithm = {
 
     q3_b2: {
       id: 'q3_b2',
-      title: '용변을 마친 뒤 스스로 뒤처리를 할 수 있나요?',
+      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
       simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
-      description: '',
-      simpleDescription: '닦기, 옷 정리하기, 물 내리기 같은 동작을 혼자 할 수 있는지 확인합니다.',
       iconType: 'caregiver',
       type: 'single',
       options: [
