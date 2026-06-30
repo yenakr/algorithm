@@ -147,6 +147,85 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     }
   }, [currentQuestionId, uiMode, answers]);
 
+  const [isCriteriaPopupOpen, setIsCriteriaPopupOpen] = useState(false);
+  const [lastPopupQuestionId, setLastPopupQuestionId] = useState<string | null>(null);
+
+  const getCriteriaForQuestion = (qId: string) => {
+    if (algorithm.id === 'transfer') {
+      if (qId === 'q1') {
+        return {
+          title: '자리이동하기 기능 평가 기준',
+          theme: 'indigo',
+          items: criteriaTables.transfer.leftSection.items,
+          type: criteriaTables.transfer.leftSection.type
+        };
+      }
+      if (qId === 'q2') {
+        return {
+          title: '하지 근력 평가 방법',
+          theme: 'indigo',
+          items: criteriaTables.transfer.rightSection.items,
+          type: criteriaTables.transfer.rightSection.type
+        };
+      }
+    }
+    if (algorithm.id === 'feeding') {
+      if (qId === 'q2') {
+        return {
+          title: '먹기, 마시기 기능평가 기준',
+          theme: 'emerald',
+          items: criteriaTables.feeding.leftSection.items,
+          type: criteriaTables.feeding.leftSection.type
+        };
+      }
+      if (qId === 'q3') {
+        return {
+          title: '팔의 근력 평가 방법',
+          theme: 'emerald',
+          items: criteriaTables.feeding.rightSection.items,
+          type: criteriaTables.feeding.rightSection.type
+        };
+      }
+    }
+    if (algorithm.id === 'toileting') {
+      if (qId === 'q1') {
+        return {
+          title: '배뇨/배변 조절하기 기능 평가 기준',
+          theme: 'blue',
+          items: criteriaTables.toileting.rightSection.items,
+          type: criteriaTables.toileting.rightSection.type
+        };
+      }
+      if (qId.startsWith('q2')) {
+        return {
+          title: '화장실 이동 거동 평가 기준',
+          theme: 'blue',
+          items: criteriaTables.toileting.rightSection.items,
+          type: criteriaTables.toileting.rightSection.type
+        };
+      }
+      if (qId.startsWith('q3')) {
+        return {
+          title: '용변 후 청결/위생 처리 평가 기준',
+          theme: 'blue',
+          items: criteriaTables.toileting.rightSection.items,
+          type: criteriaTables.toileting.rightSection.type
+        };
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    if (uiMode === 'simple' && currentQuestionId) {
+      const criteria = getCriteriaForQuestion(currentQuestionId);
+      if (criteria && currentQuestionId !== lastPopupQuestionId) {
+        setIsCriteriaPopupOpen(true);
+        setLastPopupQuestionId(currentQuestionId);
+      }
+    }
+  }, [currentQuestionId, uiMode, lastPopupQuestionId]);
+
 
   // Detailed mode map collapsible & zoom states
   const [showDecisionMap, setShowDecisionMap] = useState(true);
@@ -586,6 +665,38 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     }
   };
 
+  const getNextNodeName = (optValue: string) => {
+    if (!currentQuestionId) return '';
+    const q = (algorithm.questions as any)[currentQuestionId];
+    if (!q) return '';
+
+    const tempAnswers = { ...answers, [currentQuestionId]: optValue };
+    
+    let nextId: string | null = null;
+    let resId: string | null = null;
+
+    if (typeof q.nextQuestionId === 'function') {
+      nextId = q.nextQuestionId(tempAnswers);
+    } else if (q.nextQuestionId) {
+      nextId = q.nextQuestionId;
+    }
+
+    if (typeof q.resultId === 'function') {
+      resId = q.resultId(tempAnswers);
+    } else if (q.resultId) {
+      resId = q.resultId;
+    }
+
+    if (resId) {
+      const res = (resultDetails[resId] || algorithm.results[resId]) as any;
+      return `💡 ${res?.deviceName || res?.simpleTitle || res?.title || '결과 추천'}`;
+    } else if (nextId) {
+      return `➔ 다음 단계 질문`;
+    }
+    return '➔ 다음 단계';
+  };
+
+
   const getProjectedPath = () => {
     const path: string[] = [];
     let currId: string | null = algorithm.startQuestionId;
@@ -704,6 +815,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     // Check if result is showing
     const isResultPage = !!resultId;
     const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
+    const activeCriteria = currentQuestionId ? getCriteriaForQuestion(currentQuestionId) : null;
 
     const friendlyName = getFriendlyAlgorithmName();
 
@@ -834,11 +946,70 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           ) : (
             /* Question Wizard Page */
             currentQuestion && (
-              <div className="space-y-8 animate-fade-in text-center max-w-2xl mx-auto">
-                <div className="space-y-3">
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-805 leading-snug">
-                    {getDisplayText(currentQuestion, 'title', 'simple')}
-                  </h3>
+              <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full">
+                {/* Criteria Table Popup Modal */}
+                {isCriteriaPopupOpen && activeCriteria && (
+                  <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 border border-slate-100 text-left">
+                      <div className="flex justify-between items-center border-b pb-3.5 border-slate-100">
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-2">
+                          <Info className="w-6 h-6 text-blue-600" />
+                          <span>{activeCriteria.title}</span>
+                        </h4>
+                        <button 
+                          onClick={() => setIsCriteriaPopupOpen(false)}
+                          className="p-1 text-slate-400 hover:text-slate-650 transition-colors text-lg font-bold cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      
+                      <div className="max-h-[350px] overflow-y-auto space-y-3 pr-2 scrollbar-thin text-slate-700">
+                        {activeCriteria.type === 'list' ? (
+                          <ul className="list-decimal pl-5 font-bold space-y-2 text-base">
+                            {(activeCriteria.items as string[]).map((item, idx) => (
+                              <li key={idx} className="leading-relaxed">{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="space-y-2.5 font-bold text-base">
+                            {(activeCriteria.items as { label: string; text: string }[]).map((item, idx) => (
+                              <div key={idx} className="flex items-start gap-2.5 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
+                                <strong className="font-extrabold px-2 py-0.5 rounded text-[13px] shrink-0 bg-blue-100 text-blue-900 border border-blue-200">
+                                  {item.label}
+                                </strong>
+                                <span className="leading-snug">{item.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => setIsCriteriaPopupOpen(false)}
+                        className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-2xl shadow transition-colors cursor-pointer text-base text-center"
+                      >
+                        기준표 확인 완료
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-805 leading-snug">
+                      {getDisplayText(currentQuestion, 'title', 'simple')}
+                    </h3>
+                    {activeCriteria && (
+                      <button
+                        onClick={() => setIsCriteriaPopupOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-all cursor-pointer shadow-sm hover:shadow shrink-0 animate-bounce"
+                      >
+                        <HelpCircle className="w-4 h-4 text-amber-600" />
+                        <span>평가 기준표 보기</span>
+                      </button>
+                    )}
+                  </div>
                   {getDisplayText(currentQuestion, 'description', 'simple') && (
                     <p className="text-base sm:text-lg text-slate-500 font-bold leading-relaxed bg-blue-50/40 p-4.5 rounded-2xl border border-blue-100/30 inline-block">
                       💡 {getDisplayText(currentQuestion, 'description', 'simple')}
@@ -846,65 +1017,107 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   )}
                 </div>
 
-                {/* Single Choice Options */}
-                {currentQuestion.type === 'single' ? (
-                  <div className="space-y-4 text-left">
+                {/* Local Decision Tree Flowchart */}
+                <div className="flex flex-col items-center py-4 select-none w-full">
+                  {/* Root Node: Current Question */}
+                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/80 border-2 border-blue-200 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-md text-center group ring-4 ring-blue-100/30">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-widest">
+                      현재 질문 단계
+                    </span>
+                    <h4 className="text-lg sm:text-xl font-black text-slate-805 leading-snug">
+                      {getDisplayText(currentQuestion, 'title', 'simple')}
+                    </h4>
+                  </div>
+
+                  {/* Flow Arrow SVG Connectors */}
+                  <div className="w-full h-10 relative flex justify-center">
+                    <svg className="absolute inset-0 w-full h-full" style={{ minHeight: '40px' }}>
+                      <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                          <path d="M 0 2 L 10 5 L 0 8 z" fill="#94a3b8" />
+                        </marker>
+                      </defs>
+                      <line x1="50%" y1="0" x2="50%" y2="50%" stroke="#cbd5e1" strokeWidth="2.5" />
+                      {currentQuestion.options.length === 2 ? (
+                        <>
+                          <path d="M 50% 20 L 25% 20 L 25% 40" fill="none" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
+                          <path d="M 50% 20 L 75% 20 L 75% 40" fill="none" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
+                        </>
+                      ) : currentQuestion.options.length > 2 ? (
+                        <>
+                          {currentQuestion.options.map((_, idx) => {
+                            const pct = 15 + (70 / (currentQuestion.options.length - 1)) * idx;
+                            return (
+                              <path 
+                                key={idx}
+                                d={`M 50% 20 L ${pct}% 20 L ${pct}% 40`} 
+                                fill="none" 
+                                stroke="#cbd5e1" 
+                                strokeWidth="2.5" 
+                                markerEnd="url(#arrow)" 
+                              />
+                            );
+                          })}
+                        </>
+                      ) : (
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
+                      )}
+                    </svg>
+                  </div>
+
+                  {/* Branch Options Grid */}
+                  <div className={`grid gap-4 w-full mt-2 ${
+                    currentQuestion.options.length <= 2 ? 'grid-cols-2 max-w-xl' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl'
+                  }`}>
                     {currentQuestion.options.map((opt) => {
-                      const isSelected = tempSelectedSimple === opt.value;
+                      const isSelected = currentQuestion.type === 'multi' 
+                        ? tempMultiSelect.includes(opt.value)
+                        : tempSelectedSimple === opt.value;
+                      
+                      const nextNodeName = getNextNodeName(opt.value);
+
                       return (
                         <button
                           key={opt.id}
-                          onClick={() => handleSimpleOptionClick(opt.value)}
-                          className={`w-full text-left rounded-2xl border transition-all duration-200 flex justify-between items-center group font-black text-slate-755 bg-white cursor-pointer shadow-sm hover:shadow-md p-5 sm:p-6 hover:scale-[1.01] ${
+                          onClick={() => {
+                            if (currentQuestion.type === 'multi') {
+                              handleMultiToggle(opt.value);
+                            } else {
+                              handleSimpleOptionClick(opt.value);
+                            }
+                          }}
+                          className={`text-left rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between p-4 sm:p-5 cursor-pointer shadow-sm hover:shadow-md min-h-[140px] hover:scale-[1.02] bg-white group ${
                             isSelected
-                              ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-400/20'
+                              ? 'border-emerald-500 bg-emerald-50/20 ring-4 ring-emerald-400/10'
                               : 'border-slate-200 hover:border-emerald-300'
                           }`}
                         >
-                          <span className="text-lg sm:text-xl font-bold leading-snug text-slate-800">
-                            {getDisplayText(opt, 'text', 'simple')}
-                          </span>
-                          <div className={`rounded-full border-2 flex items-center justify-center transition-all shrink-0 w-7 h-7 ${
-                            isSelected 
-                              ? 'border-emerald-500 bg-emerald-500 text-white' 
-                              : 'border-slate-300 group-hover:border-emerald-400 bg-white'
+                          <div className="flex justify-between items-start gap-2 w-full">
+                            <span className="text-base sm:text-[17px] font-extrabold leading-snug text-slate-800">
+                              {getDisplayText(opt, 'text', 'simple')}
+                            </span>
+                            <div className={`rounded flex items-center justify-center border-2 transition-all shrink-0 ${
+                              currentQuestion.type === 'multi' ? 'rounded' : 'rounded-full'
+                            } w-6 h-6 ${
+                              isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white'
+                            }`}>
+                              {isSelected && <Check className="w-3 h-3 stroke-[3.5]" />}
+                            </div>
+                          </div>
+
+                          {/* Outcome Preview Banner */}
+                          <div className={`mt-4 w-full py-1.5 px-2.5 rounded-lg border text-[11px] font-black transition-colors text-center ${
+                            isSelected
+                              ? 'bg-emerald-100/60 border-emerald-200 text-emerald-800'
+                              : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:bg-slate-100/80'
                           }`}>
-                            <div className={`rounded-full bg-white transition-transform w-2.5 h-2.5 ${
-                              isSelected ? 'scale-100' : 'scale-0 group-hover:scale-50'
-                            }`} />
+                            {nextNodeName}
                           </div>
                         </button>
                       );
                     })}
                   </div>
-                ) : (
-                  /* Multi Choice Options */
-                  <div className="space-y-4 text-left">
-                    {currentQuestion.options.map((opt) => {
-                      const isChecked = tempMultiSelect.includes(opt.value);
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => handleMultiToggle(opt.value)}
-                          className={`w-full text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 font-black cursor-pointer shadow-sm hover:shadow-md p-5 sm:p-6 hover:scale-[1.01] ${
-                            isChecked
-                              ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-400/20 text-slate-855'
-                              : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300'
-                          }`}
-                        >
-                          <div className={`rounded flex items-center justify-center border-2 transition-all shrink-0 w-7 h-7 ${
-                            isChecked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white'
-                          }`}>
-                            {isChecked && <Check className="w-4 h-4 stroke-[3]" />}
-                          </div>
-                          <span className="text-lg sm:text-xl font-bold leading-snug text-slate-800">
-                            {getDisplayText(opt, 'text', 'simple')}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                </div>
               </div>
             )
           )}
