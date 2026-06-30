@@ -147,84 +147,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     }
   }, [currentQuestionId, uiMode, answers]);
 
-  const [isCriteriaPopupOpen, setIsCriteriaPopupOpen] = useState(false);
-  const [lastPopupQuestionId, setLastPopupQuestionId] = useState<string | null>(null);
 
-  const getCriteriaForQuestion = (qId: string) => {
-    if (algorithm.id === 'transfer') {
-      if (qId === 'q1') {
-        return {
-          title: '자리이동하기 기능 평가 기준',
-          theme: 'indigo',
-          items: criteriaTables.transfer.leftSection.items,
-          type: criteriaTables.transfer.leftSection.type
-        };
-      }
-      if (qId === 'q2') {
-        return {
-          title: '하지 근력 평가 방법',
-          theme: 'indigo',
-          items: criteriaTables.transfer.rightSection.items,
-          type: criteriaTables.transfer.rightSection.type
-        };
-      }
-    }
-    if (algorithm.id === 'feeding') {
-      if (qId === 'q2') {
-        return {
-          title: '먹기, 마시기 기능평가 기준',
-          theme: 'emerald',
-          items: criteriaTables.feeding.leftSection.items,
-          type: criteriaTables.feeding.leftSection.type
-        };
-      }
-      if (qId === 'q3') {
-        return {
-          title: '팔의 근력 평가 방법',
-          theme: 'emerald',
-          items: criteriaTables.feeding.rightSection.items,
-          type: criteriaTables.feeding.rightSection.type
-        };
-      }
-    }
-    if (algorithm.id === 'toileting') {
-      if (qId === 'q1') {
-        return {
-          title: '배뇨/배변 조절하기 기능 평가 기준',
-          theme: 'blue',
-          items: criteriaTables.toileting.rightSection.items,
-          type: criteriaTables.toileting.rightSection.type
-        };
-      }
-      if (qId.startsWith('q2')) {
-        return {
-          title: '화장실 이동 거동 평가 기준',
-          theme: 'blue',
-          items: criteriaTables.toileting.rightSection.items,
-          type: criteriaTables.toileting.rightSection.type
-        };
-      }
-      if (qId.startsWith('q3')) {
-        return {
-          title: '용변 후 청결/위생 처리 평가 기준',
-          theme: 'blue',
-          items: criteriaTables.toileting.rightSection.items,
-          type: criteriaTables.toileting.rightSection.type
-        };
-      }
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    if (uiMode === 'simple' && currentQuestionId) {
-      const criteria = getCriteriaForQuestion(currentQuestionId);
-      if (criteria && currentQuestionId !== lastPopupQuestionId) {
-        setIsCriteriaPopupOpen(true);
-        setLastPopupQuestionId(currentQuestionId);
-      }
-    }
-  }, [currentQuestionId, uiMode, lastPopupQuestionId]);
 
 
   // Detailed mode map collapsible & zoom states
@@ -671,7 +594,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (!q) return '';
 
     const tempAnswers = { ...answers, [currentQuestionId]: optValue };
-    
+
     let nextId: string | null = null;
     let resId: string | null = null;
 
@@ -689,9 +612,12 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
     if (resId) {
       const res = (resultDetails[resId] || algorithm.results[resId]) as any;
-      return `💡 ${res?.deviceName || res?.simpleTitle || res?.title || '결과 추천'}`;
+      const name = res?.deviceName || res?.simpleTitle || res?.title || '결과 추천';
+      return `💡 추천: ${name}`;
     } else if (nextId) {
-      return `➔ 다음 단계 질문`;
+      const nextQ = (algorithm.questions as any)[nextId];
+      const nextTitle = nextQ?.simpleTitle || nextQ?.title || '다음 질문';
+      return `➔ 다음: ${nextTitle}`;
     }
     return '➔ 다음 단계';
   };
@@ -766,7 +692,33 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
 
   const handleSimpleOptionClick = (value: string) => {
+    if (!currentQuestionId) return;
+    const q = algorithm.questions[currentQuestionId];
+    if (!q || q.type !== 'single') return;
+
     setTempSelectedSimple(value);
+
+    // Auto-advance immediately for single-select questions
+    let currentHistory = [...history];
+    let currentAnswers = { ...answers };
+
+    if (history.includes(currentQuestionId)) {
+      const idx = history.indexOf(currentQuestionId);
+      currentHistory = history.slice(0, idx);
+      history.slice(idx).forEach(id => { delete currentAnswers[id]; });
+    }
+
+    const updatedAnswers = { ...currentAnswers, [currentQuestionId]: value };
+    const newHistory = [...currentHistory, currentQuestionId];
+
+    setAnswers(updatedAnswers);
+    setHistory(newHistory);
+
+    if (onPathChange) {
+      onPathChange([...newHistory, value]);
+    }
+
+    resolveNextStep(currentQuestionId, updatedAnswers, newHistory);
   };
 
   const handleSimpleNext = () => {
@@ -815,7 +767,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     // Check if result is showing
     const isResultPage = !!resultId;
     const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
-    const activeCriteria = currentQuestionId ? getCriteriaForQuestion(currentQuestionId) : null;
+
 
     const friendlyName = getFriendlyAlgorithmName();
 
@@ -947,68 +899,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             /* Question Wizard Page */
             currentQuestion && (
               <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full">
-                {/* Criteria Table Popup Modal */}
-                {isCriteriaPopupOpen && activeCriteria && (
-                  <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 border border-slate-100 text-left">
-                      <div className="flex justify-between items-center border-b pb-3.5 border-slate-100">
-                        <h4 className="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-2">
-                          <Info className="w-6 h-6 text-blue-600" />
-                          <span>{activeCriteria.title}</span>
-                        </h4>
-                        <button 
-                          onClick={() => setIsCriteriaPopupOpen(false)}
-                          className="p-1 text-slate-400 hover:text-slate-650 transition-colors text-lg font-bold cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      
-                      <div className="max-h-[350px] overflow-y-auto space-y-3 pr-2 scrollbar-thin text-slate-700">
-                        {activeCriteria.type === 'list' ? (
-                          <ul className="list-decimal pl-5 font-bold space-y-2 text-base">
-                            {(activeCriteria.items as string[]).map((item, idx) => (
-                              <li key={idx} className="leading-relaxed">{item}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className="space-y-2.5 font-bold text-base">
-                            {(activeCriteria.items as { label: string; text: string }[]).map((item, idx) => (
-                              <div key={idx} className="flex items-start gap-2.5 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
-                                <strong className="font-extrabold px-2 py-0.5 rounded text-[13px] shrink-0 bg-blue-100 text-blue-900 border border-blue-200">
-                                  {item.label}
-                                </strong>
-                                <span className="leading-snug">{item.text}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
 
-                      <button
-                        onClick={() => setIsCriteriaPopupOpen(false)}
-                        className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-2xl shadow transition-colors cursor-pointer text-base text-center"
-                      >
-                        기준표 확인 완료
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-center justify-center gap-3">
                     <h3 className="text-2xl sm:text-3xl font-black text-slate-805 leading-snug">
                       {getDisplayText(currentQuestion, 'title', 'simple')}
                     </h3>
-                    {activeCriteria && (
-                      <button
-                        onClick={() => setIsCriteriaPopupOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-all cursor-pointer shadow-sm hover:shadow shrink-0 animate-bounce"
-                      >
-                        <HelpCircle className="w-4 h-4 text-amber-600" />
-                        <span>평가 기준표 보기</span>
-                      </button>
-                    )}
                   </div>
                   {getDisplayText(currentQuestion, 'description', 'simple') && (
                     <p className="text-base sm:text-lg text-slate-500 font-bold leading-relaxed bg-blue-50/40 p-4.5 rounded-2xl border border-blue-100/30 inline-block">
@@ -1138,7 +1035,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             <div className="w-28" />
           )}
 
-          {/* Action/Next Button */}
+          {/* Action/Next Button - only shown on result page or multi-select */}
           {isResultPage ? (
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {onLearnMore && (
@@ -1157,23 +1054,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 처음부터 다시하기
               </button>
             </div>
-          ) : (
+          ) : currentQuestion?.type === 'multi' ? (
             <button
               onClick={handleSimpleNext}
-              disabled={
-                currentQuestion?.type === 'multi' 
-                  ? tempMultiSelect.length === 0 
-                  : !tempSelectedSimple
-              }
+              disabled={tempMultiSelect.length === 0}
               className={`px-8 py-4 rounded-2xl font-extrabold transition-all flex items-center gap-2 shadow-md text-base sm:text-lg cursor-pointer ${
-                (currentQuestion?.type === 'multi' ? tempMultiSelect.length > 0 : !!tempSelectedSimple)
+                tempMultiSelect.length > 0
                   ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-lg scale-[1.01] hover:scale-[1.03] active:scale-[0.98]'
                   : 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed shadow-none'
               }`}
             >
-              <span>{displayCurrentPage === displayTotalPages - 1 ? '결과 확인하기' : '다음 단계'}</span>
+              <span>선택 완료</span>
               <ChevronRight className="w-5 h-5 shrink-0" />
             </button>
+          ) : (
+            <div className="w-28" />
           )}
         </div>
       </div>
