@@ -697,28 +697,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (!q || q.type !== 'single') return;
 
     setTempSelectedSimple(value);
-
-    // Auto-advance immediately for single-select questions
-    let currentHistory = [...history];
-    let currentAnswers = { ...answers };
-
-    if (history.includes(currentQuestionId)) {
-      const idx = history.indexOf(currentQuestionId);
-      currentHistory = history.slice(0, idx);
-      history.slice(idx).forEach(id => { delete currentAnswers[id]; });
-    }
-
-    const updatedAnswers = { ...currentAnswers, [currentQuestionId]: value };
-    const newHistory = [...currentHistory, currentQuestionId];
-
-    setAnswers(updatedAnswers);
-    setHistory(newHistory);
-
-    if (onPathChange) {
-      onPathChange([...newHistory, value]);
-    }
-
-    resolveNextStep(currentQuestionId, updatedAnswers, newHistory);
   };
 
   const handleSimpleNext = () => {
@@ -768,25 +746,80 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     const isResultPage = !!resultId;
     const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
 
-
     const friendlyName = getFriendlyAlgorithmName();
 
+    // Group options by their target destination (nextQuestionId or resultId)
+    const groups: Record<string, {
+      targetId: string;
+      isResult: boolean;
+      label: string;
+      options: Option[];
+    }> = {};
+
+    if (currentQuestion) {
+      currentQuestion.options.forEach((opt) => {
+        const tempAnswers = { ...answers, [currentQuestion.id]: opt.value };
+        let nextId: string | null = null;
+        let resId: string | null = null;
+
+        if (typeof currentQuestion.nextQuestionId === 'function') {
+          nextId = currentQuestion.nextQuestionId(tempAnswers);
+        } else if (currentQuestion.nextQuestionId) {
+          nextId = currentQuestion.nextQuestionId;
+        }
+
+        if (typeof currentQuestion.resultId === 'function') {
+          resId = currentQuestion.resultId(tempAnswers);
+        } else if (currentQuestion.resultId) {
+          resId = currentQuestion.resultId;
+        }
+
+        const targetId = resId || nextId || '';
+        const isResult = !!resId;
+        
+        let label = '';
+        if (isResult) {
+          const res = (resultDetails[targetId] || algorithm.results[targetId]) as any;
+          const name = res?.deviceName || res?.simpleTitle || res?.title || '결과 추천';
+          label = `💡 추천: ${name}`;
+        } else if (targetId) {
+          const nextQ = (algorithm.questions as any)[targetId];
+          const nextTitle = nextQ?.simpleTitle || nextQ?.title || '다음 질문';
+          label = `➔ 다음: ${nextTitle}`;
+        } else {
+          label = '➔ 다음 단계';
+        }
+
+        if (!groups[targetId]) {
+          groups[targetId] = {
+            targetId,
+            isResult,
+            label,
+            options: []
+          };
+        }
+        groups[targetId].options.push(opt);
+      });
+    }
+
+    const groupList = Object.values(groups);
+
     return (
-      <div className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 bg-gradient-to-br from-blue-50/40 via-emerald-50/20 to-white rounded-3xl border border-blue-100/50 shadow-lg min-h-[500px] flex flex-col justify-between">
+      <div className="w-full max-w-4xl mx-auto py-10 px-6 sm:px-8 space-y-10 bg-gradient-to-br from-blue-50/30 via-emerald-50/10 to-white rounded-3xl border border-slate-200/80 shadow-xl min-h-[600px] flex flex-col justify-between">
         {/* Top Header Row */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-blue-100/60 pb-5">
-            <div className="text-left">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-slate-200/60 pb-6">
+            <div className="text-left space-y-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-150">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                 보호자/일반인용 자가진단
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-805 tracking-tight mt-2">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
                 {friendlyName}
               </h2>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xl sm:text-2xl font-black text-emerald-600 bg-emerald-50 border border-emerald-100/80 px-4.5 py-1.5 rounded-2xl shadow-sm">
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-4 py-1.5 rounded-2xl shadow-sm">
                 {displayCurrentPage} / {displayTotalPages} 페이지
               </span>
             </div>
@@ -802,7 +835,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 py-8 flex flex-col justify-center">
+        <div className="flex-1 py-4 flex flex-col justify-center">
           {isResultPage ? (
             /* Infographic Result Card */
             (() => {
@@ -898,119 +931,112 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           ) : (
             /* Question Wizard Page */
             currentQuestion && (
-              <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full">
-
-
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    <h3 className="text-2xl sm:text-3xl font-black text-slate-805 leading-snug">
-                      {getDisplayText(currentQuestion, 'title', 'simple')}
-                    </h3>
-                  </div>
+              <div className="space-y-10 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
+                <div className="space-y-3">
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-800 leading-snug">
+                    {getDisplayText(currentQuestion, 'title', 'simple')}
+                  </h3>
                   {getDisplayText(currentQuestion, 'description', 'simple') && (
-                    <p className="text-base sm:text-lg text-slate-500 font-bold leading-relaxed bg-blue-50/40 p-4.5 rounded-2xl border border-blue-100/30 inline-block">
+                    <p className="text-sm sm:text-base text-slate-500 font-extrabold leading-relaxed bg-blue-50/30 px-5 py-3 rounded-2xl border border-blue-100/30 inline-block">
                       💡 {getDisplayText(currentQuestion, 'description', 'simple')}
                     </p>
                   )}
                 </div>
 
                 {/* Local Decision Tree Flowchart */}
-                <div className="flex flex-col items-center py-4 select-none w-full">
+                <div className="flex flex-col items-center py-2 select-none w-full">
                   {/* Root Node: Current Question */}
-                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/80 border-2 border-blue-200 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-md text-center group ring-4 ring-blue-100/30">
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-widest">
+                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/30 border-2 border-blue-200 rounded-2xl p-5 max-w-md w-full shadow-sm text-center ring-4 ring-blue-100/10">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-widest">
                       현재 질문 단계
                     </span>
-                    <h4 className="text-lg sm:text-xl font-black text-slate-805 leading-snug">
+                    <h4 className="text-base sm:text-lg font-black text-slate-805 leading-snug">
                       {getDisplayText(currentQuestion, 'title', 'simple')}
                     </h4>
                   </div>
 
                   {/* Flow Arrow SVG Connectors */}
-                  <div className="w-full h-10 relative flex justify-center">
-                    <svg className="absolute inset-0 w-full h-full" style={{ minHeight: '40px' }}>
+                  <div className="w-full h-12 relative flex justify-center">
+                    <svg className="absolute inset-0 w-full h-full" style={{ minHeight: '48px' }}>
                       <defs>
                         <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                           <path d="M 0 2 L 10 5 L 0 8 z" fill="#94a3b8" />
                         </marker>
                       </defs>
-                      <line x1="50%" y1="0" x2="50%" y2="50%" stroke="#cbd5e1" strokeWidth="2.5" />
-                      {currentQuestion.options.length === 2 ? (
+                      <line x1="50%" y1="0" x2="50%" y2="40%" stroke="#cbd5e1" strokeWidth="2" />
+                      {groupList.length === 2 ? (
                         <>
-                          <path d="M 50% 20 L 25% 20 L 25% 40" fill="none" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
-                          <path d="M 50% 20 L 75% 20 L 75% 40" fill="none" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
+                          <path d="M 50% 40% L 25% 40% L 25% 100%" fill="none" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
+                          <path d="M 50% 40% L 75% 40% L 75% 100%" fill="none" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
                         </>
-                      ) : currentQuestion.options.length > 2 ? (
+                      ) : groupList.length > 2 ? (
                         <>
-                          {currentQuestion.options.map((_, idx) => {
-                            const pct = 15 + (70 / (currentQuestion.options.length - 1)) * idx;
+                          {groupList.map((_, idx) => {
+                            const pct = 15 + (70 / (groupList.length - 1)) * idx;
                             return (
                               <path 
                                 key={idx}
-                                d={`M 50% 20 L ${pct}% 20 L ${pct}% 40`} 
+                                d={`M 50% 40% L ${pct}% 40% L ${pct}% 100%`} 
                                 fill="none" 
                                 stroke="#cbd5e1" 
-                                strokeWidth="2.5" 
+                                strokeWidth="2" 
                                 markerEnd="url(#arrow)" 
                               />
                             );
                           })}
                         </>
                       ) : (
-                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#cbd5e1" strokeWidth="2.5" markerEnd="url(#arrow)" />
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
                       )}
                     </svg>
                   </div>
 
-                  {/* Branch Options Grid */}
-                  <div className={`grid gap-4 w-full mt-2 ${
-                    currentQuestion.options.length <= 2 ? 'grid-cols-2 max-w-xl' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl'
-                  }`}>
-                    {currentQuestion.options.map((opt) => {
-                      const isSelected = currentQuestion.type === 'multi' 
-                        ? tempMultiSelect.includes(opt.value)
-                        : tempSelectedSimple === opt.value;
-                      
-                      const nextNodeName = getNextNodeName(opt.value);
-
+                  {/* Grouped Destination Containers */}
+                  <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
+                    {groupList.map((group) => {
                       return (
-                        <button
-                          key={opt.id}
-                          onClick={() => {
-                            if (currentQuestion.type === 'multi') {
-                              handleMultiToggle(opt.value);
-                            } else {
-                              handleSimpleOptionClick(opt.value);
-                            }
-                          }}
-                          className={`text-left rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between p-4 sm:p-5 cursor-pointer shadow-sm hover:shadow-md min-h-[140px] hover:scale-[1.02] bg-white group ${
-                            isSelected
-                              ? 'border-emerald-500 bg-emerald-50/20 ring-4 ring-emerald-400/10'
-                              : 'border-slate-200 hover:border-emerald-300'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start gap-2 w-full">
-                            <span className="text-base sm:text-[17px] font-extrabold leading-snug text-slate-800">
-                              {getDisplayText(opt, 'text', 'simple')}
-                            </span>
-                            <div className={`rounded flex items-center justify-center border-2 transition-all shrink-0 ${
-                              currentQuestion.type === 'multi' ? 'rounded' : 'rounded-full'
-                            } w-6 h-6 ${
-                              isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white'
-                            }`}>
-                              {isSelected && <Check className="w-3 h-3 stroke-[3.5]" />}
-                            </div>
+                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow transition-all space-y-4">
+                          {/* Destination Header (➔ 다음: ... / 💡 추천: ... ) */}
+                          <div className="bg-blue-50/70 text-blue-800 text-xs font-black py-2 px-3 rounded-xl border border-blue-100/60 text-center">
+                            {group.label}
                           </div>
-
-                          {/* Outcome Preview Banner */}
-                          <div className={`mt-4 w-full py-1.5 px-2.5 rounded-lg border text-[11px] font-black transition-colors text-center ${
-                            isSelected
-                              ? 'bg-emerald-100/60 border-emerald-200 text-emerald-800'
-                              : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:bg-slate-100/80'
-                          }`}>
-                            {nextNodeName}
+                          
+                          {/* Options in this group */}
+                          <div className="space-y-2.5 flex-1 flex flex-col justify-center">
+                            {group.options.map((opt) => {
+                              const isSelected = currentQuestion.type === 'multi'
+                                ? tempMultiSelect.includes(opt.value)
+                                : tempSelectedSimple === opt.value;
+                              
+                              return (
+                                <button
+                                  key={opt.id}
+                                  onClick={() => {
+                                    if (currentQuestion.type === 'multi') {
+                                      handleMultiToggle(opt.value);
+                                    } else {
+                                      handleSimpleOptionClick(opt.value);
+                                    }
+                                  }}
+                                  className={`w-full text-left rounded-xl border transition-all duration-250 p-4 flex items-center justify-between cursor-pointer group ${
+                                    isSelected
+                                      ? 'border-emerald-500 bg-emerald-50/30 text-emerald-950 ring-2 ring-emerald-500/20'
+                                      : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50/50 text-slate-700'
+                                  }`}
+                                >
+                                  <span className="text-sm sm:text-base font-bold leading-snug">
+                                    {getDisplayText(opt, 'text', 'simple')}
+                                  </span>
+                                  <div className={`rounded-full border-2 transition-all shrink-0 w-5 h-5 flex items-center justify-center ${
+                                    isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-350 bg-white'
+                                  }`}>
+                                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -1021,12 +1047,12 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         </div>
 
         {/* Bottom Navigation Buttons */}
-        <div className="flex justify-between items-center gap-6 border-t border-blue-100/60 pt-6">
+        <div className="flex justify-between items-center gap-6 border-t border-slate-200/60 pt-6">
           {/* Previous Button */}
           {history.length > 0 ? (
             <button
               onClick={handlePrevQuestion}
-              className="px-6 py-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 bg-white text-slate-600 font-extrabold transition-all cursor-pointer flex items-center gap-2 text-base sm:text-lg hover:bg-slate-50"
+              className="px-6 py-3.5 rounded-xl border border-slate-300 hover:border-slate-400 bg-white text-slate-600 font-extrabold transition-all cursor-pointer flex items-center gap-1.5 text-base sm:text-lg hover:bg-slate-50"
             >
               <ChevronLeft className="w-5 h-5 shrink-0" />
               <span>이전 단계</span>
@@ -1035,13 +1061,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             <div className="w-28" />
           )}
 
-          {/* Action/Next Button - only shown on result page or multi-select */}
+          {/* Action/Next Button */}
           {isResultPage ? (
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {onLearnMore && (
                 <button
                   onClick={() => onLearnMore(resultId)}
-                  className="px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-extrabold hover:from-blue-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer text-base sm:text-lg"
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-extrabold hover:from-blue-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-1.5 shadow hover:shadow-md cursor-pointer text-base sm:text-lg"
                 >
                   <span>돌봄로봇 정보 더 알아보기</span>
                   <ArrowRight className="w-5 h-5 shrink-0" />
@@ -1049,26 +1075,28 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               )}
               <button
                 onClick={handleReset}
-                className="px-6 py-4 rounded-2xl border-2 border-slate-200 text-slate-600 font-extrabold hover:bg-slate-50 transition-all cursor-pointer text-base sm:text-lg"
+                className="px-6 py-3.5 rounded-xl border border-slate-300 text-slate-600 font-extrabold hover:bg-slate-50 transition-all cursor-pointer text-base sm:text-lg"
               >
                 처음부터 다시하기
               </button>
             </div>
-          ) : currentQuestion?.type === 'multi' ? (
+          ) : (
             <button
               onClick={handleSimpleNext}
-              disabled={tempMultiSelect.length === 0}
-              className={`px-8 py-4 rounded-2xl font-extrabold transition-all flex items-center gap-2 shadow-md text-base sm:text-lg cursor-pointer ${
-                tempMultiSelect.length > 0
-                  ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-lg scale-[1.01] hover:scale-[1.03] active:scale-[0.98]'
-                  : 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed shadow-none'
+              disabled={
+                currentQuestion?.type === 'multi'
+                  ? tempMultiSelect.length === 0
+                  : !tempSelectedSimple
+              }
+              className={`px-8 py-3.5 rounded-xl font-extrabold transition-all flex items-center gap-1.5 shadow text-base sm:text-lg cursor-pointer ${
+                (currentQuestion?.type === 'multi' ? tempMultiSelect.length > 0 : !!tempSelectedSimple)
+                  ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-md scale-[1.01] hover:scale-[1.03] active:scale-[0.98]'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
               }`}
             >
-              <span>선택 완료</span>
+              <span>다음 단계</span>
               <ChevronRight className="w-5 h-5 shrink-0" />
             </button>
-          ) : (
-            <div className="w-28" />
           )}
         </div>
       </div>
