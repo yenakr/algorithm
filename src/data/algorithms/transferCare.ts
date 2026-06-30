@@ -84,7 +84,7 @@ export const transferCareAlgorithm = {
     q3: {
       id: 'q3',
       title: '환경적 요소 고려',
-      simpleTitle: '장비를 설치할 주거 환경의 가공 가능 여부를 선택해 주세요.',
+      simpleTitle: '장비를 설치할 주거 환경이 어떻게 되나요?.',
       iconType: 'safety',
       type: 'single',
       options: [

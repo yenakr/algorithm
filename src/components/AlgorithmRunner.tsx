@@ -139,6 +139,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Guide panel tracking
   const [selectedGuideQuestionId, setSelectedGuideQuestionId] = useState<string | null>(algorithm.startQuestionId);
   const [tempMultiSelect, setTempMultiSelect] = useState<string[]>([]);
+  const [tempSelectedSimple, setTempSelectedSimple] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (uiMode === 'simple' && currentQuestionId) {
+      setTempSelectedSimple(answers[currentQuestionId] || null);
+    }
+  }, [currentQuestionId, uiMode, answers]);
+
 
   // Detailed mode map collapsible & zoom states
   const [showDecisionMap, setShowDecisionMap] = useState(true);
@@ -564,6 +572,405 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     if (history.includes(nodeId)) return 'completed';
     return 'inactive';
   };
+
+  const getFriendlyAlgorithmName = () => {
+    switch (algorithm.id) {
+      case 'transfer':
+        return '이동 도움 자가진단';
+      case 'toileting':
+        return '화장실 사용 자가진단';
+      case 'feeding':
+        return '식사 도움 자가진단';
+      default:
+        return algorithm.title;
+    }
+  };
+
+  const getProjectedPath = () => {
+    const path: string[] = [];
+    let currId: string | null = algorithm.startQuestionId;
+    const tempAnswers = { ...answers };
+
+    if (currentQuestionId && tempSelectedSimple) {
+      tempAnswers[currentQuestionId] = tempSelectedSimple;
+    }
+
+    while (currId) {
+      path.push(currId);
+      const q: Question = (algorithm.questions as any)[currId];
+      if (!q) break;
+
+      let nextId: string | null = null;
+      let resId: string | null = null;
+
+      if (typeof q.nextQuestionId === 'function') {
+        nextId = q.nextQuestionId(tempAnswers);
+      } else if (q.nextQuestionId) {
+        nextId = q.nextQuestionId;
+      }
+
+      if (typeof q.resultId === 'function') {
+        resId = q.resultId(tempAnswers);
+      } else if (q.resultId) {
+        resId = q.resultId;
+      }
+
+      if (nextId) {
+        currId = nextId;
+      } else if (resId) {
+        path.push(resId);
+        break;
+      } else {
+        // Projecting forward using first option if no answer yet
+        const firstOpt = q.options[0]?.value;
+        if (firstOpt !== undefined) {
+          tempAnswers[currId] = firstOpt;
+          let projNextId: string | null = null;
+          let projResId: string | null = null;
+          if (typeof q.nextQuestionId === 'function') {
+            projNextId = q.nextQuestionId(tempAnswers);
+          } else if (q.nextQuestionId) {
+            projNextId = q.nextQuestionId;
+          }
+          if (typeof q.resultId === 'function') {
+            projResId = q.resultId(tempAnswers);
+          } else if (q.resultId) {
+            projResId = q.resultId;
+          }
+
+          if (projNextId) {
+            currId = projNextId;
+          } else if (projResId) {
+            path.push(projResId);
+            break;
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+    }
+    return path;
+  };
+
+  const handleSimpleOptionClick = (value: string) => {
+    setTempSelectedSimple(value);
+  };
+
+  const handleSimpleNext = () => {
+    if (!currentQuestionId) return;
+    const q = algorithm.questions[currentQuestionId];
+    if (!q) return;
+
+    if (q.type === 'multi') {
+      handleMultiSubmit(currentQuestionId);
+    } else {
+      if (!tempSelectedSimple) return;
+      
+      let currentHistory = [...history];
+      let currentAnswers = { ...answers };
+
+      if (history.includes(currentQuestionId)) {
+        const idx = history.indexOf(currentQuestionId);
+        currentHistory = history.slice(0, idx);
+        history.slice(idx).forEach(id => {
+          delete currentAnswers[id];
+        });
+      }
+
+      const updatedAnswers = { ...currentAnswers, [currentQuestionId]: tempSelectedSimple };
+      const newHistory = [...currentHistory, currentQuestionId];
+
+      setAnswers(updatedAnswers);
+      setHistory(newHistory);
+
+      if (onPathChange) {
+        onPathChange([...newHistory, tempSelectedSimple]);
+      }
+
+      resolveNextStep(currentQuestionId, updatedAnswers, newHistory);
+    }
+  };
+
+  const renderSimpleWizard = () => {
+    const projectedPath = getProjectedPath();
+    const currentIndex = currentQuestionId 
+      ? projectedPath.indexOf(currentQuestionId) 
+      : (resultId ? projectedPath.indexOf(resultId) : 0);
+    const displayCurrentPage = currentIndex !== -1 ? currentIndex + 1 : history.length + 1;
+    const displayTotalPages = projectedPath.length;
+
+    // Check if result is showing
+    const isResultPage = !!resultId;
+    const currentQuestion = currentQuestionId ? algorithm.questions[currentQuestionId] : null;
+
+    const friendlyName = getFriendlyAlgorithmName();
+
+    return (
+      <div className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 bg-gradient-to-br from-blue-50/40 via-emerald-50/20 to-white rounded-3xl border border-blue-100/50 shadow-lg min-h-[500px] flex flex-col justify-between">
+        {/* Top Header Row */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-blue-100/60 pb-5">
+            <div className="text-left">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                보호자/일반인용 자가진단
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-805 tracking-tight mt-2">
+                {friendlyName}
+              </h2>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 bg-emerald-50 border border-emerald-100/80 px-4.5 py-1.5 rounded-2xl shadow-sm">
+                {displayCurrentPage} / {displayTotalPages} 페이지
+              </span>
+            </div>
+          </div>
+
+          {/* Simple Progress Bar */}
+          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${(displayCurrentPage / displayTotalPages) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 py-8 flex flex-col justify-center">
+          {isResultPage ? (
+            /* Infographic Result Card */
+            (() => {
+              const res = (resultDetails[resultId] || algorithm.results[resultId]) as any;
+              const deviceName = res?.deviceName || res?.simpleTitle || res?.title;
+              const image = res?.image;
+              const reason = res?.simpleReason || res?.reason;
+              const whenToUse = res?.whenToUse;
+              const precautions = res?.precautions || [];
+
+              return (
+                <div className="space-y-8 animate-fade-in text-center">
+                  <div className="space-y-3">
+                    <span className="text-4xl">🎉</span>
+                    <h3 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
+                      어르신께 딱 맞는 돌봄 방법!
+                    </h3>
+                    <p className="text-lg text-slate-500 font-semibold">
+                      종합 분석 결과 아래의 돌봄로봇/기기를 추천해 드립니다.
+                    </p>
+                  </div>
+
+                  <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 sm:p-10 space-y-6 text-left max-w-2xl mx-auto">
+                    {/* Device Icon/Badge */}
+                    <div className="flex items-center gap-3.5 border-b border-slate-100 pb-5">
+                      <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100 text-blue-600">
+                        <Bot className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest block">추천 돌봄로봇</span>
+                        <h4 className="text-2xl sm:text-3xl font-black text-slate-800 mt-0.5">
+                          {deviceName}
+                        </h4>
+                      </div>
+                    </div>
+
+                    {/* Image if available */}
+                    {image && (
+                      <div className="relative mx-auto w-full max-w-sm h-64 bg-slate-50 rounded-2xl border border-slate-105 overflow-hidden flex items-center justify-center p-4">
+                        <Image
+                          src={image}
+                          alt={deviceName}
+                          fill
+                          className="object-contain p-4 hover:scale-105 transition-transform duration-300 animate-fade-in"
+                          priority
+                          unoptimized
+                        />
+                      </div>
+                    )}
+
+                    {/* Simple Explanation */}
+                    <div className="space-y-1 bg-emerald-50/40 p-5 rounded-2xl border border-emerald-100/60">
+                      <h5 className="text-base font-extrabold text-emerald-800 flex items-center gap-1.5">
+                        <ThumbsUp className="w-5 h-5 text-emerald-500" />
+                        왜 추천하나요?
+                      </h5>
+                      <p className="text-base sm:text-lg text-slate-700 font-bold leading-relaxed whitespace-pre-wrap">
+                        {cleanInternalCodes(reason)}
+                      </p>
+                    </div>
+
+                    {/* When to use */}
+                    {whenToUse && (
+                      <div className="space-y-1 bg-blue-50/30 p-5 rounded-2xl border border-blue-100/40">
+                        <h5 className="text-base font-extrabold text-blue-800 flex items-center gap-1.5">
+                          <Info className="w-5 h-5 text-blue-500" />
+                          이럴 때 사용하는 장비입니다
+                        </h5>
+                        <p className="text-base sm:text-lg text-slate-700 font-bold leading-relaxed whitespace-pre-wrap">
+                          {whenToUse}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Precautions */}
+                    {precautions.length > 0 && (
+                      <div className="space-y-2 bg-amber-50/40 p-5 rounded-2xl border border-amber-100/60">
+                        <h5 className="text-base font-extrabold text-amber-800 flex items-center gap-1.5">
+                          <AlertTriangle className="w-5 h-5 text-amber-500" />
+                          안전한 사용을 위한 주의사항
+                        </h5>
+                        <ul className="space-y-2 text-sm sm:text-base text-slate-705 font-bold list-disc pl-5 leading-relaxed">
+                          {precautions.map((tip: string, idx: number) => (
+                            <li key={idx}>{cleanInternalCodes(tip)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()
+          ) : (
+            /* Question Wizard Page */
+            currentQuestion && (
+              <div className="space-y-8 animate-fade-in text-center max-w-2xl mx-auto">
+                <div className="space-y-3">
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-805 leading-snug">
+                    {getDisplayText(currentQuestion, 'title', 'simple')}
+                  </h3>
+                  {getDisplayText(currentQuestion, 'description', 'simple') && (
+                    <p className="text-base sm:text-lg text-slate-500 font-bold leading-relaxed bg-blue-50/40 p-4.5 rounded-2xl border border-blue-100/30 inline-block">
+                      💡 {getDisplayText(currentQuestion, 'description', 'simple')}
+                    </p>
+                  )}
+                </div>
+
+                {/* Single Choice Options */}
+                {currentQuestion.type === 'single' ? (
+                  <div className="space-y-4 text-left">
+                    {currentQuestion.options.map((opt) => {
+                      const isSelected = tempSelectedSimple === opt.value;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleSimpleOptionClick(opt.value)}
+                          className={`w-full text-left rounded-2xl border transition-all duration-200 flex justify-between items-center group font-black text-slate-755 bg-white cursor-pointer shadow-sm hover:shadow-md p-5 sm:p-6 hover:scale-[1.01] ${
+                            isSelected
+                              ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-400/20'
+                              : 'border-slate-200 hover:border-emerald-300'
+                          }`}
+                        >
+                          <span className="text-lg sm:text-xl font-bold leading-snug text-slate-800">
+                            {getDisplayText(opt, 'text', 'simple')}
+                          </span>
+                          <div className={`rounded-full border-2 flex items-center justify-center transition-all shrink-0 w-7 h-7 ${
+                            isSelected 
+                              ? 'border-emerald-500 bg-emerald-500 text-white' 
+                              : 'border-slate-300 group-hover:border-emerald-400 bg-white'
+                          }`}>
+                            <div className={`rounded-full bg-white transition-transform w-2.5 h-2.5 ${
+                              isSelected ? 'scale-100' : 'scale-0 group-hover:scale-50'
+                            }`} />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* Multi Choice Options */
+                  <div className="space-y-4 text-left">
+                    {currentQuestion.options.map((opt) => {
+                      const isChecked = tempMultiSelect.includes(opt.value);
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleMultiToggle(opt.value)}
+                          className={`w-full text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 font-black cursor-pointer shadow-sm hover:shadow-md p-5 sm:p-6 hover:scale-[1.01] ${
+                            isChecked
+                              ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-400/20 text-slate-855'
+                              : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300'
+                          }`}
+                        >
+                          <div className={`rounded flex items-center justify-center border-2 transition-all shrink-0 w-7 h-7 ${
+                            isChecked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white'
+                          }`}>
+                            {isChecked && <Check className="w-4 h-4 stroke-[3]" />}
+                          </div>
+                          <span className="text-lg sm:text-xl font-bold leading-snug text-slate-800">
+                            {getDisplayText(opt, 'text', 'simple')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          )}
+        </div>
+
+        {/* Bottom Navigation Buttons */}
+        <div className="flex justify-between items-center gap-6 border-t border-blue-100/60 pt-6">
+          {/* Previous Button */}
+          {history.length > 0 ? (
+            <button
+              onClick={handlePrevQuestion}
+              className="px-6 py-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 bg-white text-slate-600 font-extrabold transition-all cursor-pointer flex items-center gap-2 text-base sm:text-lg hover:bg-slate-50"
+            >
+              <ChevronLeft className="w-5 h-5 shrink-0" />
+              <span>이전 단계</span>
+            </button>
+          ) : (
+            <div className="w-28" />
+          )}
+
+          {/* Action/Next Button */}
+          {isResultPage ? (
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {onLearnMore && (
+                <button
+                  onClick={() => onLearnMore(resultId)}
+                  className="px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-extrabold hover:from-blue-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer text-base sm:text-lg"
+                >
+                  <span>돌봄로봇 정보 더 알아보기</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
+                </button>
+              )}
+              <button
+                onClick={handleReset}
+                className="px-6 py-4 rounded-2xl border-2 border-slate-200 text-slate-600 font-extrabold hover:bg-slate-50 transition-all cursor-pointer text-base sm:text-lg"
+              >
+                처음부터 다시하기
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleSimpleNext}
+              disabled={
+                currentQuestion?.type === 'multi' 
+                  ? tempMultiSelect.length === 0 
+                  : !tempSelectedSimple
+              }
+              className={`px-8 py-4 rounded-2xl font-extrabold transition-all flex items-center gap-2 shadow-md text-base sm:text-lg cursor-pointer ${
+                (currentQuestion?.type === 'multi' ? tempMultiSelect.length > 0 : !!tempSelectedSimple)
+                  ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-lg scale-[1.01] hover:scale-[1.03] active:scale-[0.98]'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed shadow-none'
+              }`}
+            >
+              <span>{displayCurrentPage === displayTotalPages - 1 ? '결과 확인하기' : '다음 단계'}</span>
+              <ChevronRight className="w-5 h-5 shrink-0" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const modeUi = uiMode as any;
+  if (modeUi === 'simple') {
+    return renderSimpleWizard();
+  }
 
   if (uiMode === 'map') {
     return (

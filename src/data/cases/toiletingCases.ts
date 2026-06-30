@@ -77,7 +77,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '화장실 이동 평가 결과가 중간 이상 어려움이면 용변 후 청결 평가를 반드시 시행한다.',
     options: ['예 (O)', '아니오 (X)'],
     correctAnswerIndex: 0,
-    explanation: '화장실 이동에 지장이 있더라도 뒤처리 독립성을 판단하기 위해 용변 후 청결 평가를 함께 해야 합니다.',
+    explanation: '화장실 이동에 지장이 있더라도 청결 독립성을 판단하기 위해 용변 후 청결 평가를 함께 해야 합니다.',
     category: 'B'
   },
   {
@@ -86,7 +86,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '용변 후 청결 평가가 정상이라도 화장실 이동이 어려우면 보조가 필요할 수 있다.',
     options: ['예 (O)', '아니오 (X)'],
     correctAnswerIndex: 0,
-    explanation: '뒤처리는 스스로 가능해도 화장실로 직접 걸어가기 힘든 상황이면 보행이나 간이 이동수단에 대한 보조가 필요합니다.',
+    explanation: '청결 관리는 스스로 가능해도 화장실로 직접 걸어가기 힘든 상황이면 보행이나 간이 이동수단에 대한 보조가 필요합니다.',
     category: 'B'
   },
   {
@@ -132,7 +132,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '화장실 이동은 가능하나 용변 후 청결에 중간 이상 어려움인 경우 적합한 방법은?',
     options: ['용변 후 처리 돕기 (비데 등)', '자동 배설처리로봇', '침상 배설', '배변 프로그램만'],
     correctAnswerIndex: 0,
-    explanation: '이동은 가능하나 뒤처리가 어려운 경우, 변기 주변 세정 장치(비데 등)를 우선 활용합니다.',
+    explanation: '이동은 가능하나 청결 관리가 어려운 경우, 변기 주변 세정 장치(비데 등)를 우선 활용합니다.',
     category: 'C'
   },
   {
@@ -215,7 +215,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '화장실 이동은 가능하나 용변 후 청결에 어려움이 있는 대상자에게 배변 프로그램 적용이 도움이 될 수 있다.',
     options: ['예 (O)', '아니오 (X)'],
     correctAnswerIndex: 0,
-    explanation: '주기적인 훈련으로 계획적인 배설을 도우면 뒤처리 시 발생하는 안전 및 위생 문제를 감소시킬 수 있습니다.',
+    explanation: '주기적인 훈련으로 계획적인 배설을 도우면 청결 처리 시 발생하는 안전 및 위생 문제를 감소시킬 수 있습니다.',
     category: 'D'
   },
   {
@@ -224,7 +224,7 @@ export const toiletingCases: CaseStudy[] = [
     question: '다음 중 자동 배설처리로봇(지속적 이용)이 가장 필요한 대상자는?',
     options: ['A: 화장실 이동·청결 모두 어려움', 'B: 배뇨감 인지만 어려움'],
     correctAnswerIndex: 0,
-    explanation: '이동 및 뒤처리 자립도가 모두 현격히 떨어진 대상자(A)에게 지속적 관리를 지원하는 배설로봇이 매우 유용합니다.',
+    explanation: '이동 및 청결 자립도가 모두 현격히 떨어진 대상자(A)에게 지속적 관리를 지원하는 배설로봇이 매우 유용합니다.',
     category: 'D'
   },
   {
