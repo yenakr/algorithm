@@ -517,36 +517,36 @@ export const learningGuides: Record<string, { title: string; content: string; de
 
 // Node positioning and styling configurations (Detail Mode React Flow coordinates)
 export const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 460, y: 0, label: "자리이동에 어려움이 있나요?", typeLabel: "기능평가" },
-  q2: { x: 775, y: 220, label: "체중을 스스로 지탱할 수 없는가?", typeLabel: "하지 근력" },
+  q1: { x: 460, y: 0, label: "자리이동하기 기능평가", typeLabel: "기능평가" },
+  q2: { x: 775, y: 220, label: "하지 근력 평가", typeLabel: "하지 근력" },
   q4: { x: 480, y: 440, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
   q3: { x: 1060, y: 440, label: "환경적 요소 고려", typeLabel: "설치 환경" },
-  q3_2: { x: 1360, y: 640, label: "독립 지지대 설치가 가능한가요?", typeLabel: "공사 평가" },
-  'T-B': { x: 150, y: 840, label: "이승보조장비 (이승판/이승벨트)", isResult: true, typeLabel: "추천 결과" },
-  'T-C': { x: 370, y: 840, label: "전동형 기립보조리프트", isResult: true, typeLabel: "추천 결과" },
+  q3_2: { x: 1360, y: 640, label: "슬링 적용방식 고려", typeLabel: "공사 평가" },
+  'T-B': { x: 150, y: 840, label: "이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
+  'T-C': { x: 370, y: 840, label: "전동형 기립보조리프트 (예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
   'T-D': { x: 590, y: 840, label: "비전동형 기립보조기기", isResult: true, typeLabel: "추천 결과" },
-  'T-E': { x: 810, y: 840, label: "천장 고정형 리프트", isResult: true, typeLabel: "추천 결과" },
-  'T-F': { x: 1030, y: 840, label: "벽 고정형 리프트", isResult: true, typeLabel: "추천 결과" },
-  'T-H': { x: 1250, y: 840, label: "이동식 겐트리 리프트", isResult: true, typeLabel: "추천 결과" },
-  'T-G': { x: 1470, y: 840, label: "이동식 리프트", isResult: true, typeLabel: "추천 결과" },
+  'T-E': { x: 810, y: 840, label: "전신슬링리프트 (천장 고정형)", isResult: true, typeLabel: "추천 결과" },
+  'T-F': { x: 1030, y: 840, label: "전신슬링리프트 (벽 고정형)", isResult: true, typeLabel: "추천 결과" },
+  'T-H': { x: 1250, y: 840, label: "전신슬링리프트 (이동식 겐트리)", isResult: true, typeLabel: "추천 결과" },
+  'T-G': { x: 1470, y: 840, label: "전신슬링리프트 (이동식)", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 770, y: 0, label: "배설 인지 조절에 어려움이 있나요?", typeLabel: "인지 평가" },
-  q2_a: { x: 330, y: 220, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
-  q2_b: { x: 1210, y: 220, label: "화장실 이동에 어려움이 있나요?", typeLabel: "이동 평가" },
-  q3_a1: { x: 110, y: 440, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "청결 평가" },
-  q3_a2: { x: 550, y: 440, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "청결 평가" },
-  q3_b1: { x: 990, y: 440, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "청결 평가" },
-  q3_b2: { x: 1430, y: 440, label: "스스로 뒤처리를 할 수 있나요?", typeLabel: "청결 평가" },
-  'B-A': { x: 0, y: 660, label: "도움 없이 진행 가능", isResult: true, typeLabel: "추천 결과" },
-  'B-B': { x: 220, y: 660, label: "온수 세정 자동 비데", isResult: true, typeLabel: "추천 결과" },
-  'B-C': { x: 440, y: 660, label: "변기 전동 리프트", isResult: true, typeLabel: "추천 결과" },
-  'B-D': { x: 660, y: 660, label: "이동식 전동변기", isResult: true, typeLabel: "추천 결과" },
-  'B-E': { x: 880, y: 660, label: "배설 유도 프로그램", isResult: true, typeLabel: "추천 결과" },
-  'B-F': { x: 1100, y: 660, label: "배설 프로그램 및 세정 비데", isResult: true, typeLabel: "추천 결과" },
-  'B-G': { x: 1320, y: 660, label: "자동배설처리로봇 (간헐적)", isResult: true, typeLabel: "추천 결과" },
-  'B-H': { x: 1540, y: 660, label: "자동배설처리로봇 (지속적)", isResult: true, typeLabel: "추천 결과" },
+  q1: { x: 770, y: 0, label: "배뇨감 인지 평가", typeLabel: "인지 평가" },
+  q2_a: { x: 330, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
+  q2_b: { x: 1210, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
+  q3_a1: { x: 110, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  q3_a2: { x: 550, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  q3_b1: { x: 990, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  q3_b2: { x: 1430, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  'B-A': { x: 0, y: 660, label: "도움 불필요", isResult: true, typeLabel: "추천 결과" },
+  'B-B': { x: 220, y: 660, label: "용변 후 처리 돕기 (비데 등)", isResult: true, typeLabel: "추천 결과" },
+  'B-C': { x: 440, y: 660, label: "화장실 이동 돕기", isResult: true, typeLabel: "추천 결과" },
+  'B-D': { x: 660, y: 660, label: "화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-E': { x: 880, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용", isResult: true, typeLabel: "추천 결과" },
+  'B-F': { x: 1100, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용 + 용변 후 처리 돕기", isResult: true, typeLabel: "추천 결과" },
+  'B-G': { x: 1320, y: 660, label: "자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-H': { x: 1540, y: 660, label: "자동 배설처리로봇 간헐적 이용 / 흡인형 스마트 기저귀 로봇시스템 지속적 이용", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const transferEdges = [
@@ -581,13 +581,13 @@ export const toiletingEdges = [
 ];
 
 export const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 570, y: 0, label: "구강 섭취가 가능한가", typeLabel: "삼킴 평가" },
-  q2: { x: 310, y: 240, label: "먹기/마시기 기능 평가", typeLabel: "동작 평가" },
-  q3: { x: 520, y: 480, label: "팔 근력 평가 (근력 등급)", typeLabel: "근력 평가" },
-  'F-A': { x: 100, y: 720, label: "특수식사도구 및 수동형 팔 지지대", isResult: true, typeLabel: "추천 결과" },
-  'F-B': { x: 380, y: 720, label: "전자동 식사돌봄로봇", isResult: true, typeLabel: "추천 결과" },
-  'F-C': { x: 660, y: 720, label: "부분보조기기 또는 반자동로봇", isResult: true, typeLabel: "추천 결과" },
-  'F-D': { x: 940, y: 720, label: "비구강영양 지원 (의료진 지시 필수)", isResult: true, typeLabel: "추천 결과" },
+  q1: { x: 570, y: 0, label: "삼킴 기능 평가", typeLabel: "삼킴 평가" },
+  q2: { x: 310, y: 240, label: "먹기/마시기 기능평가", typeLabel: "동작 평가" },
+  q3: { x: 520, y: 480, label: "팔의 근력 평가", typeLabel: "근력 평가" },
+  'F-A': { x: 100, y: 720, label: "특수식사도구 이용", isResult: true, typeLabel: "추천 결과" },
+  'F-B': { x: 380, y: 720, label: "전자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
+  'F-C': { x: 660, y: 720, label: "부분 식사보조기기 / 수동·반자동 식사돌봄로봇", isResult: true, typeLabel: "추천 결과" },
+  'F-D': { x: 940, y: 720, label: "구강 섭취 불가능 시 (의료진 지시, 경관영양 등)", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const feedingEdges = [

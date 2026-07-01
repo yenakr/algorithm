@@ -2,21 +2,18 @@ import { Question, Option } from './transferCare';
 
 export const toiletingCareAlgorithm = {
   id: 'toileting',
-  title: '배설돌봄로봇 자가평가 알고리즘',
+  title: '배설돌봄 및 배설돌봄로봇의 활용 알고리즘',
   startQuestionId: 'q1',
   questions: {
     q1: {
       id: 'q1',
-      title: '배뇨감 및 배변감을 인지하고 조절하는 데 어려움이 있나요?',
-      simpleTitle: '화장실에 가고 싶다는 느낌을 잘 알 수 있나요?',
+      title: '배뇨감 인지 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'toilet',
       type: 'single',
       options: [
-        { id: 'q1_0', text: '0점: 문제 없음', simpleText: '네, 대소변 신호를 알고 잘 조절해요', score: 0, value: '0' },
-        { id: 'q1_1', text: '1점: 가벼운 정도의 어려움', simpleText: '가끔 실수하시지만 스스로 알아차려요', score: 1, value: '1' },
-        { id: 'q1_2', text: '2점: 중간 정도의 어려움', simpleText: '신호를 가끔 모르시거나 대소변 실수가 잦아요', score: 2, value: '2' },
-        { id: 'q1_3', text: '3점: 심한 정도의 어려움', simpleText: '참지 못하고 기저귀나 이불에 실례를 자주 해요', score: 3, value: '3' },
-        { id: 'q1_4', text: '4점: 극심한 정도의 어려움', simpleText: '신호를 전혀 느끼지 못해 기저귀에 의존해요', score: 4, value: '4' },
+        { id: 'q1_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q1_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q1'] || '0');
@@ -27,16 +24,13 @@ export const toiletingCareAlgorithm = {
 
     q2_a: {
       id: 'q2_a',
-      title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
-      simpleTitle: '스스로 화장실까지 안전하게 이동하실 수 있나요?',
+      title: '화장실 이동 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'walking',
       type: 'single',
       options: [
-        { id: 'q2a_0', text: '0점: 문제 없음', simpleText: '네, 혼자 걸어가실 수 있어요', score: 0, value: '0' },
-        { id: 'q2a_1', text: '1점: 가벼운 정도의 어려움', simpleText: '약간 흔들리시지만 혼자 이동하세요', score: 1, value: '1' },
-        { id: 'q2a_2', text: '2점: 중간 정도의 어려움', simpleText: '안전을 위해 보행기를 짚거나 부축해야 해요', score: 2, value: '2' },
-        { id: 'q2a_3', text: '3점: 심한 정도의 어려움', simpleText: '다리 힘이 약해 주로 휠체어를 타고 부축받아야 해요', score: 3, value: '3' },
-        { id: 'q2a_4', text: '4점: 극심한 정도의 어려움', simpleText: '화장실 거동이 안 되어 방 변기나 침상에서 해야 해요', score: 4, value: '4' },
+        { id: 'q2a_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q2a_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q2_a'] || '0');
@@ -47,16 +41,13 @@ export const toiletingCareAlgorithm = {
 
     q3_a1: {
       id: 'q3_a1',
-      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
-      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
+      title: '용변 후 청결 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'caregiver',
       type: 'single',
       options: [
-        { id: 'q3a1_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
-        { id: 'q3a1_1', text: '1점: 가벼운 어려움', simpleText: '시간이 걸리거나 서투르지만 혼자 하세요', score: 1, value: '1' },
-        { id: 'q3a1_2', text: '2점: 중간 정도의 어려움', simpleText: '손이나 어깨 통증으로 닦을 때 부축이 필요해요', score: 2, value: '2' },
-        { id: 'q3a1_3', text: '3점: 심한 어려움', simpleText: '보호자가 뒤처리를 해주고 바지 정리를 다 해야 해요', score: 3, value: '3' },
-        { id: 'q3a1_4', text: '4점: 극심한 어려움', simpleText: '위생 처리를 할 수 없어 전적으로 닦아 드려야 해요', score: 4, value: '4' },
+        { id: 'q3a1_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q3a1_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q3_a1'] || '0');
@@ -67,16 +58,13 @@ export const toiletingCareAlgorithm = {
 
     q3_a2: {
       id: 'q3_a2',
-      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
-      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
+      title: '용변 후 청결 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'caregiver',
       type: 'single',
       options: [
-        { id: 'q3a2_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
-        { id: 'q3a2_1', text: '1점: 가벼운 어려움', simpleText: '시간이 걸리거나 서투르지만 혼자 하세요', score: 1, value: '1' },
-        { id: 'q3a2_2', text: '2점: 중간 정도의 어려움', simpleText: '손이나 어깨 통증으로 닦을 때 부축이 필요해요', score: 2, value: '2' },
-        { id: 'q3a2_3', text: '3점: 심한 어려움', simpleText: '보호자가 뒤처리를 해주고 바지 정리를 다 해야 해요', score: 3, value: '3' },
-        { id: 'q3a2_4', text: '4점: 극심한 어려움', simpleText: '위생 처리를 할 수 없어 전적으로 닦아 드려야 해요', score: 4, value: '4' },
+        { id: 'q3a2_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q3a2_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q3_a2'] || '0');
@@ -87,16 +75,13 @@ export const toiletingCareAlgorithm = {
 
     q2_b: {
       id: 'q2_b',
-      title: '화장실까지 스스로 이동하는 데 어려움이 있나요?',
-      simpleTitle: '스스로 침실방에서 화장실 변기까지 안전하게 이동하실 수 있나요?',
+      title: '화장실 이동 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'walking',
       type: 'single',
       options: [
-        { id: 'q2b_0', text: '0점: 문제 없음', simpleText: '네, 혼자 걸어가실 수 있어요', score: 0, value: '0' },
-        { id: 'q2b_1', text: '1점: 가벼운 어려움', simpleText: '약간 흔들리시지만 혼자 이동하세요', score: 1, value: '1' },
-        { id: 'q2b_2', text: '2점: 중간 정도의 어려움', simpleText: '안전을 위해 보행기를 짚거나 부축해야 해요', score: 2, value: '2' },
-        { id: 'q2b_3', text: '3점: 심한 어려움', simpleText: '다리 힘이 약해 주로 휠체어를 타고 부축받아야 해요', score: 3, value: '3' },
-        { id: 'q2b_4', text: '4점: 극심한 어려움', simpleText: '화장실 거동이 안 되어 방 변기나 침상에서 해야 해요', score: 4, value: '4' },
+        { id: 'q2b_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q2b_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q2_b'] || '0');
@@ -107,16 +92,13 @@ export const toiletingCareAlgorithm = {
 
     q3_b1: {
       id: 'q3_b1',
-      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
-      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
+      title: '용변 후 청결 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'caregiver',
       type: 'single',
       options: [
-        { id: 'q3b1_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
-        { id: 'q3b1_1', text: '1점: 가벼운 어려움', simpleText: '시간이 걸리거나 서투르지만 혼자 하세요', score: 1, value: '1' },
-        { id: 'q3b1_2', text: '2점: 중간 정도의 어려움', simpleText: '손이나 어깨 통증으로 닦을 때 부축이 필요해요', score: 2, value: '2' },
-        { id: 'q3b1_3', text: '3점: 심한 어려움', simpleText: '보호자가 뒤처리를 해주고 바지 정리를 다 해야 해요', score: 3, value: '3' },
-        { id: 'q3b1_4', text: '4점: 극심한 어려움', simpleText: '위생 처리를 할 수 없어 전적으로 닦아 드려야 해요', score: 4, value: '4' },
+        { id: 'q3b1_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q3b1_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q3_b1'] || '0');
@@ -127,16 +109,13 @@ export const toiletingCareAlgorithm = {
 
     q3_b2: {
       id: 'q3_b2',
-      title: '용변을 마친 뒤 스스로 청결을 할 수 있나요?',
-      simpleTitle: '화장실 사용 후 스스로 정리할 수 있나요?',
+      title: '용변 후 청결 평가',
+      simpleTitle: '중간 이상 어려움 (2~4)이 있는가?',
       iconType: 'caregiver',
       type: 'single',
       options: [
-        { id: 'q3b2_0', text: '0점: 문제 없음', simpleText: '네, 혼자서 닦고 옷 입기까지 다 하세요', score: 0, value: '0' },
-        { id: 'q3b2_1', text: '1점: 가벼운 어려움', simpleText: '시간이 걸리거나 서투르지만 혼자 하세요', score: 1, value: '1' },
-        { id: 'q3b2_2', text: '2점: 중간 정도의 어려움', simpleText: '손이나 어깨 통증으로 닦을 때 부축이 필요해요', score: 2, value: '2' },
-        { id: 'q3b2_3', text: '3점: 심한 어려움', simpleText: '보호자가 뒤처리를 해주고 바지 정리를 다 해야 해요', score: 3, value: '3' },
-        { id: 'q3b2_4', text: '4점: 극심한 어려움', simpleText: '위생 처리를 할 수 없어 전적으로 닦아 드려야 해요', score: 4, value: '4' },
+        { id: 'q3b2_no', text: '아니오', simpleText: '아니오', score: 0, value: '0' },
+        { id: 'q3b2_yes', text: '예', simpleText: '예', score: 2, value: '2' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q3_b2'] || '0');
@@ -149,7 +128,7 @@ export const toiletingCareAlgorithm = {
     'B-A': {
       id: 'B-A',
       title: '도움 불필요',
-      simpleTitle: '도움 없이 스스로 해결 가능',
+      simpleTitle: '도움 불필요',
       description: '인지력, 화장실 이동 능력, 용변 후 청결 관리 능력이 모두 양호하여 현재 특별한 돌봄로봇 지원은 필요하지 않습니다.',
       simpleDescription: '요의 인지, 보행 이동, 뒤처리가 모두 원활하게 잘 유지되는 상태이므로 특별한 위생 보조 돌봄로봇은 필요하지 않습니다.',
       recommendation: '독립적인 배설 관리를 유지하기 위해 가벼운 스트레칭이나 일상 활동을 계속 장려합니다.',
@@ -159,8 +138,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-B': {
       id: 'B-B',
-      title: '비데 고려',
-      simpleTitle: '자동 위생 세정 비데 추천',
+      title: '용변 후 처리 돕기 (비데 등)',
+      simpleTitle: '용변 후 처리 돕기 (비데 등)',
       description: '인지와 화장실 이동은 양호하나 용변 후 잔여물을 깨끗하게 뒤처리하고 위생관리를 대행받을 필요가 있는 상태입니다.',
       simpleDescription: '화장실로 직접 걸어가실 수 있고 정신이 명료하지만, 손가락 통증 등으로 휴지 뒤처리가 잘 안 될 때 요로 감염 등을 예방하기 위해 세정을 돕는 돌봄로봇입니다.',
       recommendation: '온수 세정 및 건조가 자동으로 연동되는 비데 시트 도입을 고려해보세요.',
@@ -170,8 +149,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-C': {
       id: 'B-C',
-      title: '화장실 이동 보조 및 변기 리프트 고려',
-      simpleTitle: '화장실 변기 전동 리프트 추천',
+      title: '화장실 이동 돕기',
+      simpleTitle: '화장실 이동 돕기',
       description: '배설 의사는 명확히 인지하고 뒤처리 능력도 갖추었으나 보행 장애나 균형 저하로 인해 변기에 착석하고 일어서는 데 어려움이 큽니다.',
       simpleDescription: '화장실 변기에서 앉고 일어설 때 하체 근력이 부족해 무리가 가거나 낙상 위험이 높을 때, 모터 힘으로 시트를 밀어 올려 관절을 지켜주는 리프트형 돌봄로봇입니다.',
       recommendation: '일반 변기에 설치 가능한 양변기 리프트 또는 보행 보조기 활용을 추천합니다.',
@@ -181,8 +160,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-D': {
       id: 'B-D',
-      title: '이동 변기 이용',
-      simpleTitle: '침실 간이 이동 변기 추천',
+      title: '화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용',
+      simpleTitle: '화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용',
       description: '배설감은 스스로 느끼지만 화장실로의 이동과 용변 후 뒤처리를 독자적으로 수행하기 불가능하므로 침실 내에서 해결하는 이동 변기 솔루션이 권장됩니다.',
       recommendation: '방 안에 배치할 수 있고 팔걸이와 높이 조절이 가능한 가구형 이동 변기를 도입하세요.',
       simpleDescription: '소대변 신호는 아시나 거동이 불편해 방 밖의 먼 화장실까지 걸어갈 수 없는 분들을 위해, 침대 바로 옆에 놓고 안전하게 이동 탑승하여 해결하는 침상 변기형 돌봄로봇입니다.',
@@ -192,8 +171,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-E': {
       id: 'B-E',
-      title: '시간에 맞춘 배뇨·배변 프로그램 적용',
-      simpleTitle: '인지 유도식 배설 프로그램 추천',
+      title: '시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용',
+      simpleTitle: '시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용',
       description: '화장실로 걸어갈 수 있고 뒤처리도 할 수 있지만 인지 기능 저하로 인해 배뇨와 배변 시기를 알아차리지 못해 실금하는 위험이 높은 단계입니다.',
       simpleDescription: '치매나 뇌기능 저하로 방광에 소변이 차는 감각을 제때 알아차리지 못해 실금할 때, 스마트 센서 신호에 맞추어 시간마다 배설을 유도하는 훈련법입니다.',
       recommendation: '스마트 배뇨 예측 센서를 활용하여 정해진 시간마다 화장실로 동반 이동하는 체계적 훈련을 실시하세요.',
@@ -203,8 +182,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-F': {
       id: 'B-F',
-      title: '시간에 맞춘 배뇨·배변 프로그램 및 비데 이용',
-      simpleTitle: '예약 배설 유도 및 비데 세정 추천',
+      title: '시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용 + 용변 후 처리 돕기',
+      simpleTitle: '시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용 + 용변 후 처리 돕기',
       description: '배설 인지 능력이 떨어져 제때 화장실을 가기 어렵고 신체적 관절 가동 범위 제한 등으로 용변 후 처리 능력마저 결여된 상태입니다.',
       simpleDescription: '배설 신호를 제때 알지 못하고 손 움직임도 둔해 닦아내지 못하지만 보호자가 부축하면 변기까지 걸어갈 수 있는 분들을 위한 혼합 조력 방식입니다.',
       recommendation: '주기적 알림 센서와 함께 화장실 내 전동 비데 시트 세정 시스템을 보조로 구축하는 것을 고려하십시오.',
@@ -214,8 +193,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-G': {
       id: 'B-G',
-      title: '자동배설로봇 간헐적 이용',
-      simpleTitle: '자동 배설 처리 로봇 (간헐용) 추천',
+      title: '자동 배설처리로봇 간헐적 이용',
+      simpleTitle: '자동 배설처리로봇 간헐적 이용',
       description: '배설감을 인지하지 못하고 화장실로 직접 이동할 수도 없지만 다행히 보호자 도움을 받아 간헐적으로 침상에서 로봇을 장착하여 뒤처리를 자동화하는 솔루션이 효과적입니다.',
       simpleDescription: '용변 느낌을 잘 모르고 걷지 못해 침대에 완전히 누워 계실 때, 소대변 감지 센서가 내장된 패드를 착용해 오물 처리 물청소를 대행해 주는 돌봄로봇입니다.',
       recommendation: '야간 또는 특정 시간대에 탈부착이 가능한 세정식 자동배설로봇의 간헐적 도입을 고려해 볼 수 있습니다.',
@@ -225,8 +204,8 @@ export const toiletingCareAlgorithm = {
     },
     'B-H': {
       id: 'B-H',
-      title: '흡인형 스마트 기저귀 로봇시스템 지속적 이용',
-      simpleTitle: '음압 진공 스마트 기저귀 로봇 추천',
+      title: '화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용 + 용변 후 처리 돕기 추가 또는 자동 배설처리로봇',
+      simpleTitle: '자동 배설처리로봇 간헐적 이용 / 흡인형 스마트 기저귀 로봇시스템 지속적 이용',
       description: '배설 인지, 이동 능력, 용변 후 뒤처리 자립도가 모두 상실된 전적인 와상 환자에게 자동으로 대소변을 처리해주는 스마트 기저귀 로봇시스템입니다.',
       simpleDescription: '24시간 침대에 완전히 누워 지내며 스스로의 어떠한 신체 기능 조율도 불가능한 환자에게, 자동으로 오물을 1초 만에 감지 진공 흡입하고 세정 드라이까지 마무리해주는 돌봄로봇입니다.',
       recommendation: '침상에서 대소변을 감지 즉시 흡입, 세정, 온풍 건조하는 24시간 연동 흡인형 스마트 기저귀 로봇시스템 배치를 추천합니다.',
