@@ -193,7 +193,7 @@ export const resultDetails: Record<string, {
 
   // 배설돌봄 결과 기기 상세
   'B-A': {
-    deviceName: '도움 불필요',
+    deviceName: '도움 필요',
     image: '',
     whenToUse: '용변 요의/변의 인지, 화장실 보행 이동, 스스로 닦기 및 의복 조절이 원활히 가능한 자력 해결 상태',
     pros: ['환자 본인의 신체 잔존 역량 및 독립적 자조 능력을 최대한 유지', '보호자의 배설 돌봄 물리적 개입이 불필요하여 삶의 피로도 최하 유지'],
@@ -491,7 +491,7 @@ export const toiletingNodes: Record<string, { x: number; y: number; label: strin
   q3_b1:        { x: 1000, y: 820, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
   q3_b2:        { x: 1450, y: 820, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
   // 결과 노드 (8개, 각 220px 간격)
-  'B-A':        { x: 0,    y: 1150, label: "도움 불필요",                                                                              isResult: true, typeLabel: "추천 결과" },
+  'B-A':        { x: 0,    y: 1150, label: "도움 필요",                                                                                isResult: true, typeLabel: "추천 결과" },
   'B-B':        { x: 230,  y: 1150, label: "용변 후 처리 돕기 (비데 등)",                                                              isResult: true, typeLabel: "추천 결과" },
   'B-C':        { x: 460,  y: 1150, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용",                                        isResult: true, typeLabel: "추천 결과" },
   'B-D':        { x: 690,  y: 1150, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용 /\n용변 후 처리 돕기 추가 또는\n자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },

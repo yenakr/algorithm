@@ -150,10 +150,10 @@ export const toiletingCareAlgorithm = {
   results: {
     'B-A': {
       id: 'B-A',
-      title: '도움 불필요',
-      simpleTitle: '도움 불필요',
-      description: '도움 불필요',
-      simpleDescription: '도움 불필요',
+      title: '도움 필요',
+      simpleTitle: '도움 필요',
+      description: '도움 필요',
+      simpleDescription: '도움 필요',
       recommendation: '독립적인 배설 관리를 유지합니다.',
       simpleRecommendation: '현재의 양호한 신체 관리 능력을 유지하도록 규칙적인 화장실 이용을 권장합니다.',
       reason: '배뇨와 배변 인지, 화장실 이동, 용변 후 청결 평가에서 모두 어려움이 낮음으로 판정되었습니다.',
