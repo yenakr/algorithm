@@ -495,7 +495,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return uiMode === 'simple' ? 200 : 160;
+    if ((node as any)?.isLabel) return uiMode === 'simple' ? 200 : 180;
+    if (node?.isResult) {
+      // 결과 박스는 텍스트 양에 따라 너비 조절
+      const labelLen = (node.label || '').length;
+      if (labelLen > 30) return uiMode === 'simple' ? 240 : 200;
+      return uiMode === 'simple' ? 210 : 180;
+    }
     const outgoingCount = edges.filter(e => e.from === id).length;
     const baseWidth = uiMode === 'simple' ? 260 : 220;
     if (outgoingCount >= 5) return baseWidth + 60;
@@ -505,7 +511,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if (node?.isResult) return uiMode === 'simple' ? 120 : 100;
+    if ((node as any)?.isLabel) return uiMode === 'simple' ? 52 : 44;
+    if (node?.isResult) {
+      // 결과 박스는 \n과 /로 분리된 줄수에 따라 높이 자동 조절
+      const lines = (node.label || '')
+        .split(/\n|\//).filter((s: string) => s.trim().length > 0).length;
+      const baseH = uiMode === 'simple' ? 110 : 90;
+      const perLine = 28;
+      return baseH + lines * perLine;
+    }
     const outgoingEdges2 = edges.filter(e => e.from === id);
     const outgoingCount = outgoingEdges2.length;
     const allLabels = outgoingEdges2.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
@@ -537,6 +551,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
 
   const isEdgeActive = (edge: typeof edges[0]) => {
+    // label 노드에서 나오는 항상 true 엣지는 배선 없는 연결
+    const fromNode = nodes[edge.from];
+    if ((fromNode as any)?.isLabel) return true;
     if (answers[edge.from] === undefined) return false;
     return edge.condition(answers);
   };
@@ -1207,43 +1224,51 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
                     const outgoingEdges = edges.filter(e => e.from === id);
 
+                    const isLabel = (node as any).isLabel === true;
+
                     return (
                       <div
                         key={id}
-                        onClick={() => handleNodeClick(id)}
-                        className={`absolute pointer-events-auto flex flex-col justify-between p-5 select-none transition-all duration-300 ${dimOpacity} ${
-                          isResult
-                            ? `rounded-2xl border-2 ${
-                                isHighlightedResult
-                                  ? 'border-teal-600 bg-teal-600 text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-teal-600/20'
-                                  : isActive
-                                    ? 'border-teal-500 bg-teal-55 text-teal-950 shadow-md ring-4 ring-teal-500/20 scale-[1.02] z-20 cursor-default'
-                                    : 'border-teal-200/80 bg-teal-50/20 text-teal-900/80 shadow-sm cursor-pointer hover:shadow-md hover:border-teal-400'
-                               }`
-                            : `rounded-2xl border-2 ${
-                                isActive
-                                  ? 'border-purple-500 bg-purple-50 text-purple-950 shadow-md ring-4 ring-purple-100/30 scale-[1.02] z-20 cursor-default'
-                                  : 'border-purple-200/80 bg-purple-50/10 text-purple-900 shadow-sm cursor-pointer hover:shadow-md hover:border-purple-400'
-                               }`
+                        onClick={() => !isLabel && handleNodeClick(id)}
+                        className={`absolute pointer-events-auto flex flex-col justify-center p-4 select-none transition-all duration-300 ${dimOpacity} ${
+                          isLabel
+                            ? 'rounded-xl border-2 border-blue-200 bg-blue-50/60 text-blue-800 shadow-sm cursor-default'
+                            : isResult
+                              ? `rounded-2xl border-2 ${
+                                  isHighlightedResult
+                                    ? 'border-teal-600 bg-teal-600 text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-teal-600/20'
+                                    : isActive
+                                      ? 'border-teal-500 bg-teal-55 text-teal-950 shadow-md ring-4 ring-teal-500/20 scale-[1.02] z-20 cursor-default'
+                                      : 'border-teal-200/80 bg-teal-50/20 text-teal-900/80 shadow-sm cursor-pointer hover:shadow-md hover:border-teal-400'
+                                 }`
+                              : `rounded-2xl border-2 ${
+                                  isActive
+                                    ? 'border-purple-500 bg-purple-50 text-purple-950 shadow-md ring-4 ring-purple-100/30 scale-[1.02] z-20 cursor-default'
+                                    : 'border-purple-200/80 bg-purple-50/10 text-purple-900 shadow-sm cursor-pointer hover:shadow-md hover:border-purple-400'
+                                 }`
                         }`}
                         style={{
                           left: `${node.x}px`,
                           top: `${node.y}px`,
                           width: `${nodeW}px`,
-                          height: `${nodeH}px`,
+                          ...(isResult
+                            ? { minHeight: `${nodeH}px`, height: 'auto' }
+                            : { height: `${nodeH}px` }),
                         }}
                       >
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
-                            {!isResult && node.typeLabel && (
+                            {!isResult && !((node as any).isLabel) && node.typeLabel && (
                               <div className="text-[11.5px] font-black text-slate-500 bg-slate-100 border border-slate-200/60 px-2.5 py-0.5 rounded-lg inline-block mb-1.5 self-start">
                                 {node.typeLabel}
                               </div>
                             )}
-                            {isResult ? (
+                            {(node as any).isLabel ? (
+                              <p className="text-[15px] font-extrabold text-slate-600 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
+                            ) : isResult ? (
                               <div className="space-y-1 text-left">
                                 {(algorithm.results[id]?.title || node.label)
-                                  .split(/\s*[\/\n]\s*/)
+                                  .split(/\s*\/\s*|\n/)
                                   .filter(Boolean)
                                   .map((item, idx) => (
                                     <div key={idx} className="flex items-start gap-1 leading-tight">
@@ -1263,15 +1288,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                             )}
                           </div>
 
-                          {!isResult && outgoingEdges.length > 0 && (() => {
-                            const allLabels = outgoingEdges.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
+                          {!isResult && !isLabel && outgoingEdges.filter(e => e.label).length > 0 && (() => {
+                            const labeledEdges = outgoingEdges.filter(e => e.label);
+                            const allLabels = labeledEdges.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
                             const maxLen = Math.max(...allLabels.map(l => l.length));
                             const useVertical = maxLen > 4;
                             return (
                             <div 
                               className={`pt-2 border-t border-slate-100 mt-auto flex gap-2 w-full ${useVertical ? 'flex-col' : 'flex-row flex-nowrap'}`}
                             >
-                              {outgoingEdges.map((edge, eIdx) => {
+                              {labeledEdges.map((edge, eIdx) => {
                                 const isBranchSelected = answers[id] !== undefined && isEdgeActive(edge);
                                 return (
                                   <button
