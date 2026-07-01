@@ -922,15 +922,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   </h4>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
+                <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch w-full mt-6">
                     {groupList.map((group) => {
                       return (
-                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-center shadow-sm hover:shadow transition-all space-y-5">
-                          <div className="space-y-3 flex-1 flex flex-col justify-center">
+                        <div key={group.targetId} className="flex-1 min-w-[290px] max-w-lg flex flex-col justify-between">
+                          <div className="space-y-4 flex-1 flex flex-col">
                             {group.options.map((opt) => {
                               const isSelected = currentQuestion.type === 'multi'
-                                ? tempMultiSelect.includes(opt.value)
-                                : tempSelectedSimple === opt.value;
+                                  ? tempMultiSelect.includes(opt.value)
+                                  : tempSelectedSimple === opt.value;
                               
                               return (
                                 <button
@@ -943,112 +943,84 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                       handleSingleSelect(currentQuestionId!, opt.value);
                                     }
                                   }}
-                                  className={`w-full text-left rounded-xl border transition-all duration-250 p-5 flex items-center justify-between cursor-pointer group ${
+                                  className={`w-full text-left rounded-3xl border transition-all duration-300 p-8 flex flex-col justify-between cursor-pointer min-h-[380px] shadow-md hover:shadow-xl group relative ${
                                     isSelected
-                                      ? 'border-emerald-500 bg-emerald-50/30 text-emerald-950 ring-2 ring-emerald-500/20'
-                                      : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50/50 text-slate-700'
+                                      ? 'border-blue-500 bg-blue-50/20 text-blue-950 ring-4 ring-blue-500/20'
+                                      : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/30 text-slate-700'
                                   }`}
                                 >
-                                    <div className="flex-1 pr-4">
-                                      <span className="text-lg sm:text-xl md:text-2xl font-black leading-snug block">
+                                  {/* Top Side: Detailed descriptions wrapped in pretty card grids */}
+                                  <div className="w-full space-y-3.5 flex-1 pb-16">
+                                    {(() => {
+                                      const cleanQId = currentQuestionId!.replace('_', ''); // q2_a -> q2a
+                                      const optKey = `${cleanQId}_${opt.value}`; // q2a_yes, q2a_no
+                                      const alternativeOptKey = `${currentQuestionId}_${opt.value}`; // q1_yes, q1_no
+                                      const directDetail = optionDetails[optKey] || optionDetails[alternativeOptKey];
+
+                                      let itemsToRender: string[] = [];
+
+                                      if (directDetail) {
+                                        itemsToRender = [directDetail];
+                                      } else if (currentQuestionId === 'q1' && algorithm.id === 'transfer') {
+                                        const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                        itemsToRender = scores.map(s => optionDetails[`q1_${s}`]).filter(Boolean);
+                                      } else if (currentQuestionId === 'q1' && algorithm.id === 'toileting') {
+                                        const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                        itemsToRender = scores.map(s => optionDetails[`toileting_q1_${s}`]).filter(Boolean);
+                                      } else if ((currentQuestionId === 'q2_a' || currentQuestionId === 'q2_b') && algorithm.id === 'toileting') {
+                                        const prefix = currentQuestionId === 'q2_a' ? 'q2a' : 'q2b';
+                                        const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                        itemsToRender = scores.map(s => optionDetails[`${prefix}_${s}`]).filter(Boolean);
+                                      } else if (['q3_a1', 'q3_a2', 'q3_b1', 'q3_b2'].includes(currentQuestionId!) && algorithm.id === 'toileting') {
+                                        const prefix = currentQuestionId!.replace('_', '');
+                                        const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                        itemsToRender = scores.map(s => optionDetails[`${prefix}_${s}`]).filter(Boolean);
+                                      } else if (currentQuestionId === 'q2' && algorithm.id === 'feeding') {
+                                        const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                        itemsToRender = scores.map(s => optionDetails[`feeding_q2_${s}`]).filter(Boolean);
+                                      } else if ((currentQuestionId === 'q1' || currentQuestionId === 'q3') && algorithm.id === 'feeding') {
+                                        const specKey = `feeding_${currentQuestionId}_${opt.value}`;
+                                        if (optionDetails[specKey]) {
+                                          itemsToRender = [optionDetails[specKey]];
+                                        }
+                                      }
+
+                                      if (itemsToRender.length > 0) {
+                                        return (
+                                          <div className="grid grid-cols-1 gap-3 w-full">
+                                            {itemsToRender.map((itemStr, index) => (
+                                              <div 
+                                                key={index}
+                                                className={`rounded-2xl p-4 border text-base sm:text-lg font-bold leading-relaxed shadow-sm transition-colors ${
+                                                  isSelected
+                                                    ? 'bg-blue-600/10 border-blue-200/50 text-blue-900'
+                                                    : 'bg-slate-50/80 border-slate-100 text-slate-600 group-hover:bg-slate-100/50'
+                                                }`}
+                                              >
+                                                {itemStr}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                  </div>
+
+                                  {/* Bottom Side: Huge Centered Title Label */}
+                                  <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center border-t border-slate-100/60 bg-slate-50/30 rounded-b-3xl">
+                                    <div className="flex items-center gap-3">
+                                      <span className={`text-2xl sm:text-3xl md:text-4xl font-black tracking-wide ${
+                                        isSelected ? 'text-blue-600' : 'text-slate-800'
+                                      }`}>
                                         {getDisplayText(opt, 'text', 'simple')}
                                       </span>
-                                      {(() => {
-                                        const cleanQId = currentQuestionId!.replace('_', ''); // q2_a -> q2a
-                                        const optKey = `${cleanQId}_${opt.value}`; // q2a_yes, q2a_no
-                                        const alternativeOptKey = `${currentQuestionId}_${opt.value}`; // q1_yes, q1_no
-                                        const directDetail = optionDetails[optKey] || optionDetails[alternativeOptKey];
-
-                                        if (directDetail) {
-                                          return (
-                                            <span className="text-base sm:text-lg text-slate-500 mt-2 block font-bold leading-normal">
-                                              • {directDetail}
-                                            </span>
-                                          );
-                                        }
-
-                                        // 0~4점 분할식 자가진단 항목 가이드 맵핑
-                                        // 1) 자리이동 기능평가 (transfer q1)
-                                        if (currentQuestionId === 'q1' && algorithm.id === 'transfer') {
-                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
-                                          return (
-                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
-                                              {scores.map(s => (
-                                                <span key={s} className="block">• {optionDetails[`q1_${s}`]}</span>
-                                              ))}
-                                            </div>
-                                          );
-                                        }
-
-                                        // 1-1) 배설 인지 평가 (toileting q1)
-                                        if (currentQuestionId === 'q1' && algorithm.id === 'toileting') {
-                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
-                                          return (
-                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
-                                              {scores.map(s => (
-                                                <span key={s} className="block">• {optionDetails[`toileting_q1_${s}`]}</span>
-                                              ))}
-                                            </div>
-                                          );
-                                        }
-
-                                        // 2) 배설 이동 평가 (toileting q2_a, q2_b)
-                                        if ((currentQuestionId === 'q2_a' || currentQuestionId === 'q2_b') && algorithm.id === 'toileting') {
-                                          const prefix = currentQuestionId === 'q2_a' ? 'q2a' : 'q2b';
-                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
-                                          return (
-                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
-                                              {scores.map(s => (
-                                                <span key={s} className="block">• {optionDetails[`${prefix}_${s}`]}</span>
-                                              ))}
-                                            </div>
-                                          );
-                                        }
-
-                                        // 3) 배설 청결 평가 (toileting q3_a1, q3_a2, q3_b1, q3_b2)
-                                        if (['q3_a1', 'q3_a2', 'q3_b1', 'q3_b2'].includes(currentQuestionId!) && algorithm.id === 'toileting') {
-                                          const prefix = currentQuestionId!.replace('_', '');
-                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
-                                          return (
-                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
-                                              {scores.map(s => (
-                                                <span key={s} className="block">• {optionDetails[`${prefix}_${s}`]}</span>
-                                              ))}
-                                            </div>
-                                          );
-                                        }
-
-                                        // 4) 식사 먹기/마시기 기능 평가 (feeding q2)
-                                        if (currentQuestionId === 'q2' && algorithm.id === 'feeding') {
-                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
-                                          return (
-                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
-                                              {scores.map(s => (
-                                                <span key={s} className="block">• {optionDetails[`feeding_q2_${s}`]}</span>
-                                              ))}
-                                            </div>
-                                          );
-                                        }
-
-                                        // 5) 식사 삼킴 및 팔의 근력 평가 (feeding q1, q3) 예/아니오 키 매핑
-                                        if ((currentQuestionId === 'q1' || currentQuestionId === 'q3') && algorithm.id === 'feeding') {
-                                          const specKey = `feeding_${currentQuestionId}_${opt.value}`;
-                                          if (optionDetails[specKey]) {
-                                            return (
-                                              <span className="text-base sm:text-lg text-slate-500 mt-2 block font-bold leading-normal">
-                                                • {optionDetails[specKey]}
-                                              </span>
-                                            );
-                                          }
-                                        }
-
-                                        return null;
-                                      })()}
+                                      <div className={`rounded-full border-2 transition-all shrink-0 w-8 h-8 flex items-center justify-center ${
+                                        isSelected ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-350 bg-white'
+                                      }`}>
+                                        {isSelected && <Check className="w-4 h-4 stroke-[4]" />}
+                                      </div>
                                     </div>
-                                  <div className={`rounded-full border-2 transition-all shrink-0 w-6 h-6 flex items-center justify-center ${
-                                    isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-350 bg-white'
-                                  }`}>
-                                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[3.5]" />}
                                   </div>
                                 </button>
                               );
