@@ -912,14 +912,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             currentQuestion && (
               <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
                 <div className="space-y-4">
-                  <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 leading-snug">
+                  {getDisplayText(currentQuestion, 'description', 'simple') && (
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-blue-600 leading-tight">
+                      {getDisplayText(currentQuestion, 'description', 'simple')}
+                    </h2>
+                  )}
+                  <h4 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-500 leading-snug">
                     {currentQuestion.simpleTitle || currentQuestion.title}
                   </h4>
-                  {getDisplayText(currentQuestion, 'description', 'simple') && (
-                    <p className="text-base sm:text-lg text-slate-500 font-bold">
-                      {getDisplayText(currentQuestion, 'description', 'simple')}
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
@@ -975,6 +975,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                             <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
                                               {scores.map(s => (
                                                 <span key={s} className="block">• {optionDetails[`q1_${s}`]}</span>
+                                              ))}
+                                            </div>
+                                          );
+                                        }
+
+                                        // 1-1) 배설 인지 평가 (toileting q1)
+                                        if (currentQuestionId === 'q1' && algorithm.id === 'toileting') {
+                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                          return (
+                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
+                                              {scores.map(s => (
+                                                <span key={s} className="block">• {optionDetails[`toileting_q1_${s}`]}</span>
                                               ))}
                                             </div>
                                           );
