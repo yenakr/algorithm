@@ -495,15 +495,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if ((node as any)?.isLabel) return uiMode === 'simple' ? 200 : 180;
+    if ((node as any)?.isLabel) return uiMode === 'simple' ? 220 : 200;
     if (node?.isResult) {
       // 결과 박스는 텍스트 양에 따라 너비 조절
       const labelLen = (node.label || '').length;
-      if (labelLen > 30) return uiMode === 'simple' ? 240 : 200;
-      return uiMode === 'simple' ? 210 : 180;
+      if (labelLen > 30) return uiMode === 'simple' ? 260 : 220;
+      return uiMode === 'simple' ? 230 : 200;
     }
-    const outgoingCount = edges.filter(e => e.from === id).length;
-    const baseWidth = uiMode === 'simple' ? 260 : 220;
+    // noButtons 노드(슬링 적용방식 등)는 일반 질문 노드와 동일 너비
+    const outgoingCount = edges.filter(e => e.from === id && e.label).length;
+    const baseWidth = uiMode === 'simple' ? 280 : 240;
     if (outgoingCount >= 5) return baseWidth + 60;
     if (outgoingCount === 4) return baseWidth + 40;
     if (outgoingCount === 3) return baseWidth + 20;
@@ -511,22 +512,25 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   };
   const getNodeHeight = (id: string) => {
     const node = nodes[id];
-    if ((node as any)?.isLabel) return uiMode === 'simple' ? 52 : 44;
+    if ((node as any)?.isLabel) return uiMode === 'simple' ? 56 : 48;
     if (node?.isResult) {
-      // 결과 박스는 \n과 /로 분리된 줄수에 따라 높이 자동 조절
       const lines = (node.label || '')
         .split(/\n|\//).filter((s: string) => s.trim().length > 0).length;
-      const baseH = uiMode === 'simple' ? 110 : 90;
-      const perLine = 28;
+      const baseH = uiMode === 'simple' ? 120 : 100;
+      const perLine = 32;
       return baseH + lines * perLine;
     }
     const outgoingEdges2 = edges.filter(e => e.from === id);
+    // noButtons 노드는 버튼 영역이 없으므로 높이 줄임
+    if ((node as any)?.noButtons) {
+      return uiMode === 'simple' ? 120 : 100;
+    }
     const outgoingCount = outgoingEdges2.length;
     const allLabels = outgoingEdges2.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
     const maxLabelLen = allLabels.length > 0 ? Math.max(...allLabels.map(l => l.length)) : 0;
     const verticalStack = maxLabelLen > 4;
     const verticalExtra = verticalStack ? (outgoingCount - 1) * 38 : 0;
-    const baseHeight = uiMode === 'simple' ? 195 : 165;
+    const baseHeight = uiMode === 'simple' ? 210 : 180;
     if (outgoingCount >= 5) return baseHeight + 55 + verticalExtra;
     if (outgoingCount === 4) return baseHeight + 45 + verticalExtra;
     if (outgoingCount === 3) return baseHeight + 10 + verticalExtra;
@@ -1259,28 +1263,28 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
                             {!isResult && !((node as any).isLabel) && node.typeLabel && (
-                              <div className="text-[11.5px] font-black text-slate-500 bg-slate-100 border border-slate-200/60 px-2.5 py-0.5 rounded-lg inline-block mb-1.5 self-start">
+                              <div className="text-[13px] font-black text-slate-500 bg-slate-100 border border-slate-200/60 px-2.5 py-0.5 rounded-lg inline-block mb-2 self-start">
                                 {node.typeLabel}
                               </div>
                             )}
                             {(node as any).isLabel ? (
-                              <p className="text-[15px] font-extrabold text-slate-600 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
+                               <p className="text-[17px] font-extrabold text-slate-700 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
                             ) : isResult ? (
-                              <div className="space-y-1 text-left">
+                              <div className="space-y-1.5 text-left">
                                 {(algorithm.results[id]?.title || node.label)
                                   .split(/\s*\/\s*|\n/)
                                   .filter(Boolean)
                                   .map((item, idx) => (
-                                    <div key={idx} className="flex items-start gap-1 leading-tight">
+                                    <div key={idx} className="flex items-start gap-1.5 leading-tight">
                                       <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
-                                      <span className={`text-[13px] sm:text-[14px] font-black ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
+                                      <span className={`text-[14px] sm:text-[15px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
                                         {cleanInternalCodes(item)}
                                       </span>
                                     </div>
                                   ))}
                               </div>
                             ) : (
-                              <h4 className={`text-base sm:text-[18px] font-black leading-snug text-left ${
+                              <h4 className={`text-[17px] sm:text-[19px] font-black leading-snug text-left ${
                                 isHighlightedResult ? 'text-white' : 'text-slate-900'
                               }`}>
                                 {cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
@@ -1288,7 +1292,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                             )}
                           </div>
 
-                          {!isResult && !isLabel && outgoingEdges.filter(e => e.label).length > 0 && (() => {
+                          {!isResult && !isLabel && !(node as any).noButtons && outgoingEdges.filter(e => e.label).length > 0 && (() => {
                             const labeledEdges = outgoingEdges.filter(e => e.label);
                             const allLabels = labeledEdges.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
                             const maxLen = Math.max(...allLabels.map(l => l.length));
