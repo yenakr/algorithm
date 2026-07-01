@@ -910,48 +910,45 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           ) : (
             /* Question Wizard Page */
             currentQuestion && (
-              <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
-                <div className="space-y-4">
+              <div className="space-y-6 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
+                <div className="space-y-2">
                   {(() => {
-                    // 친절하고 풀어서 쓴 질문 맵핑
+                    // 친절하고 풀어서 쓴 질문 맵핑 ('어르신' 표현 제외)
                     const friendlyQuestionMap: Record<string, string> = {
                       'q1': algorithm.id === 'transfer' 
-                        ? '어르신께서 침대나 의자 등에서 스스로 일어나 자리를 이동하시는 데 어려움이 있으신가요?'
+                        ? '침대나 의자 등에서 스스로 일어나 자리를 이동하시는 데 어려움이 있으신가요?'
                         : algorithm.id === 'toileting'
-                          ? '어르신께서 소변이나 대변이 마려운 배설 신호를 스스로 정확하게 느끼고 인지하시나요?'
-                          : '어르신께서 사래에 걸리지 않고 입으로 안전하게 직접 음식을 씹어 삼키실 수 있으신가요?',
+                          ? '소변이나 대변이 마려운 배설 신호를 스스로 정확하게 느끼고 알아차리시나요?'
+                          : '사래에 걸리지 않고 입으로 안전하게 직접 음식을 씹어 삼키실 수 있으신가요?',
                       'q2': algorithm.id === 'transfer'
-                        ? '어르신께서 보호자가 부축을 해주어도 다리에 힘을 주어 서 있는 것을 힘들어하시나요?'
-                        : '어르신께서 숟가락이나 젓가락을 사용해 음식을 입으로 직접 떠서 식사하시는 데 어려움이 있으신가요?',
-                      'q2_a': '어르신께서 침대 주변이나 방에서 화장실까지 걸어서 이동하시는 데 어려움이 있으신가요?',
-                      'q2_b': '어르신께서 침대 주변이나 방에서 화장실까지 걸어서 이동하시는 데 어려움이 있으신가요?',
+                        ? '보호자가 옆에서 부축을 해주어도 다리에 힘을 주어 서 있는 것을 힘들어하시나요?'
+                        : '숟가락이나 젓가락을 사용해 음식을 입으로 직접 떠서 식사하시는 데 어려움이 있으신가요?',
+                      'q2_a': '침대 주변이나 방에서 화장실까지 스스로 걸어서 이동하시는 데 어려움이 있으신가요?',
+                      'q2_b': '침대 주변이나 방에서 화장실까지 스스로 걸어서 이동하시는 데 어려움이 있으신가요?',
                       'q3': algorithm.id === 'feeding'
                         ? '식사하실 때 주로 사용하시는 한쪽 팔을 어깨 위로 들어 올리는 동작이 아예 불가능하신가요?'
-                        : '천장형 레일 리프트 설치나 고정을 위해 튼튼한 하중 벽면 공사가 가능한 가정환경이신가요?',
-                      'q3_a1': '어르신께서 화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
-                      'q3_a2': '어르신께서 화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
-                      'q3_b1': '어르신께서 화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
-                      'q3_b2': '어르신께서 화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
-                      'q4': '어르신께서 등받이 없이 앉아 있을 때 상체를 세우지 못하고 옆으로 고꾸라지시나요?',
+                        : '천장형 레일 리프트 설치나 고정을 위해 튼튼한 하중 벽면 공사가 가능한 환경이신가요?',
+                      'q3_a1': '화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
+                      'q3_a2': '화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
+                      'q3_b1': '화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
+                      'q3_b2': '화장실 용변 뒤처리나 옷 입고 벗기 같은 위생 관리에 어려움이 있으신가요?',
+                      'q4': '등받이 없이 앉아 있을 때 스스로 상체를 세우지 못하고 옆으로 고꾸라지시나요?',
                     };
 
                     const friendlyQ = friendlyQuestionMap[currentQuestionId!];
                     return (
                       <>
                         {friendlyQ ? (
-                          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-blue-600 leading-tight">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-800 leading-tight">
                             {friendlyQ}
                           </h2>
                         ) : (
                           getDisplayText(currentQuestion, 'description', 'simple') && (
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-blue-600 leading-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-800 leading-tight">
                               {getDisplayText(currentQuestion, 'description', 'simple')}
                             </h2>
                           )
                         )}
-                        <h4 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-400 leading-snug">
-                          분류 기준명: {currentQuestion.simpleTitle || currentQuestion.title} ({getDisplayText(currentQuestion, 'description', 'simple')})
-                        </h4>
                       </>
                     );
                   })()}
@@ -1026,7 +1023,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                             {itemsToRender.map((itemStr, index) => (
                                               <div 
                                                 key={index}
-                                                className={`rounded-2xl p-4 border text-base sm:text-lg font-bold leading-relaxed shadow-sm transition-colors bg-white text-slate-900 ${
+                                                className={`rounded-2xl p-5 border text-lg sm:text-xl md:text-2xl font-black leading-relaxed shadow-sm transition-colors bg-white text-slate-900 ${
                                                   isSelected
                                                     ? 'border-blue-400/70 bg-white ring-1 ring-blue-400/30'
                                                     : 'border-slate-200'
