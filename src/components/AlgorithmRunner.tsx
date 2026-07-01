@@ -849,14 +849,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             (() => {
               const res = (resultDetails[resultId] || algorithm.results[resultId]) as any;
               const deviceName = res?.deviceName || res?.simpleTitle || res?.title;
-              const image = res?.image;
-              const reason = res?.simpleReason || res?.reason;
-              const whenToUse = res?.whenToUse;
-              const precautions = res?.precautions || [];
-
-              const items = typeof deviceName === 'string' 
-                ? deviceName.split(/\s*[\+\/]\s*/g).map(s => s.trim()).filter(Boolean)
-                : [deviceName];
 
               return (
                 <div className="space-y-8 animate-fade-in text-center">
@@ -866,39 +858,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     </h3>
                   </div>
 
-                  <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 sm:p-10 space-y-6 text-left max-w-2xl mx-auto">
-                    {/* Device Icon/Badge */}
-                    <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
-                      <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-100 text-blue-600 shrink-0 mt-1">
-                        <Bot className="w-8 h-8" />
-                      </div>
-                      <div className="space-y-2 flex-1">
-                        <div className="flex flex-col gap-2.5">
-                          {items.map((item, idx) => (
-                            <div key={idx} className="flex items-start gap-2 bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-3 shadow-sm">
-                              <span className="text-emerald-500 font-extrabold text-lg">•</span>
-                              <span className="text-lg sm:text-xl font-black text-slate-800 leading-snug">
-                                {item}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Image if available */}
-                    {image && (
-                      <div className="relative mx-auto w-full max-w-sm h-64 bg-slate-50 rounded-2xl border border-slate-105 overflow-hidden flex items-center justify-center p-4">
-                        <Image
-                          src={image}
-                          alt={deviceName}
-                          fill
-                          className="object-contain p-4 hover:scale-105 transition-transform duration-300 animate-fade-in"
-                          priority
-                          unoptimized
-                        />
-                      </div>
-                    )}
+                  <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 sm:p-10 text-left max-w-2xl mx-auto">
+                    <p className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-snug whitespace-pre-line">
+                      {deviceName}
+                    </p>
                   </div>
                 </div>
               );
@@ -1276,8 +1239,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                   .split(/\s*\/\s*|\n/)
                                   .filter(Boolean)
                                   .map((item, idx) => (
-                                    <div key={idx} className="flex items-start gap-1.5 leading-tight">
-                                      <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
+                                    <div key={idx} className="leading-tight">
                                       <span className={`text-[16px] sm:text-[17px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
                                         {cleanInternalCodes(item)}
                                       </span>
