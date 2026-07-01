@@ -138,10 +138,10 @@ export const transferCareAlgorithm = {
   results: {
     'T-B': {
       id: 'T-B',
-      title: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
-      simpleTitle: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
-      description: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
-      simpleDescription: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
+      title: '가벼운 정도의 어려움이 있다면, \n• 이승보조장비 이용',
+      simpleTitle: '가벼운 정도의 어려움이 있다면, \n• 이승보조장비 이용',
+      description: '가벼운 정도의 어려움이 있다면, \n• 이승보조장비 이용',
+      simpleDescription: '가벼운 정도의 어려움이 있다면, \n• 이승보조장비 이용',
       recommendation: '슬라이딩 보드 또는 이승벨트를 사용하여 안전한 이동을 지원합니다.',
       simpleRecommendation: '침대와 휠체어 사이를 매끄럽게 연결하는 슬라이딩 보드나 부축 벨트를 추천합니다.',
       reason: '자리이동하기 기능평가 결과 가벼운 정도의 어려움이 존재하나 체중 지지나 일상 수행은 크게 훼손되지 않은 단계입니다.',

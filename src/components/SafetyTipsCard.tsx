@@ -22,8 +22,8 @@ export default function SafetyTipsCard({ tips, type = 'transfer' }: SafetyTipsCa
 
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tips.map((tip, idx) => (
-          <li 
-            key={idx} 
+          <li
+            key={idx}
             className="flex items-start gap-3 bg-white/80 backdrop-blur-sm border border-amber-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
           >
             <CheckCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
