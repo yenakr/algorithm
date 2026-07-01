@@ -1006,6 +1006,30 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                           );
                                         }
 
+                                        // 4) 식사 먹기/마시기 기능 평가 (feeding q2)
+                                        if (currentQuestionId === 'q2' && algorithm.id === 'feeding') {
+                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                          return (
+                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
+                                              {scores.map(s => (
+                                                <span key={s} className="block">• {optionDetails[`feeding_q2_${s}`]}</span>
+                                              ))}
+                                            </div>
+                                          );
+                                        }
+
+                                        // 5) 식사 삼킴 및 팔의 근력 평가 (feeding q1, q3) 예/아니오 키 매핑
+                                        if ((currentQuestionId === 'q1' || currentQuestionId === 'q3') && algorithm.id === 'feeding') {
+                                          const specKey = `feeding_${currentQuestionId}_${opt.value}`;
+                                          if (optionDetails[specKey]) {
+                                            return (
+                                              <span className="text-base sm:text-lg text-slate-500 mt-2 block font-bold leading-normal">
+                                                • {optionDetails[specKey]}
+                                              </span>
+                                            );
+                                          }
+                                        }
+
                                         return null;
                                       })()}
                                     </div>
