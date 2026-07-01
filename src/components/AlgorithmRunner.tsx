@@ -950,21 +950,62 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                   }`}
                                 >
                                     <div className="flex-1 pr-4">
-                                      <span className="text-base sm:text-lg md:text-xl font-black leading-snug block">
+                                      <span className="text-lg sm:text-xl md:text-2xl font-black leading-snug block">
                                         {getDisplayText(opt, 'text', 'simple')}
                                       </span>
                                       {(() => {
                                         const cleanQId = currentQuestionId!.replace('_', ''); // q2_a -> q2a
                                         const optKey = `${cleanQId}_${opt.value}`; // q2a_yes, q2a_no
                                         const alternativeOptKey = `${currentQuestionId}_${opt.value}`; // q1_yes, q1_no
-                                        const detailText = optionDetails[optKey] || optionDetails[alternativeOptKey];
-                                        if (detailText) {
+                                        const directDetail = optionDetails[optKey] || optionDetails[alternativeOptKey];
+
+                                        if (directDetail) {
                                           return (
-                                            <span className="text-xs sm:text-sm text-slate-400 mt-1 block font-semibold leading-normal">
-                                              {detailText}
+                                            <span className="text-base sm:text-lg text-slate-500 mt-2 block font-bold leading-normal">
+                                              • {directDetail}
                                             </span>
                                           );
                                         }
+
+                                        // 0~4점 분할식 자가진단 항목 가이드 맵핑
+                                        // 1) 자리이동 기능평가 (transfer q1)
+                                        if (currentQuestionId === 'q1' && algorithm.id === 'transfer') {
+                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                          return (
+                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
+                                              {scores.map(s => (
+                                                <span key={s} className="block">• {optionDetails[`q1_${s}`]}</span>
+                                              ))}
+                                            </div>
+                                          );
+                                        }
+
+                                        // 2) 배설 이동 평가 (toileting q2_a, q2_b)
+                                        if ((currentQuestionId === 'q2_a' || currentQuestionId === 'q2_b') && algorithm.id === 'toileting') {
+                                          const prefix = currentQuestionId === 'q2_a' ? 'q2a' : 'q2b';
+                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                          return (
+                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
+                                              {scores.map(s => (
+                                                <span key={s} className="block">• {optionDetails[`${prefix}_${s}`]}</span>
+                                              ))}
+                                            </div>
+                                          );
+                                        }
+
+                                        // 3) 배설 청결 평가 (toileting q3_a1, q3_a2, q3_b1, q3_b2)
+                                        if (['q3_a1', 'q3_a2', 'q3_b1', 'q3_b2'].includes(currentQuestionId!) && algorithm.id === 'toileting') {
+                                          const prefix = currentQuestionId!.replace('_', '');
+                                          const scores = opt.value === 'no' ? [0, 1] : [2, 3, 4];
+                                          return (
+                                            <div className="mt-2 space-y-1 text-base sm:text-lg text-slate-500 font-bold leading-normal">
+                                              {scores.map(s => (
+                                                <span key={s} className="block">• {optionDetails[`${prefix}_${s}`]}</span>
+                                              ))}
+                                            </div>
+                                          );
+                                        }
+
                                         return null;
                                       })()}
                                     </div>
