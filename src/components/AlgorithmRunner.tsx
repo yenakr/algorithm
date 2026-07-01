@@ -1156,28 +1156,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: Flowchart Map */}
-          <div className="lg:col-span-12 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+          <div className="lg:col-span-12 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col items-center">
             <div 
               ref={wrapperRef}
-              className="w-full overflow-auto p-6 scrollbar-thin scrollbar-thumb-slate-200 bg-slate-50/10"
-              style={{ maxHeight: '950px' }}
+              className="w-full p-6 bg-slate-50/10 flex justify-center items-center overflow-visible"
             >
               <div
+                className="mx-auto flex justify-center items-center overflow-visible"
                 style={{
                   width: `${maxCoords.width * zoom}px`,
                   height: `${maxCoords.height * zoom}px`,
-                  overflow: 'hidden',
                   transition: 'width 0.15s ease-out, height 0.15s ease-out'
                 }}
               >
                 <div 
                   ref={containerRef}
-                  className="relative select-none origin-top-left"
+                  className="relative select-none"
                   style={{ 
                     width: `${maxCoords.width}px`, 
                     height: `${maxCoords.height}px`,
                     transform: `scale(${zoom})`,
-                    transformOrigin: '0 0',
+                    transformOrigin: 'top center',
                     transition: 'transform 0.15s ease-out'
                   }}
                 >
