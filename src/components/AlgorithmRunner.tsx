@@ -960,10 +960,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
                 {/* Local Decision Tree Flowchart */}
                 <div className="flex flex-col items-center py-2 select-none w-full">
+                  {/* 평가 카테고리 레이블 (description) */}
+                  {(currentQuestion.description || currentQuestion.simpleDescription) && (
+                    <p className="text-sm sm:text-base font-extrabold text-blue-500 mb-3 tracking-wide">
+                      {currentQuestion.simpleDescription || currentQuestion.description}
+                    </p>
+                  )}
                   {/* Root Node: Current Question */}
                   <div className="relative bg-gradient-to-r from-purple-50 to-indigo-50/30 border-2 border-purple-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-md text-center ring-4 ring-purple-100/10">
                     <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-purple-950 leading-snug">
-                      {getDisplayText(currentQuestion, 'title', 'simple')}
+                      {currentQuestion.simpleTitle || currentQuestion.title}
                     </h4>
                   </div>
 
@@ -1001,11 +1007,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
                       )}
                     </svg>
-                  </div>
-
-                  {/* Subtitle / Condition */}
-                  <div className="text-base sm:text-lg font-black text-purple-900 bg-purple-50 border border-purple-200 px-5 py-2.5 rounded-2xl mb-6 shadow-sm">
-                    {getDisplayText(currentQuestion, 'simpleTitle', 'simple')}
                   </div>
 
                   {/* Grouped Destination Containers */}
@@ -1257,13 +1258,13 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
-                            {!isResult && !isLabel && node.typeLabel && (
-                              <p className="text-[16px] sm:text-[18px] font-extrabold text-blue-600 mb-1 leading-tight">
+                            {!isResult && !isLabelStyle && node.typeLabel && (
+                              <p className="text-[18px] sm:text-[20px] font-extrabold text-blue-600 mb-1 leading-tight">
                                 {node.typeLabel}
                               </p>
                             )}
                             {isLabelStyle ? (
-                               <p className="text-[17px] font-extrabold text-slate-700 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
+                               <p className="text-[18px] sm:text-[20px] font-extrabold text-slate-700 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
                             ) : isResult ? (
                               <div className="space-y-1.5 text-left">
                                 {(algorithm.results[id]?.title || node.label)
@@ -1272,14 +1273,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                   .map((item, idx) => (
                                     <div key={idx} className="flex items-start gap-1.5 leading-tight">
                                       <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
-                                      <span className={`text-[15px] sm:text-[16px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
+                                      <span className={`text-[16px] sm:text-[17px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
                                         {cleanInternalCodes(item)}
                                       </span>
                                     </div>
                                   ))}
                               </div>
                             ) : (
-                              <h4 className={`text-[17px] sm:text-[19px] font-black leading-snug text-left ${
+                              <h4 className={`text-[18px] sm:text-[20px] font-black leading-snug text-left ${
                                 isHighlightedResult ? 'text-white' : 'text-slate-900'
                               }`}>
                                 {cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
