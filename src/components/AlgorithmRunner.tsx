@@ -495,19 +495,17 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
   // Node dimensions config
   const getNodeWidth = (id: string) => {
     const node = nodes[id];
-    if ((node as any)?.isLabel) return uiMode === 'simple' ? 220 : 200;
+    if ((node as any)?.isLabel) return uiMode === 'simple' ? 200 : 180;
     if (node?.isResult) {
-      // 결과 박스는 텍스트 양에 따라 너비 조절
       const labelLen = (node.label || '').length;
-      if (labelLen > 30) return uiMode === 'simple' ? 260 : 220;
-      return uiMode === 'simple' ? 230 : 200;
+      if (labelLen > 30) return uiMode === 'simple' ? 240 : 210;
+      return uiMode === 'simple' ? 210 : 190;
     }
-    // noButtons 노드(슬링 적용방식 등)는 일반 질문 노드와 동일 너비
     const outgoingCount = edges.filter(e => e.from === id && e.label).length;
-    const baseWidth = uiMode === 'simple' ? 280 : 240;
-    if (outgoingCount >= 5) return baseWidth + 60;
-    if (outgoingCount === 4) return baseWidth + 40;
-    if (outgoingCount === 3) return baseWidth + 20;
+    const baseWidth = uiMode === 'simple' ? 260 : 220;
+    if (outgoingCount >= 5) return baseWidth + 50;
+    if (outgoingCount === 4) return baseWidth + 30;
+    if (outgoingCount === 3) return baseWidth + 10;
     return baseWidth;
   };
   const getNodeHeight = (id: string) => {
@@ -1258,7 +1256,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
                             {!isResult && !isLabel && node.typeLabel && (
-                              <p className="text-[13px] font-extrabold text-blue-500 mb-1 leading-tight">
+                              <p className="text-[16px] sm:text-[18px] font-extrabold text-blue-600 mb-1 leading-tight">
                                 {node.typeLabel}
                               </p>
                             )}
@@ -1272,7 +1270,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                   .map((item, idx) => (
                                     <div key={idx} className="flex items-start gap-1.5 leading-tight">
                                       <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
-                                      <span className={`text-[14px] sm:text-[15px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
+                                      <span className={`text-[15px] sm:text-[16px] font-black leading-snug ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
                                         {cleanInternalCodes(item)}
                                       </span>
                                     </div>
