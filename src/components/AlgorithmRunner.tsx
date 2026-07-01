@@ -2228,3 +2228,5 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
     </div>
   );
 }
+
+
