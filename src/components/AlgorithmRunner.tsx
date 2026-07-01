@@ -1240,13 +1240,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                 {node.typeLabel}
                               </div>
                             )}
-                            <h4 className={`text-base sm:text-[18px] font-black leading-snug text-left ${
-                              isHighlightedResult ? 'text-white' : 'text-slate-900'
-                            }`}>
-                              {isResult
-                                ? cleanInternalCodes(algorithm.results[id]?.title || node.label)
-                                : cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
-                            </h4>
+                            {isResult ? (
+                              <div className="space-y-1 text-left">
+                                {(algorithm.results[id]?.title || node.label)
+                                  .split(/\s*[\/\n]\s*/)
+                                  .filter(Boolean)
+                                  .map((item, idx) => (
+                                    <div key={idx} className="flex items-start gap-1 leading-tight">
+                                      <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
+                                      <span className={`text-[13px] sm:text-[14px] font-black ${isHighlightedResult ? 'text-white' : 'text-slate-800'}`}>
+                                        {cleanInternalCodes(item)}
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
+                            ) : (
+                              <h4 className={`text-base sm:text-[18px] font-black leading-snug text-left ${
+                                isHighlightedResult ? 'text-white' : 'text-slate-900'
+                              }`}>
+                                {cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
+                              </h4>
+                            )}
                           </div>
 
                           {!isResult && outgoingEdges.length > 0 && (() => {
@@ -1507,13 +1521,27 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           </div>
 
                           {/* Title */}
-                          <h4 className={`leading-snug font-black text-left ${
-                            uiMode === 'simple' ? 'text-sm sm:text-base md:text-lg' : 'text-xs font-bold'
-                          } ${isHighlightedResult ? 'text-white' : 'text-slate-850'}`}>
-                            {isResult 
-                              ? cleanInternalCodes(algorithm.results[id]?.title || node.label)
-                              : cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
-                          </h4>
+                          {isResult ? (
+                            <div className="space-y-1 text-left">
+                              {(algorithm.results[id]?.title || node.label)
+                                .split(/\s*\/\s*|\n/)
+                                .filter(Boolean)
+                                .map((item: string, idx: number) => (
+                                  <div key={idx} className="flex items-start gap-1 leading-tight">
+                                    <span className={isHighlightedResult ? "text-white" : "text-emerald-500 font-extrabold"}>•</span>
+                                    <span className={`font-black ${isHighlightedResult ? 'text-white' : 'text-slate-800'} ${uiMode === 'simple' ? 'text-sm' : 'text-[11px]'}`}>
+                                      {cleanInternalCodes(item.trim())}
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          ) : (
+                            <h4 className={`leading-snug font-black text-left ${
+                              uiMode === 'simple' ? 'text-sm sm:text-base md:text-lg' : 'text-xs font-bold'
+                            } ${isHighlightedResult ? 'text-white' : 'text-slate-850'}`}>
+                              {cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
+                            </h4>
+                          )}
                         </div>
 
                         {/* Card Bottom Quick Action Interface */}
