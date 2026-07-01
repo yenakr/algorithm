@@ -38,18 +38,20 @@ export interface Result {
 
 export const transferCareAlgorithm = {
   id: 'transfer',
-  title: '이승돌봄 및 이승돌봄로봇의 활용 알고리즘',
+  title: '이승돌봄로봇 자가평가 알고리즘',
   startQuestionId: 'q1',
   questions: {
     q1: {
       id: 'q1',
-      title: '자리이동하기 기능평가',
-      simpleTitle: '중간 정도 이상의 어려움(2~4)이 있는가?',
+      title: '자리이동에 어려움이 있나요?',
+      simpleTitle: '침대에서 일어나거나 의자로 옮겨 앉을 때 도움이 필요한가요?',
       iconType: 'transfer',
       type: 'single',
       options: [
-        { id: 'q1_1', text: '아니오 (가벼운 정도의 어려움이 있다면)', simpleText: '아니오 (가벼운 정도의 어려움이 있다면)', score: 1, value: '1' },
-        { id: 'q1_2', text: '예 (중간 정도 이상의 어려움이 있는가? - 예)', simpleText: '예 (중간 정도 이상의 어려움이 있는가? - 예)', score: 2, value: '2' },
+        { id: 'q1_1', text: '1점: 가벼운 어려움', simpleText: '혼자 할 수는 있지만 약간 불안해요', score: 1, value: '1' },
+        { id: 'q1_2', text: '2점: 중간 정도의 어려움', simpleText: '일어서거나 탈 때 약간 도와주어야 해요', score: 2, value: '2' },
+        { id: 'q1_3', text: '3점: 심한 어려움', simpleText: '다치지 않게 많이 붙잡아 주어야 해요', score: 3, value: '3' },
+        { id: 'q1_4', text: '4점: 극심한 어려움', simpleText: '스스로 움직이지 못해 전적으로 도와주어야 해요', score: 4, value: '4' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = parseInt(answers['q1'] || '0');
@@ -64,13 +66,13 @@ export const transferCareAlgorithm = {
     } as Question,
     q2: {
       id: 'q2',
-      title: '하지 근력 평가',
-      simpleTitle: '체중을 지탱할 수 있는가 (<Grade IV)',
+      title: '다리 힘으로 체중을 지탱할 수 없는가?',
+      simpleTitle: '보호자가 부축해 주었을 때, 환자분이 본인의 다리 힘으로 서 계실 수 있나요?',
       iconType: 'balance',
       type: 'single',
       options: [
-        { id: 'q2_yes', text: '예 (체중 지탱 불가)', simpleText: '예 (체중 지탱 불가)', value: 'yes' },
-        { id: 'q2_no', text: '아니오 (체중 지탱 가능)', simpleText: '아니오 (체중 지탱 가능)', value: 'no' },
+        { id: 'q2_yes', text: '예, 체중을 지탱하기 어렵다', simpleText: '아니요, 다리 힘이 없어 서지 못해요', value: 'yes' },
+        { id: 'q2_no', text: '아니오, 체중을 지탱할 수 있다', simpleText: '네, 붙잡아 주면 서 있을 수 있어요', value: 'no' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q2'];
@@ -82,13 +84,13 @@ export const transferCareAlgorithm = {
     q3: {
       id: 'q3',
       title: '환경적 요소 고려',
-      simpleTitle: '환경적 요소 고려',
+      simpleTitle: '장비를 설치할 주거 환경이 어떻게 되나요?.',
       iconType: 'safety',
       type: 'single',
       options: [
-        { id: 'q3_ceiling', text: '천장식', simpleText: '천장식', value: 'ceiling' },
-        { id: 'q3_wall', text: '벽식', simpleText: '벽식', value: 'wall' },
-        { id: 'q3_movable', text: '이동식', simpleText: '이동식', value: 'movable' },
+        { id: 'q3_ceiling', text: '천장에 장비 설치가 가능하다', simpleText: '천장에 장비를 달기 위한 공사를 할 수 있어요', value: 'ceiling' },
+        { id: 'q3_wall', text: '벽면에 장비 설치가 가능하다', simpleText: '방에 단단한 콘크리트 벽이 있어 고정할 수 있어요', value: 'wall' },
+        { id: 'q3_movable', text: '고정식 설치는 어렵고 이동식 장비가 필요하다', simpleText: '공사를 할 수 없어 바퀴로 끄는 이동식이 필요해요', value: 'movable' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q3'];
@@ -104,13 +106,13 @@ export const transferCareAlgorithm = {
     } as Question,
     q3_2: {
       id: 'q3_2',
-      title: '슬링 적용방식 고려',
-      simpleTitle: '독립 지지대 설치가 가능한가요?',
+      title: '독립 지지대 설치가 가능한가요?',
+      simpleTitle: '벽이나 천장 공사는 어렵지만, 침실 바닥에 문 모양의 큰 조립 지지대를 세워둘 공간이 있나요?',
       iconType: 'safety',
       type: 'single',
       options: [
-        { id: 'q3_2_yes', text: '예 (프레임 가능)', simpleText: '예 (프레임 가능)', value: 'yes' },
-        { id: 'q3_2_no', text: '아니오 (프레임 불가)', simpleText: '아니오 (프레임 불가)', value: 'no' },
+        { id: 'q3_2_yes', text: '가능하다: 이동식 겐트리 및 독립 프레임 설치', simpleText: '네, 프레임 기둥을 조립해 세워둘 공간이 있어요', value: 'yes' },
+        { id: 'q3_2_no', text: '어렵다: 설치 없이 바퀴로 끄는 순수 이동식 필요', simpleText: '아니요, 방이 좁아 구조물 기둥을 세우기 곤란해요', value: 'no' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = answers['q3_2'];
@@ -121,12 +123,12 @@ export const transferCareAlgorithm = {
     q4: {
       id: 'q4',
       title: '스스로 상체를 일으킬 수 없는가?',
-      simpleTitle: '스스로 상체를 일으킬 수 없는가?',
+      simpleTitle: '환자분이 앉은 상태에서 스스로 상체(허리와 목)를 세우거나 손잡이를 꽉 잡을 수 있나요?',
       iconType: 'balance',
       type: 'single',
       options: [
-        { id: 'q4_yes', text: '예', simpleText: '예', value: 'yes' },
-        { id: 'q4_no', text: '아니오', simpleText: '아니오', value: 'no' },
+        { id: 'q4_yes', text: '예, 상체를 일으킬 수 없음', simpleText: '아니요, 상체 힘이 없어 버티거나 잡기 힘들어요', value: 'yes' },
+        { id: 'q4_no', text: '아니오, 상체를 일으킬 수 있음', simpleText: '네, 스스로 상체를 세우고 손잡이를 꽉 잡을 수 있어요', value: 'no' },
       ],
       resultId: (answers: Record<string, any>) => {
         const val = answers['q4'];

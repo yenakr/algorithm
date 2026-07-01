@@ -2,18 +2,18 @@ import { Question, Result } from './transferCare';
 
 export const feedingCareAlgorithm = {
   id: 'feeding',
-  title: '식사돌봄 및 식사돌봄로봇의 활용 알고리즘',
+  title: '식사돌봄로봇 자가평가 알고리즘',
   startQuestionId: 'q1',
   questions: {
     q1: {
       id: 'q1',
-      title: '삼킴 기능 평가',
-      simpleTitle: '구강섭취 가능?',
+      title: '구강 섭취가 가능한가',
+      simpleTitle: '입으로 직접 음식을 삼키고 섭취할 수 있나요?',
       iconType: 'safety',
       type: 'single',
       options: [
-        { id: 'q1_yes', text: '예', simpleText: '예', value: 'yes' },
-        { id: 'q1_no', text: '아니오', simpleText: '아니오', value: 'no' },
+        { id: 'q1_yes', text: '예', simpleText: '네, 입으로 음식을 직접 먹을 수 있어요', value: 'yes' },
+        { id: 'q1_no', text: '아니오', simpleText: '아니오, 입으로 먹기 어려워요', value: 'no' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q1'];
@@ -29,13 +29,13 @@ export const feedingCareAlgorithm = {
 
     q2: {
       id: 'q2',
-      title: '먹기/마시기 기능평가',
-      simpleTitle: '중간 정도 이상의 어려움이 있는가?',
+      title: '먹기/마시기 기능 평가',
+      simpleTitle: '음식을 숟가락이나 도구로 떠서 직접 드시는 데 어느 정도 어려움이 있나요?',
       iconType: 'transfer',
       type: 'single',
       options: [
-        { id: 'q2_light', text: '아니오 (가벼운 정도의 어려움이 있다면)', simpleText: '아니오 (가벼운 정도의 어려움이 있다면)', value: 'light' },
-        { id: 'q2_heavy', text: '예 (중간 정도 이상의 어려움)', simpleText: '예 (중간 정도 이상의 어려움)', value: 'heavy' },
+        { id: 'q2_light', text: '가벼운 어려움/어려움 없음', simpleText: '혼자 드실 수는 있지만 약간 서툴거나 손이 조금 떨려요', value: 'light' },
+        { id: 'q2_heavy', text: '중간 정도 이상의 어려움', simpleText: '숟가락질이 많이 어렵거나 스스로 도구를 쓰지 못해요', value: 'heavy' },
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q2'];
@@ -51,13 +51,13 @@ export const feedingCareAlgorithm = {
 
     q3: {
       id: 'q3',
-      title: '팔의 근력 평가',
-      simpleTitle: '팔을 들지 못하는가 (< Grade III)',
+      title: '팔의 근력 평가 (팔을 들지 못하는가)',
+      simpleTitle: '스스로 팔을 들어 올릴 수 있나요?',
       iconType: 'balance',
       type: 'single',
       options: [
-        { id: 'q3_low', text: '예', simpleText: '예', value: 'low' },
-        { id: 'q3_high', text: '아니오', simpleText: '아니오', value: 'high' }
+        { id: 'q3_low', text: '아니오 (<Grade III)', simpleText: '팔을 위로 들어 올릴 수 없어요', value: 'low' },
+        { id: 'q3_high', text: '예', simpleText: '팔을 스스로 들 수는 있지만, 버티는 힘이 약하거나 수저 조작이 서툴러요', value: 'high' }
       ],
       resultId: (answers: Record<string, any>) => {
         const val = answers['q3'];

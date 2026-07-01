@@ -1221,11 +1221,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                     : 'border-teal-200/80 bg-teal-50/20 text-teal-900/80 shadow-sm cursor-pointer hover:shadow-md hover:border-teal-400'
                                }`
                             : `rounded-2xl border-2 ${
-                                isHighlightedResult
-                                  ? 'border-blue-600 bg-blue-600 text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-blue-600/20'
-                                  : isActive
-                                    ? 'border-blue-500 bg-blue-50 text-blue-950 shadow-md ring-4 ring-blue-500/20 scale-[1.02] z-20 cursor-default'
-                                    : 'border-blue-200/80 bg-blue-50/10 text-blue-900 shadow-sm cursor-pointer hover:shadow-md hover:border-blue-400'
+                                isActive
+                                  ? 'border-purple-500 bg-purple-50 text-purple-950 shadow-md ring-4 ring-purple-100/30 scale-[1.02] z-20 cursor-default'
+                                  : 'border-purple-200/80 bg-purple-50/10 text-purple-900 shadow-sm cursor-pointer hover:shadow-md hover:border-purple-400'
                                }`
                         }`}
                         style={{
@@ -1237,19 +1235,20 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
-                            {/* Card Top Label */}
-                            <div className="flex justify-between items-center w-full mb-1">
-                              <span className={`text-xs sm:text-sm font-black uppercase tracking-wider ${
-                                isHighlightedResult ? 'text-white/80' : isActive ? 'text-blue-600' : 'text-slate-400'
-                              }`}>
-                                {node.typeLabel}
-                              </span>
-                            </div>
                             <h4 className={`text-base sm:text-[18px] font-black leading-snug text-left ${
                               isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
                               {cleanInternalCodes(node.label)}
                             </h4>
+                            {!isResult && (() => {
+                              const q = algorithm.questions[id];
+                              const simpleTitle = q ? (q.simpleTitle || q.title) : '';
+                              return simpleTitle ? (
+                                <div className="text-[11px] font-semibold text-purple-800 bg-purple-100/50 rounded-lg px-2 py-1 text-center mt-1.5 leading-snug border border-purple-200/40">
+                                  {simpleTitle}
+                                </div>
+                              ) : null;
+                            })()}
                           </div>
 
                           {!isResult && outgoingEdges.length > 0 && (() => {
@@ -1497,10 +1496,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <div className="space-y-1">
                           {/* Card Top Label */}
                           <div className="flex justify-between items-center w-full">
-                            <span className={`font-black uppercase tracking-wider ${
-                              uiMode === 'simple' ? 'text-[10px] sm:text-xs' : 'text-[8px]'
-                            } ${isHighlightedResult ? 'text-white/80' : isActive ? 'text-primary' : 'text-slate-400'}`}>
-                              {isResult ? '추천 유형' : (uiMode === 'simple' ? '평가 문항' : node.typeLabel)}
+                            <span className="text-[10px] uppercase font-bold text-slate-400">
                             </span>
                             
                             {/* Completed checkmark */}
