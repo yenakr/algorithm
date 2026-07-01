@@ -1235,20 +1235,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
+                            {!isResult && node.typeLabel && (
+                              <div className="text-[11.5px] font-black text-slate-500 bg-slate-100 border border-slate-200/60 px-2.5 py-0.5 rounded-lg inline-block mb-1.5 self-start">
+                                {node.typeLabel}
+                              </div>
+                            )}
                             <h4 className={`text-base sm:text-[18px] font-black leading-snug text-left ${
                               isHighlightedResult ? 'text-white' : 'text-slate-900'
                             }`}>
-                              {cleanInternalCodes(node.label)}
+                              {isResult
+                                ? cleanInternalCodes(algorithm.results[id]?.title || node.label)
+                                : cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
                             </h4>
-                            {!isResult && (() => {
-                              const q = algorithm.questions[id];
-                              const simpleTitle = q ? (q.simpleTitle || q.title) : '';
-                              return simpleTitle ? (
-                                <div className="text-[11px] font-semibold text-purple-800 bg-purple-100/50 rounded-lg px-2 py-1 text-center mt-1.5 leading-snug border border-purple-200/40">
-                                  {simpleTitle}
-                                </div>
-                              ) : null;
-                            })()}
                           </div>
 
                           {!isResult && outgoingEdges.length > 0 && (() => {
@@ -1497,6 +1495,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           {/* Card Top Label */}
                           <div className="flex justify-between items-center w-full">
                             <span className="text-[10px] uppercase font-bold text-slate-400">
+                              {!isResult && node.typeLabel}
                             </span>
                             
                             {/* Completed checkmark */}
@@ -1512,8 +1511,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                             uiMode === 'simple' ? 'text-sm sm:text-base md:text-lg' : 'text-xs font-bold'
                           } ${isHighlightedResult ? 'text-white' : 'text-slate-850'}`}>
                             {isResult 
-                              ? cleanInternalCodes(algorithm.results[id]?.simpleTitle || algorithm.results[id]?.title || node.label)
-                              : cleanInternalCodes(getDisplayText(algorithm.questions[id], 'title', uiMode) || node.label)}
+                              ? cleanInternalCodes(algorithm.results[id]?.title || node.label)
+                              : cleanInternalCodes(algorithm.questions[id]?.title || node.label)}
                           </h4>
                         </div>
 

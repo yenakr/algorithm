@@ -255,8 +255,7 @@ export const resultToRobotTypeMap: Record<string, { category: 'transfer' | 'toil
   'B-E': { category: 'toileting', robotTypeId: 'toileting-prediction' },
   'B-F': { category: 'toileting', robotTypeId: 'toileting-prediction' },
   'B-G': { category: 'toileting', robotTypeId: 'toileting-auto-care' },
-  'B-H': { category: 'toileting', robotTypeId: 'toileting-auto-care' },
-  'B-I': { category: 'toileting', robotTypeId: 'smart-diaper-monitoring' },
+  'B-H': { category: 'toileting', robotTypeId: 'smart-diaper-monitoring' },
 
   // 식사돌봄 결과 기기 매핑
   'F-B': { category: 'feeding', robotTypeId: 'feeding-manual' },

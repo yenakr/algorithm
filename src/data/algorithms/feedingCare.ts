@@ -7,10 +7,10 @@ export const feedingCareAlgorithm = {
   questions: {
     q1: {
       id: 'q1',
-      title: '삼킴 기능 평가',
-      simpleTitle: '삼킴 기능 평가',
-      description: '구강섭취 가능?',
-      simpleDescription: '구강섭취 가능?',
+      title: '구강섭취가 가능한가',
+      simpleTitle: '구강섭취가 가능한가',
+      description: '삼킴 기능 평가',
+      simpleDescription: '삼킴 기능 평가',
       iconType: 'safety',
       type: 'single',
       options: [
@@ -31,10 +31,10 @@ export const feedingCareAlgorithm = {
 
     q2: {
       id: 'q2',
-      title: '먹기/마시기 기능평가',
-      simpleTitle: '먹기/마시기 기능평가',
-      description: '중간 정도 이상의 어려움이 있는가?',
-      simpleDescription: '중간 정도 이상의 어려움이 있는가?',
+      title: '중간 정도 이상의 어려움이 있는가',
+      simpleTitle: '중간 정도 이상의 어려움이 있는가',
+      description: '먹기/마시기 기능평가',
+      simpleDescription: '먹기/마시기 기능평가',
       iconType: 'transfer',
       type: 'single',
       options: [
@@ -55,10 +55,10 @@ export const feedingCareAlgorithm = {
 
     q3: {
       id: 'q3',
-      title: '팔의 근력 평가',
-      simpleTitle: '팔의 근력 평가',
-      description: '팔을 들지 못하는가 (< Grade III)',
-      simpleDescription: '팔을 들지 못하는가 (< Grade III)',
+      title: '팔을 들지 못하는가 (< Grade III)',
+      simpleTitle: '팔을 들지 못하는가 (< Grade III)',
+      description: '팔의 근력 평가**',
+      simpleDescription: '팔의 근력 평가**',
       iconType: 'balance',
       type: 'single',
       options: [

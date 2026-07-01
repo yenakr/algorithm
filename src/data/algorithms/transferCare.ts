@@ -43,10 +43,10 @@ export const transferCareAlgorithm = {
   questions: {
     q1: {
       id: 'q1',
-      title: '자리이동하기 기능평가*',
-      simpleTitle: '자리이동하기 기능평가*',
-      description: '중간 정도 이상의 어려움(2~4)이 있는가?',
-      simpleDescription: '중간 정도 이상의 어려움(2~4)이 있는가?',
+      title: '중간 정도 이상의 어려움(2~4)이 있는가',
+      simpleTitle: '중간 정도 이상의 어려움(2~4)이 있는가',
+      description: '자리이동하기 기능평가*',
+      simpleDescription: '자리이동하기 기능평가*',
       iconType: 'transfer',
       type: 'single',
       options: [
@@ -67,10 +67,10 @@ export const transferCareAlgorithm = {
 
     q2: {
       id: 'q2',
-      title: '하지 근력 평가',
-      simpleTitle: '하지 근력 평가',
-      description: '체중을 지탱할 수 있는가 (<Grade IV)',
-      simpleDescription: '체중을 지탱할 수 있는가 (<Grade IV)',
+      title: '체중을 지탱할 수 없는가 (<Grade IV)',
+      simpleTitle: '체중을 지탱할 수 없는가 (<Grade IV)',
+      description: '하지 근력 평가**',
+      simpleDescription: '하지 근력 평가**',
       iconType: 'balance',
       type: 'single',
       options: [
@@ -79,8 +79,8 @@ export const transferCareAlgorithm = {
       ],
       nextQuestionId: (answers: Record<string, any>) => {
         const val = answers['q2'];
-        if (val === 'yes') return 'q4';
-        return 'q3';
+        if (val === 'yes') return 'q3';
+        return 'q4';
       }
     } as Question,
 
@@ -88,8 +88,8 @@ export const transferCareAlgorithm = {
       id: 'q3',
       title: '슬링 적용방식 고려',
       simpleTitle: '슬링 적용방식 고려',
-      description: '슬링 적용방식을 선택해주세요',
-      simpleDescription: '슬링 적용방식을 선택해주세요',
+      description: '환경 요소 고려',
+      simpleDescription: '환경 요소 고려',
       iconType: 'safety',
       type: 'single',
       options: [
@@ -110,8 +110,8 @@ export const transferCareAlgorithm = {
       id: 'q4',
       title: '스스로 상체를 일으킬 수 없는가?',
       simpleTitle: '스스로 상체를 일으킬 수 없는가?',
-      description: '상체 조절이 가능한지 평가합니다.',
-      simpleDescription: '상체 조절이 가능한지 평가합니다.',
+      description: '기립보조리프트 / 스탠딩리프트',
+      simpleDescription: '기립보조리프트 / 스탠딩리프트',
       iconType: 'balance',
       type: 'single',
       options: [
@@ -129,10 +129,10 @@ export const transferCareAlgorithm = {
   results: {
     'T-B': {
       id: 'T-B',
-      title: '이승보조장비 이용',
-      simpleTitle: '이승보조장비 이용',
-      description: '이승보조장비 이용',
-      simpleDescription: '이승보조장비 이용',
+      title: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
+      simpleTitle: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
+      description: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
+      simpleDescription: '가벼운 정도의 어려움이 있다면, • 이승보조장비 이용',
       recommendation: '슬라이딩 보드 또는 이승벨트를 사용하여 안전한 이동을 지원합니다.',
       simpleRecommendation: '침대와 휠체어 사이를 매끄럽게 연결하는 슬라이딩 보드(미끄럼판)나 보호자가 잡는 이승 부축 벨트를 추천합니다.',
       reason: '자리이동하기 기능평가 결과 가벼운 정도의 어려움이 존재하나 체중 지지나 일상 수행은 크게 훼손되지 않은 단계입니다.',
@@ -140,10 +140,10 @@ export const transferCareAlgorithm = {
     },
     'T-C': {
       id: 'T-C',
-      title: '전동형 기립보조리프트 (예: 히그, 업고플러스)',
-      simpleTitle: '전동형 기립보조리프트 (예: 히그, 업고플러스)',
-      description: '전동형 기립보조리프트 (예: 히그, 업고플러스)',
-      simpleDescription: '전동형 기립보조리프트 (예: 히그, 업고플러스)',
+      title: '전동형 기립보조리프트 (예: 허그, 업고플러스)',
+      simpleTitle: '전동형 기립보조리프트 (예: 허그, 업고플러스)',
+      description: '전동형 기립보조리프트 (예: 허그, 업고플러스)',
+      simpleDescription: '전동형 기립보조리프트 (예: 허그, 업고플러스)',
       recommendation: '모터 구동식 전동형 기립보조리프트(허그, 업고플러스 등) 고려를 추천합니다.',
       simpleRecommendation: '벨트로 엉덩이와 등을 받친 후 단추만 누르면 알아서 일으켜 태우고 이동할 수 있는 전동 기립 리프트를 추천합니다.',
       reason: '체중을 스스로 지탱하지는 못하지만 상체를 가눌 힘이 남아 있어, 등판을 벨트로 감싸 안전하게 일으켜 세우는 전동 기립보조 로봇이 적합합니다.',
@@ -169,7 +169,7 @@ export const transferCareAlgorithm = {
       recommendation: '슬링 없이 이승을 보조할 수 있는 로베아 기기의 도입을 고려합니다.',
       simpleRecommendation: '슬링 그네 시트를 사용하지 않고 안전하게 앉아서 이동하는 로베아형 장비를 추천합니다.',
       reason: '천장이나 벽 설치가 불가능하고 바닥 틈새가 있는 주거환경에서 슬링 없는 전동 리프트가 최적의 이승을 지원합니다.',
-      simpleResultSummary: '슬링 체결이 번거로울 때 시트 슬라이딩만으로 이송할 수 있는 슬링 없는 리프트를 추천합니다.'
+      simpleResultSummary: '슬링 체결이 번거롵을 때 시트 슬라이딩만으로 이송할 수 있는 슬링 없는 리프트를 추천합니다.'
     },
     'T-F': {
       id: 'T-F',
