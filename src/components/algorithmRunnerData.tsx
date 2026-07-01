@@ -453,46 +453,51 @@ export const learningGuides: Record<string, { title: string; content: string; de
 // Node positioning and styling configurations (Detail Mode React Flow coordinates)
 // isLabel: true = 선택지 없는 표시 전용 통과 노드
 export const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; noButtons?: boolean; typeLabel: string }> = {
-  // 표시 전용 노드 (레이블 박스)
-  'lbl-start':   { x: 460, y: 0,   label: "자리이동하기 기능평가*",   isLabel: true, typeLabel: "" },
-  // 의사결정 노드
-  q1:  { x: 460, y: 130, label: "중간 정도 이상의 어려움(2~4)이 있는가",  typeLabel: "" },
-  q2:  { x: 775, y: 350, label: "체중을 지탱할 수 없는가 (<Grade IV)",    typeLabel: "하지 근력 평가**" },
-  // 기립보조 경로
-  'lbl-standing': { x: 310, y: 530, label: "기립보조리프트 / 스탠딩리프트", isLabel: true, typeLabel: "" },
-  q4:  { x: 310, y: 660, label: "스스로 상체를 일으킬 수 없는가",          typeLabel: "" },
-  // 전신슬링 경로
-  'lbl-sling':    { x: 1060, y: 530, label: "전신슬링리프트",               isLabel: true, typeLabel: "" },
-  'lbl-env':      { x: 1060, y: 620, label: "환경적 요소 고려",             isLabel: true, typeLabel: "" },
-  q3:  { x: 1060, y: 710, label: "슬링 적용방식 고려",                      typeLabel: "", isLabel: true },
-  // 결과
-  'T-B': { x: 0,    y: 880, label: "가벼운 정도의 어려움이 있다면,\n• 이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
-  'T-C': { x: 220,  y: 880, label: "전동형 기립보조리프트\n(예: 히그, 업고플러스)",        isResult: true, typeLabel: "추천 결과" },
-  'T-D': { x: 440,  y: 880, label: "비전동형 기립보조기기",                               isResult: true, typeLabel: "추천 결과" },
-  'T-E': { x: 760,  y: 880, label: "슬링 없음\n(예: 로베아)",                              isResult: true, typeLabel: "추천 결과" },
-  'T-F': { x: 980,  y: 880, label: "슬링 자동 삽입\n(예: 맨엔텔 자세 변환형 전동의자)",   isResult: true, typeLabel: "추천 결과" },
-  'T-G': { x: 1200, y: 880, label: "슬링 수동 체결\n(예: 슬라, 사스케)",                 isResult: true, typeLabel: "추천 결과" },
+  // 레이블(표시 전용) 노드
+  'lbl-start':    { x: 290, y: 0,    label: "자리이동하기 기능평가*",          isLabel: true,  typeLabel: "" },
+  // q1: 중앙, lbl-start 바로 아래
+  q1:             { x: 290, y: 60,   label: "중간 정도 이상의 어려움(2~4)이 있는가", typeLabel: "" },
+  // T-B: q1 아니오 → q2와 같은 y레벨, 왼쪽에 배치 (선이 짧아짐)
+  'T-B':          { x: 0,   y: 360,  label: "가벼운 정도의 어려움이 있다면,\n• 이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
+  // q2: q1 예 → 오른쪽
+  q2:             { x: 560, y: 360,  label: "체중을 지탱할 수 없는가 (<Grade IV)", typeLabel: "하지 근력 평가**" },
+  // 기립보조 경로 (q2 아니오 → 왼쪽 중앙)
+  'lbl-standing': { x: 230, y: 690,  label: "기립보조리프트 / 스탠딩리프트",    isLabel: true,  typeLabel: "" },
+  q4:             { x: 230, y: 790,  label: "스스로 상체를 일으킬 수 없는가",    typeLabel: "" },
+  // 전신슬링 경로 (q2 예 → 오른쪽)
+  'lbl-sling':    { x: 910, y: 690,  label: "전신슬링리프트",                   isLabel: true,  typeLabel: "" },
+  'lbl-env':      { x: 910, y: 790,  label: "환경적 요소 고려",                 isLabel: true,  typeLabel: "" },
+  q3:             { x: 910, y: 890,  label: "슬링 적용방식 고려",               noButtons: true, typeLabel: "" },
+  // 결과 노드
+  'T-D':          { x: 0,   y: 1120, label: "비전동형 기립보조기기",             isResult: true, typeLabel: "추천 결과" },
+  'T-C':          { x: 240, y: 1120, label: "전동형 기립보조리프트\n(예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
+  'T-E':          { x: 700, y: 1120, label: "슬링 없음\n(예: 로베아)",           isResult: true, typeLabel: "추천 결과" },
+  'T-F':          { x: 940, y: 1120, label: "슬링 자동 삽입\n(예: 맨엔텔 자세 변환형 전동의자)", isResult: true, typeLabel: "추천 결과" },
+  'T-G':          { x: 1190, y: 1120, label: "슬링 수동 체결\n(예: 슬라, 사스케)", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; typeLabel: string }> = {
-  // 표시 전용 노드
-  'lbl-start':  { x: 800, y: 0,   label: "배뇨감 인지 평가",     isLabel: true, typeLabel: "" },
-  // 의사결정 노드
-  q1:    { x: 800,  y: 100,  label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "" },
-  q2_a:  { x: 350,  y: 300, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "화장실 이동 평가" },
-  q2_b:  { x: 1250, y: 300, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "화장실 이동 평가" },
-  q3_a1: { x: 110,  y: 520, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
-  q3_a2: { x: 590,  y: 520, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
-  q3_b1: { x: 1030, y: 520, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
-  q3_b2: { x: 1470, y: 520, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
-  'B-A': { x: 0,    y: 740, label: "도움 필요",                                                                              isResult: true, typeLabel: "추천 결과" },
-  'B-B': { x: 220,  y: 740, label: "용변 후 처리 돕기 (비데 등)",                                                           isResult: true, typeLabel: "추천 결과" },
-  'B-C': { x: 440,  y: 740, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용",                                       isResult: true, typeLabel: "추천 결과" },
-  'B-D': { x: 660,  y: 740, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용 /\n용변 후 처리 돕기 추가 또는\n자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
-  'B-E': { x: 880,  y: 740, label: "시간에 맞춘 배뇨훈련 또는\n배변 프로그램 적용 /\n용변 후 처리 돕기 추가",               isResult: true, typeLabel: "추천 결과" },
-  'B-F': { x: 1100, y: 740, label: "시간에 맞춘 배뇨훈련 또는\n배변 프로그램 적용",                                         isResult: true, typeLabel: "추천 결과" },
-  'B-G': { x: 1320, y: 740, label: "자동 배설처리로봇 간헐적 이용",                                                          isResult: true, typeLabel: "추천 결과" },
-  'B-H': { x: 1540, y: 740, label: "자동 배설처리로봇 간헐적 이용 /\n흡인형 스마트 기저귀 로봇시스템 지속적 이용",           isResult: true, typeLabel: "추천 결과" },
+  // 배뇨감 레이블
+  'lbl-start':  { x: 790, y: 0,    label: "배뇨감 인지 평가",                  isLabel: true, typeLabel: "" },
+  // q1: 중앙
+  q1:           { x: 770, y: 60,   label: "중간 이상 어려움 (2~4)이 있는가",  typeLabel: "" },
+  // q1 아니오(왼쪽) / 예(오른쪽) → 화장실 이동 평가
+  q2_a:         { x: 330, y: 480,  label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "화장실 이동 평가" },
+  q2_b:         { x: 1210, y: 480, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "화장실 이동 평가" },
+  // q2 아니오/예 → 용변 후 청결 평가 (각 4개)
+  q3_a1:        { x: 100, y: 820,  label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
+  q3_a2:        { x: 550, y: 820,  label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
+  q3_b1:        { x: 1000, y: 820, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
+  q3_b2:        { x: 1450, y: 820, label: "중간 이상 어려움 (2~4)이 있는가", typeLabel: "용변 후 청결 평가" },
+  // 결과 노드 (8개, 각 220px 간격)
+  'B-A':        { x: 0,    y: 1150, label: "도움 필요",                                                                                isResult: true, typeLabel: "추천 결과" },
+  'B-B':        { x: 230,  y: 1150, label: "용변 후 처리 돕기 (비데 등)",                                                              isResult: true, typeLabel: "추천 결과" },
+  'B-C':        { x: 460,  y: 1150, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용",                                        isResult: true, typeLabel: "추천 결과" },
+  'B-D':        { x: 690,  y: 1150, label: "화장실 이동 돕기 +\n침상 배설 또는 이동 변기 이용 /\n용변 후 처리 돕기 추가 또는\n자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-E':        { x: 920,  y: 1150, label: "시간에 맞춘 배뇨훈련 또는\n배변 프로그램 적용 /\n용변 후 처리 돕기 추가",                  isResult: true, typeLabel: "추천 결과" },
+  'B-F':        { x: 1150, y: 1150, label: "시간에 맞춘 배뇨훈련 또는\n배변 프로그램 적용",                                            isResult: true, typeLabel: "추천 결과" },
+  'B-G':        { x: 1380, y: 1150, label: "자동 배설처리로봇 간헐적 이용",                                                             isResult: true, typeLabel: "추천 결과" },
+  'B-H':        { x: 1610, y: 1150, label: "자동 배설처리로봇 간헐적 이용 /\n흡인형 스마트 기저귀 로봇시스템 지속적 이용",              isResult: true, typeLabel: "추천 결과" },
 };
 
 export const transferEdges = [
@@ -534,17 +539,24 @@ export const toiletingEdges = [
 ];
 
 export const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; typeLabel: string }> = {
-  // 표시 전용 노드
-  'lbl-start':     { x: 570, y: 0,   label: "삼킴 기능 평가",      isLabel: true, typeLabel: "" },
-  'lbl-food-type': { x: 310, y: 240, label: "식사 종류 확인",        isLabel: true, typeLabel: "" },
+  // 레이블 노드
+  'lbl-start':     { x: 400, y: 0,    label: "삼킴 기능 평가",                  isLabel: true, typeLabel: "" },
+  'lbl-food-type': { x: 90,  y: 360,  label: "식사 종류 확인",                   isLabel: true, typeLabel: "" },
   // 의사결정 노드
-  q1: { x: 570, y: 100,  label: "구강섭취 가능한가",                  typeLabel: "" },
-  q2: { x: 310, y: 380,  label: "중간 정도 이상의 어려움이 있는가",   typeLabel: "먹기/마시기 기능평가" },
-  q3: { x: 520, y: 580,  label: "팔을 들지 못하는가 (< Grade III)",  typeLabel: "팔의 근력 평가**" },
-  'F-A': { x: 100, y: 720, label: "가벼운 정도의 어려움이 있다면,\n• 특수식사도구 이용 (코 부위가 절린 컵, 경사 접시 등)\n• 수동형 팔 지지대 이용",                    isResult: true, typeLabel: "추천 결과" },
-  'F-B': { x: 380, y: 720, label: "전자동 식사돌봄로봇 이용",                                                                                                             isResult: true, typeLabel: "추천 결과" },
-  'F-C': { x: 660, y: 720, label: "팔의 근력에 따라,\n• 부분 식사보조기기 이용 (예: 스프링 팔 지지대)\n• 수동/반자동 식사돌봄로봇 이용",                               isResult: true, typeLabel: "추천 결과" },
-  'F-D': { x: 940, y: 720, label: "구강 섭취 불가능 시,\n• 의료진의 지시에 따름.\n• 건강 영양 또는 완전 비경구영양\n식사 시 사래와 기침 시,\n• 구강 섭취(물 포함) 중단\n• 의료진과 상의", isResult: true, typeLabel: "추천 결과" },
+  // q1: lbl-start 바로 아래, 중앙
+  q1:              { x: 390, y: 60,   label: "구강섭취 가능한가",                typeLabel: "" },
+  // lbl-food-type(예) 아래에 q2 배치
+  q2:              { x: 140, y: 480,  label: "중간 정도 이상의 어려움이 있는가", typeLabel: "먹기/마시기 기능평가" },
+  // q2 예 → q3
+  q3:              { x: 290, y: 820,  label: "팔을 들지 못하는가 (< Grade III)", typeLabel: "팔의 근력 평가**" },
+  // 결과 노드
+  // F-D: q1 아니오 → 오른쪽에 q1과 같은 y레벨 (선이 짧아짐)
+  'F-D':           { x: 720, y: 360,  label: "구강 섭취 불가능 시,\n• 의료진의 지시에 따름.\n• 건강 영양 또는 완전 비경구영양\n식사 시 사래와 기침 시,\n• 구강 섭취(물 포함) 중단\n• 의료진과 상의", isResult: true, typeLabel: "추천 결과" },
+  // F-A: q2 아니오 → 왼쪽, q3와 같은 y레벨
+  'F-A':           { x: 0,   y: 820,  label: "가벼운 정도의 어려움이 있다면,\n• 특수식사도구 이용 (코 부위가 절린 컵, 경사 접시 등)\n• 수동형 팔 지지대 이용", isResult: true, typeLabel: "추천 결과" },
+  // F-B, F-C: q3 아래
+  'F-B':           { x: 180, y: 1150, label: "전자동 식사돌봄로봇 이용",         isResult: true, typeLabel: "추천 결과" },
+  'F-C':           { x: 420, y: 1150, label: "팔의 근력에 따라,\n• 부분 식사보조기기 이용 (예: 스프링 팔 지지대)\n• 수동/반자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const feedingEdges = [

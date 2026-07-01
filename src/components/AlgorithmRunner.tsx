@@ -1222,13 +1222,15 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     const outgoingEdges = edges.filter(e => e.from === id);
 
                     const isLabel = (node as any).isLabel === true;
+                    const isNoButtons = (node as any).noButtons === true;
+                    const isLabelStyle = isLabel || isNoButtons; // 비주얼이 레이블처럼 보이는 노드
 
                     return (
                       <div
                         key={id}
-                        onClick={() => !isLabel && handleNodeClick(id)}
+                        onClick={() => !isLabelStyle && handleNodeClick(id)}
                         className={`absolute pointer-events-auto flex flex-col justify-center p-4 select-none transition-all duration-300 ${dimOpacity} ${
-                          isLabel
+                          isLabelStyle
                             ? 'rounded-xl border-2 border-blue-200 bg-blue-50/60 text-blue-800 shadow-sm cursor-default'
                             : isResult
                               ? `rounded-2xl border-2 ${
@@ -1260,7 +1262,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                 {node.typeLabel}
                               </p>
                             )}
-                            {(node as any).isLabel ? (
+                            {isLabelStyle ? (
                                <p className="text-[17px] font-extrabold text-slate-700 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
                             ) : isResult ? (
                               <div className="space-y-1.5 text-left">
@@ -1285,7 +1287,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                             )}
                           </div>
 
-                          {!isResult && !isLabel && !(node as any).noButtons && outgoingEdges.filter(e => e.label).length > 0 && (() => {
+                          {!isResult && !isLabelStyle && !(node as any).noButtons && outgoingEdges.filter(e => e.label).length > 0 && (() => {
                             const labeledEdges = outgoingEdges.filter(e => e.label);
                             const allLabels = labeledEdges.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
                             const maxLen = Math.max(...allLabels.map(l => l.length));
