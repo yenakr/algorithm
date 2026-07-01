@@ -464,7 +464,7 @@ export const transferNodes: Record<string, { x: number; y: number; label: string
   // 전신슬링 경로
   'lbl-sling':    { x: 1060, y: 530, label: "전신슬링리프트",               isLabel: true, typeLabel: "" },
   'lbl-env':      { x: 1060, y: 620, label: "환경적 요소 고려",             isLabel: true, typeLabel: "" },
-  q3:  { x: 1060, y: 710, label: "슬링 적용방식 고려",                      typeLabel: "", noButtons: true },
+  q3:  { x: 1060, y: 710, label: "슬링 적용방식 고려",                      typeLabel: "", isLabel: true },
   // 결과
   'T-B': { x: 0,    y: 880, label: "가벼운 정도의 어려움이 있다면,\n• 이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
   'T-C': { x: 220,  y: 880, label: "전동형 기립보조리프트\n(예: 히그, 업고플러스)",        isResult: true, typeLabel: "추천 결과" },

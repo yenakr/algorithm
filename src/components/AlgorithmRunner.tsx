@@ -1029,7 +1029,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                     if (currentQuestion.type === 'multi') {
                                       handleMultiToggle(opt.value);
                                     } else {
-                                      handleSimpleOptionClick(opt.value);
+                                      // 단일 선택 시 자동 진행
+                                      setTempSelectedSimple(opt.value);
+                                      handleSingleSelect(currentQuestionId!, opt.value);
                                     }
                                   }}
                                   className={`w-full text-left rounded-xl border transition-all duration-250 p-5 flex items-center justify-between cursor-pointer group ${
@@ -1049,11 +1051,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                 </button>
                               );
                             })}
-                          </div>
-
-                          {/* Destination Footer (➔ 다음: ... / 💡 추천: ... ) */}
-                          <div className="bg-blue-50/70 text-blue-800 text-sm sm:text-base font-black py-2.5 px-3.5 rounded-xl border border-blue-100/60 text-center">
-                            {group.label}
                           </div>
                         </div>
                       );
@@ -1080,7 +1077,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             <div className="w-28" />
           )}
 
-          {/* Action/Next Button */}
+          {/* Action/Next Button - result 또는 multi 타입일 때만 표시 */}
           {isResultPage ? (
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {onLearnMore && (
@@ -1099,16 +1096,12 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 처음부터 다시하기
               </button>
             </div>
-          ) : (
+          ) : currentQuestion?.type === 'multi' ? (
             <button
-              onClick={handleSimpleNext}
-              disabled={
-                currentQuestion?.type === 'multi'
-                  ? tempMultiSelect.length === 0
-                  : !tempSelectedSimple
-              }
+              onClick={() => handleMultiSubmit(currentQuestionId!)}
+              disabled={tempMultiSelect.length === 0}
               className={`px-8 py-3.5 rounded-xl font-extrabold transition-all flex items-center gap-1.5 shadow text-base sm:text-lg cursor-pointer ${
-                (currentQuestion?.type === 'multi' ? tempMultiSelect.length > 0 : !!tempSelectedSimple)
+                tempMultiSelect.length > 0
                   ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-md scale-[1.01] hover:scale-[1.03] active:scale-[0.98]'
                   : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
               }`}
@@ -1116,6 +1109,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               <span>다음 단계</span>
               <ChevronRight className="w-5 h-5 shrink-0" />
             </button>
+          ) : (
+            <div className="w-28" />
           )}
         </div>
       </div>
@@ -1262,10 +1257,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       >
                         <div className="flex-1 flex flex-col justify-between gap-3">
                           <div>
-                            {!isResult && !((node as any).isLabel) && node.typeLabel && (
-                              <div className="text-[13px] font-black text-slate-500 bg-slate-100 border border-slate-200/60 px-2.5 py-0.5 rounded-lg inline-block mb-2 self-start">
+                            {!isResult && !isLabel && node.typeLabel && (
+                              <p className="text-[13px] font-extrabold text-blue-500 mb-1 leading-tight">
                                 {node.typeLabel}
-                              </div>
+                              </p>
                             )}
                             {(node as any).isLabel ? (
                                <p className="text-[17px] font-extrabold text-slate-700 text-center leading-snug">{cleanInternalCodes(node.label)}</p>
