@@ -1023,7 +1023,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                             {itemsToRender.map((itemStr, index) => (
                                               <div 
                                                 key={index}
-                                                className={`rounded-2xl p-5 border text-lg sm:text-xl md:text-2xl font-black leading-relaxed shadow-sm transition-colors bg-white text-slate-900 ${
+                                                className={`rounded-2xl p-5 border text-lg sm:text-xl md:text-2xl font-semibold leading-relaxed shadow-sm transition-colors bg-white text-slate-900 ${
                                                   isSelected
                                                     ? 'border-blue-400/70 bg-white ring-1 ring-blue-400/30'
                                                     : 'border-slate-200'
