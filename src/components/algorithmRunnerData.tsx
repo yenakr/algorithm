@@ -454,26 +454,27 @@ export const learningGuides: Record<string, { title: string; content: string; de
 // isLabel: true = 선택지 없는 표시 전용 통과 노드
 export const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; noButtons?: boolean; typeLabel: string }> = {
   // 레이블(표시 전용) 노드
-  'lbl-start':    { x: 290, y: 0,    label: "자리이동하기 기능평가*",          isLabel: true,  typeLabel: "" },
+  'lbl-start':    { x: 390, y: 0,    label: "자리이동하기 기능평가*",          isLabel: true,  typeLabel: "" },
   // q1: 중앙, lbl-start 바로 아래
-  q1:             { x: 290, y: 60,   label: "중간 정도 이상의 어려움(2~4)이 있는가", typeLabel: "" },
-  // T-B: q1 아니오 → q2와 같은 y레벨, 왼쪽에 배치 (선이 짧아짐)
+  q1:             { x: 390, y: 60,   label: "중간 정도 이상의 어려움(2~4)이 있는가", typeLabel: "" },
+  // T-B: q1 아니오 → 왼쪽에 배치
   'T-B':          { x: 0,   y: 360,  label: "가벼운 정도의 어려움이 있다면,\n• 이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
-  // q2: q1 예 → 오른쪽
-  q2:             { x: 560, y: 360,  label: "체중을 지탱할 수 없는가 (<Grade IV)", typeLabel: "하지 근력 평가**" },
-  // 기립보조 경로 (q2 아니오 → 왼쪽 중앙)
-  'lbl-standing': { x: 230, y: 690,  label: "기립보조리프트 / 스탠딩리프트",    isLabel: true,  typeLabel: "" },
-  q4:             { x: 230, y: 790,  label: "스스로 상체를 일으킬 수 없는가",    typeLabel: "" },
-  // 전신슬링 경로 (q2 예 → 오른쪽)
-  'lbl-sling':    { x: 910, y: 690,  label: "전신슬링리프트",                   isLabel: true,  typeLabel: "" },
-  'lbl-env':      { x: 910, y: 790,  label: "환경적 요소 고려",                 isLabel: true,  typeLabel: "" },
-  q3:             { x: 910, y: 890,  label: "슬링 적용방식 고려",               noButtons: true, typeLabel: "" },
+  // q2: q1 예 → 오른쪽에 배치
+  q2:             { x: 670, y: 360,  label: "체중을 지탱할 수 없는가 (<Grade IV)", typeLabel: "하지 근력 평가**" },
+  // 기립보조 경로 (q2 아니오 → 왼쪽으로 배치)
+  'lbl-standing': { x: 370, y: 690,  label: "기립보조리프트 / 스탠딩리프트",    isLabel: true,  typeLabel: "" },
+  q4:             { x: 370, y: 790,  label: "스스로 상체를 일으킬 수 없는가",    typeLabel: "" },
+  // 전신슬링 경로 (q2 예 → 오른쪽으로 배치)
+  'lbl-sling':    { x: 970, y: 690,  label: "전신슬링리프트",                   isLabel: true,  typeLabel: "" },
+  'lbl-env':      { x: 970, y: 790,  label: "환경적 요소 고려",                 isLabel: true,  typeLabel: "" },
+  q3:             { x: 970, y: 890,  label: "슬링 적용방식 고려",               noButtons: true, typeLabel: "" },
   // 결과 노드
-  'T-D':          { x: 0,   y: 1120, label: "비전동형 기립보조기기",             isResult: true, typeLabel: "추천 결과" },
-  'T-C':          { x: 240, y: 1120, label: "전동형 기립보조리프트\n(예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
-  'T-E':          { x: 700, y: 1120, label: "슬링 없음\n(예: 로베아)",           isResult: true, typeLabel: "추천 결과" },
-  'T-F':          { x: 940, y: 1120, label: "슬링 자동 삽입\n(예: 맨엔텔 자세 변환형 전동의자)", isResult: true, typeLabel: "추천 결과" },
-  'T-G':          { x: 1190, y: 1120, label: "슬링 수동 체결\n(예: 슬라, 사스케)", isResult: true, typeLabel: "추천 결과" },
+  // q4 아니오 (비전동형) -> 왼쪽 / 예 (전동형) -> 오른쪽
+  'T-D':          { x: 190, y: 1120, label: "비전동형 기립보조기기",             isResult: true, typeLabel: "추천 결과" },
+  'T-C':          { x: 490, y: 1120, label: "전동형 기립보조리프트\n(예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
+  'T-E':          { x: 790, y: 1120, label: "슬링 없음\n(예: 로베아)",           isResult: true, typeLabel: "추천 결과" },
+  'T-F':          { x: 1040, y: 1120, label: "슬링 자동 삽입\n(예: 맨엔텔 자세 변환형 전동의자)", isResult: true, typeLabel: "추천 결과" },
+  'T-G':          { x: 1290, y: 1120, label: "슬링 수동 체결\n(예: 슬라, 사스케)", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; typeLabel: string }> = {
@@ -541,22 +542,22 @@ export const toiletingEdges = [
 export const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; isLabel?: boolean; typeLabel: string }> = {
   // 레이블 노드
   'lbl-start':     { x: 400, y: 0,    label: "삼킴 기능 평가",                  isLabel: true, typeLabel: "" },
-  'lbl-food-type': { x: 90,  y: 360,  label: "식사 종류 확인",                   isLabel: true, typeLabel: "" },
+  'lbl-food-type': { x: 570, y: 360,  label: "식사 종류 확인",                   isLabel: true, typeLabel: "" },
   // 의사결정 노드
   // q1: lbl-start 바로 아래, 중앙
   q1:              { x: 390, y: 60,   label: "구강섭취 가능한가",                typeLabel: "" },
   // lbl-food-type(예) 아래에 q2 배치
-  q2:              { x: 140, y: 480,  label: "중간 정도 이상의 어려움이 있는가", typeLabel: "먹기/마시기 기능평가" },
+  q2:              { x: 620, y: 480,  label: "중간 정도 이상의 어려움이 있는가", typeLabel: "먹기/마시기 기능평가" },
   // q2 예 → q3
-  q3:              { x: 290, y: 820,  label: "팔을 들지 못하는가 (< Grade III)", typeLabel: "팔의 근력 평가**" },
+  q3:              { x: 770, y: 820,  label: "팔을 들지 못하는가 (< Grade III)", typeLabel: "팔의 근력 평가**" },
   // 결과 노드
-  // F-D: q1 아니오 → 오른쪽에 q1과 같은 y레벨 (선이 짧아짐)
-  'F-D':           { x: 720, y: 360,  label: "구강 섭취 불가능 시,\n• 의료진의 지시에 따름.\n• 건강 영양 또는 완전 비경구영양\n식사 시 사래와 기침 시,\n• 구강 섭취(물 포함) 중단\n• 의료진과 상의", isResult: true, typeLabel: "추천 결과" },
-  // F-A: q2 아니오 → 왼쪽, q3와 같은 y레벨
-  'F-A':           { x: 0,   y: 820,  label: "가벼운 정도의 어려움이 있다면,\n• 특수식사도구 이용 (코 부위가 절린 컵, 경사 접시 등)\n• 수동형 팔 지지대 이용", isResult: true, typeLabel: "추천 결과" },
-  // F-B, F-C: q3 아래
-  'F-B':           { x: 180, y: 1150, label: "전자동 식사돌봄로봇 이용",         isResult: true, typeLabel: "추천 결과" },
-  'F-C':           { x: 420, y: 1150, label: "팔의 근력에 따라,\n• 부분 식사보조기기 이용 (예: 스프링 팔 지지대)\n• 수동/반자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
+  // F-D: q1 아니오 → 왼쪽에 배치
+  'F-D':           { x: 0,   y: 360,  label: "구강 섭취 불가능 시,\n• 의료진의 지시에 따름.\n• 건강 영양 또는 완전 비경구영양\n식사 시 사래와 기침 시,\n• 구강 섭취(물 포함) 중단\n• 의료진과 상의", isResult: true, typeLabel: "추천 결과" },
+  // F-A: q2 아니오 → 왼쪽에 배치
+  'F-A':           { x: 380, y: 820,  label: "가벼운 정도의 어려움이 있다면,\n• 특수식사도구 이용 (코 부위가 절린 컵, 경사 접시 등)\n• 수동형 팔 지지대 이용", isResult: true, typeLabel: "추천 결과" },
+  // q3 아니오 (F-C) -> 왼쪽 / 예 (F-B) -> 오른쪽
+  'F-C':           { x: 660, y: 1150, label: "팔의 근력에 따라,\n• 부분 식사보조기기 이용 (예: 스프링 팔 지지대)\n• 수동/반자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
+  'F-B':           { x: 940, y: 1150, label: "전자동 식사돌봄로봇 이용",         isResult: true, typeLabel: "추천 결과" },
 };
 
 export const feedingEdges = [

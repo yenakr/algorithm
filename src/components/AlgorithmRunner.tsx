@@ -1289,7 +1289,17 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           </div>
 
                           {!isResult && !isLabelStyle && !(node as any).noButtons && outgoingEdges.filter(e => e.label).length > 0 && (() => {
-                            const labeledEdges = outgoingEdges.filter(e => e.label);
+                            const labeledEdges = [...outgoingEdges.filter(e => e.label)].sort((a, b) => {
+                              const aLabel = getCustomEdgeLabel(a.from, a.to, a.label, algorithm.id);
+                              const bLabel = getCustomEdgeLabel(b.from, b.to, b.label, algorithm.id);
+                              const isNoA = aLabel.includes('아니오') || a.label.includes('no') || a.label.includes('none');
+                              const isYesA = aLabel.includes('예') || a.label.includes('yes');
+                              const isNoB = bLabel.includes('아니오') || b.label.includes('no') || b.label.includes('none');
+                              const isYesB = bLabel.includes('예') || b.label.includes('yes');
+                              if (isNoA && isYesB) return -1;
+                              if (isYesA && isNoB) return 1;
+                              return 0;
+                            });
                             const allLabels = labeledEdges.map(e => getCustomEdgeLabel(e.from, e.to, e.label, algorithm.id));
                             const maxLen = Math.max(...allLabels.map(l => l.length));
                             const useVertical = maxLen > 4;
