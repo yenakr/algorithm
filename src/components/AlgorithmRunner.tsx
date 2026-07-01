@@ -544,7 +544,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
       if (n.x + w > maxX) maxX = n.x + w;
       if (n.y + h > maxY) maxY = n.y + h;
     });
-    return { width: maxX + 40, height: maxY + 40 };
+    return { width: maxX + 300, height: maxY + 200 };
   })();
 
   const getBezierPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -1159,13 +1159,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           <div className="lg:col-span-12 w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
             <div 
               ref={wrapperRef}
-              className="w-full p-8 bg-slate-50/10 flex justify-center overflow-auto"
+              className="w-full p-8 bg-slate-50/10 overflow-auto scrollbar-thin scrollbar-thumb-slate-200"
             >
               <div
-                className="relative flex justify-center items-start pt-6 pl-4 pr-4 pb-6"
+                className="relative block mx-auto pt-6 pb-6"
                 style={{
-                  width: `${maxCoords.width * zoom}px`,
-                  height: `${maxCoords.height * zoom}px`,
+                  width: `${maxCoords.width * zoom + 120}px`,
+                  height: `${maxCoords.height * zoom + 120}px`,
+                  minWidth: `${maxCoords.width * zoom + 120}px`,
                   transition: 'width 0.15s ease-out, height 0.15s ease-out'
                 }}
               >
@@ -1173,15 +1174,18 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                   ref={containerRef}
                   className="relative select-none"
                   style={{ 
-                    width: `${maxCoords.width}px`, 
-                    height: `${maxCoords.height}px`,
+                    width: `${maxCoords.width + 120}px`, 
+                    height: `${maxCoords.height + 120}px`,
                     transform: `scale(${zoom})`,
                     transformOrigin: '0 0',
                     transition: 'transform 0.15s ease-out'
                   }}
                 >
                 {/* SVG Connections */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <svg 
+                  className="absolute inset-0 pointer-events-none z-0"
+                  style={{ width: `${maxCoords.width + 120}px`, height: `${maxCoords.height + 120}px` }}
+                >
                   {edges.map((edge, idx) => {
                     const fromNode = nodes[edge.from];
                     const toNode = nodes[edge.to];
