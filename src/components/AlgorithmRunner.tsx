@@ -860,14 +860,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
               return (
                 <div className="space-y-8 animate-fade-in text-center">
-                  <div className="space-y-3">
-                    <span className="text-4xl">🎉</span>
+                  <div className="space-y-2">
                     <h3 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                      어르신께 딱 맞는 돌봄 방법!
+                      추천 결과
                     </h3>
-                    <p className="text-lg text-slate-500 font-semibold">
-                      종합 분석 결과 아래의 돌봄로봇/기기를 추천해 드립니다.
-                    </p>
                   </div>
 
                   <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 sm:p-10 space-y-6 text-left max-w-2xl mx-auto">
