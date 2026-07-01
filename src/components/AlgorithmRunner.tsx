@@ -835,6 +835,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
               const whenToUse = res?.whenToUse;
               const precautions = res?.precautions || [];
 
+              const items = typeof deviceName === 'string' 
+                ? deviceName.split(/\s*[\+\/]\s*/g).map(s => s.trim()).filter(Boolean)
+                : [deviceName];
+
               return (
                 <div className="space-y-8 animate-fade-in text-center">
                   <div className="space-y-3">
@@ -849,15 +853,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
 
                   <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 sm:p-10 space-y-6 text-left max-w-2xl mx-auto">
                     {/* Device Icon/Badge */}
-                    <div className="flex items-center gap-3.5 border-b border-slate-100 pb-5">
-                      <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100 text-blue-600">
+                    <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
+                      <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-100 text-blue-600 shrink-0 mt-1">
                         <Bot className="w-8 h-8" />
                       </div>
-                      <div>
-                        <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest block">추천 돌봄로봇</span>
-                        <h4 className="text-2xl sm:text-3xl font-black text-slate-800 mt-0.5">
-                          {deviceName}
-                        </h4>
+                      <div className="space-y-2 flex-1">
+                        <div className="flex flex-col gap-2.5">
+                          {items.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-2 bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-3 shadow-sm">
+                              <span className="text-emerald-500 font-extrabold text-lg">•</span>
+                              <span className="text-lg sm:text-xl font-black text-slate-800 leading-snug">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
@@ -881,7 +891,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         <ThumbsUp className="w-5 h-5 text-emerald-500" />
                         왜 추천하나요?
                       </h5>
-                      <p className="text-base sm:text-lg text-slate-700 font-bold leading-relaxed whitespace-pre-wrap">
+                      <p className="text-base sm:text-lg text-slate-705 font-bold leading-relaxed whitespace-pre-wrap">
                         {cleanInternalCodes(reason)}
                       </p>
                     </div>
@@ -893,7 +903,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           <Info className="w-5 h-5 text-blue-500" />
                           이럴 때 사용하는 장비입니다
                         </h5>
-                        <p className="text-base sm:text-lg text-slate-700 font-bold leading-relaxed whitespace-pre-wrap">
+                        <p className="text-base sm:text-lg text-slate-705 font-bold leading-relaxed whitespace-pre-wrap">
                           {whenToUse}
                         </p>
                       </div>
@@ -920,7 +930,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
           ) : (
             /* Question Wizard Page */
             currentQuestion && (
-              <div className="space-y-10 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
+              <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
                 {getDisplayText(currentQuestion, 'description', 'simple') && (
                   <div className="text-center">
                     <p className="text-base sm:text-lg text-slate-500 font-extrabold leading-relaxed bg-blue-50/30 px-5 py-3 rounded-2xl border border-blue-100/30 inline-block">
@@ -932,8 +942,8 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                 {/* Local Decision Tree Flowchart */}
                 <div className="flex flex-col items-center py-2 select-none w-full">
                   {/* Root Node: Current Question */}
-                  <div className="relative bg-gradient-to-r from-blue-50 to-emerald-50/30 border-2 border-blue-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-md text-center ring-4 ring-blue-100/10">
-                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 leading-snug">
+                  <div className="relative bg-gradient-to-r from-purple-50 to-indigo-50/30 border-2 border-purple-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-md text-center ring-4 ring-purple-100/10">
+                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-purple-950 leading-snug">
                       {getDisplayText(currentQuestion, 'title', 'simple')}
                     </h4>
                   </div>
@@ -943,14 +953,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     <svg className="absolute inset-0 w-full h-full" style={{ minHeight: '48px' }}>
                       <defs>
                         <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                          <path d="M 0 2 L 10 5 L 0 8 z" fill="#94a3b8" />
+                          <path d="M 0 2 L 10 5 L 0 8 z" fill="#c084fc" />
                         </marker>
                       </defs>
-                      <line x1="50%" y1="0" x2="50%" y2="40%" stroke="#cbd5e1" strokeWidth="2" />
+                      <line x1="50%" y1="0" x2="50%" y2="40%" stroke="#e9d5ff" strokeWidth="2" />
                       {groupList.length === 2 ? (
                         <>
-                          <path d="M 50% 40% L 25% 40% L 25% 100%" fill="none" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
-                          <path d="M 50% 40% L 75% 40% L 75% 100%" fill="none" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
+                          <path d="M 50% 40% L 25% 40% L 25% 100%" fill="none" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
+                          <path d="M 50% 40% L 75% 40% L 75% 100%" fill="none" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
                         </>
                       ) : groupList.length > 2 ? (
                         <>
@@ -961,7 +971,7 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                 key={idx}
                                 d={`M 50% 40% L ${pct}% 40% L ${pct}% 100%`} 
                                 fill="none" 
-                                stroke="#cbd5e1" 
+                                stroke="#e9d5ff" 
                                 strokeWidth="2" 
                                 markerEnd="url(#arrow)" 
                               />
@@ -969,16 +979,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                           })}
                         </>
                       ) : (
-                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
                       )}
                     </svg>
+                  </div>
+
+                  {/* Subtitle / Condition */}
+                  <div className="text-base sm:text-lg font-black text-purple-900 bg-purple-50 border border-purple-200 px-5 py-2.5 rounded-2xl mb-6 shadow-sm">
+                    {getDisplayText(currentQuestion, 'simpleTitle', 'simple')}
                   </div>
 
                   {/* Grouped Destination Containers */}
                   <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
                     {groupList.map((group) => {
                       return (
-                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow transition-all space-y-5">
+                        <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-center shadow-sm hover:shadow transition-all space-y-5">
                           {/* Options in this group */}
                           <div className="space-y-3 flex-1 flex flex-col justify-center">
                             {group.options.map((opt) => {

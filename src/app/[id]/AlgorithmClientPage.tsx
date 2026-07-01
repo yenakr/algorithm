@@ -355,7 +355,7 @@ export default function AlgorithmClientPage({ algoId, quizzes }: AlgorithmClient
         >
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-slate-800">
-              사용자용
+              사용자용 (쉬운 버전, 질문형 - 판단기준 포함)
             </h2>
           </div>
           <div className="h-0.5 bg-slate-100 w-full" />
