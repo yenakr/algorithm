@@ -949,16 +949,25 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                       : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50/50 text-slate-700'
                                   }`}
                                 >
-                                  <div className="flex-1 pr-4">
-                                    <span className="text-base sm:text-lg md:text-xl font-black leading-snug block">
-                                      {getDisplayText(opt, 'text', 'simple')}
-                                    </span>
-                                    {optionDetails[`${currentQuestionId}_${opt.value}`] && (
-                                      <span className="text-xs sm:text-sm text-slate-400 mt-1 block font-semibold leading-normal">
-                                        {optionDetails[`${currentQuestionId}_${opt.value}`]}
+                                    <div className="flex-1 pr-4">
+                                      <span className="text-base sm:text-lg md:text-xl font-black leading-snug block">
+                                        {getDisplayText(opt, 'text', 'simple')}
                                       </span>
-                                    )}
-                                  </div>
+                                      {(() => {
+                                        const cleanQId = currentQuestionId!.replace('_', ''); // q2_a -> q2a
+                                        const optKey = `${cleanQId}_${opt.value}`; // q2a_yes, q2a_no
+                                        const alternativeOptKey = `${currentQuestionId}_${opt.value}`; // q1_yes, q1_no
+                                        const detailText = optionDetails[optKey] || optionDetails[alternativeOptKey];
+                                        if (detailText) {
+                                          return (
+                                            <span className="text-xs sm:text-sm text-slate-400 mt-1 block font-semibold leading-normal">
+                                              {detailText}
+                                            </span>
+                                          );
+                                        }
+                                        return null;
+                                      })()}
+                                    </div>
                                   <div className={`rounded-full border-2 transition-all shrink-0 w-6 h-6 flex items-center justify-center ${
                                     isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-350 bg-white'
                                   }`}>
