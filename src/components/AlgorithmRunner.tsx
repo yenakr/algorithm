@@ -903,45 +903,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                         />
                       </div>
                     )}
-
-                    {/* Simple Explanation */}
-                    <div className="space-y-1 bg-emerald-50/40 p-5 rounded-2xl border border-emerald-100/60">
-                      <h5 className="text-base font-extrabold text-emerald-800 flex items-center gap-1.5">
-                        <ThumbsUp className="w-5 h-5 text-emerald-500" />
-                        왜 추천하나요?
-                      </h5>
-                      <p className="text-base sm:text-lg text-slate-705 font-bold leading-relaxed whitespace-pre-wrap">
-                        {cleanInternalCodes(reason)}
-                      </p>
-                    </div>
-
-                    {/* When to use */}
-                    {whenToUse && (
-                      <div className="space-y-1 bg-blue-50/30 p-5 rounded-2xl border border-blue-100/40">
-                        <h5 className="text-base font-extrabold text-blue-800 flex items-center gap-1.5">
-                          <Info className="w-5 h-5 text-blue-500" />
-                          이럴 때 사용하는 장비입니다
-                        </h5>
-                        <p className="text-base sm:text-lg text-slate-705 font-bold leading-relaxed whitespace-pre-wrap">
-                          {whenToUse}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Precautions */}
-                    {precautions.length > 0 && (
-                      <div className="space-y-2 bg-amber-50/40 p-5 rounded-2xl border border-amber-100/60">
-                        <h5 className="text-base font-extrabold text-amber-800 flex items-center gap-1.5">
-                          <AlertTriangle className="w-5 h-5 text-amber-500" />
-                          안전한 사용을 위한 주의사항
-                        </h5>
-                        <ul className="space-y-2 text-sm sm:text-base text-slate-705 font-bold list-disc pl-5 leading-relaxed">
-                          {precautions.map((tip: string, idx: number) => (
-                            <li key={idx}>{cleanInternalCodes(tip)}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -950,71 +911,21 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
             /* Question Wizard Page */
             currentQuestion && (
               <div className="space-y-8 animate-fade-in text-center max-w-5xl mx-auto w-full px-2">
-                {getDisplayText(currentQuestion, 'description', 'simple') && (
-                  <div className="text-center">
-                    <p className="text-base sm:text-lg text-slate-500 font-extrabold leading-relaxed bg-blue-50/30 px-5 py-3 rounded-2xl border border-blue-100/30 inline-block">
-                      💡 {getDisplayText(currentQuestion, 'description', 'simple')}
-                    </p>
-                  </div>
-                )}
-
-                {/* Local Decision Tree Flowchart */}
-                <div className="flex flex-col items-center py-2 select-none w-full">
-                  {/* 평가 카테고리 레이블 (description) */}
-                  {(currentQuestion.description || currentQuestion.simpleDescription) && (
-                    <p className="text-sm sm:text-base font-extrabold text-blue-500 mb-3 tracking-wide">
-                      {currentQuestion.simpleDescription || currentQuestion.description}
+                <div className="space-y-4">
+                  <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 leading-snug">
+                    {currentQuestion.simpleTitle || currentQuestion.title}
+                  </h4>
+                  {getDisplayText(currentQuestion, 'description', 'simple') && (
+                    <p className="text-base sm:text-lg text-slate-500 font-bold">
+                      {getDisplayText(currentQuestion, 'description', 'simple')}
                     </p>
                   )}
-                  {/* Root Node: Current Question */}
-                  <div className="relative bg-gradient-to-r from-purple-50 to-indigo-50/30 border-2 border-purple-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-md text-center ring-4 ring-purple-100/10">
-                    <h4 className="text-xl sm:text-2xl md:text-3xl font-black text-purple-950 leading-snug">
-                      {currentQuestion.simpleTitle || currentQuestion.title}
-                    </h4>
-                  </div>
+                </div>
 
-                  {/* Flow Arrow SVG Connectors */}
-                  <div className="w-full h-12 relative flex justify-center">
-                    <svg className="absolute inset-0 w-full h-full" style={{ minHeight: '48px' }}>
-                      <defs>
-                        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                          <path d="M 0 2 L 10 5 L 0 8 z" fill="#c084fc" />
-                        </marker>
-                      </defs>
-                      <line x1="50%" y1="0" x2="50%" y2="40%" stroke="#e9d5ff" strokeWidth="2" />
-                      {groupList.length === 2 ? (
-                        <>
-                          <path d="M 50% 40% L 25% 40% L 25% 100%" fill="none" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
-                          <path d="M 50% 40% L 75% 40% L 75% 100%" fill="none" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
-                        </>
-                      ) : groupList.length > 2 ? (
-                        <>
-                          {groupList.map((_, idx) => {
-                            const pct = 15 + (70 / (groupList.length - 1)) * idx;
-                            return (
-                              <path 
-                                key={idx}
-                                d={`M 50% 40% L ${pct}% 40% L ${pct}% 100%`} 
-                                fill="none" 
-                                stroke="#e9d5ff" 
-                                strokeWidth="2" 
-                                markerEnd="url(#arrow)" 
-                              />
-                            );
-                          })}
-                        </>
-                      ) : (
-                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#e9d5ff" strokeWidth="2" markerEnd="url(#arrow)" />
-                      )}
-                    </svg>
-                  </div>
-
-                  {/* Grouped Destination Containers */}
-                  <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
+                <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch w-full mt-2">
                     {groupList.map((group) => {
                       return (
                         <div key={group.targetId} className="flex-1 min-w-[260px] max-w-md bg-slate-50/50 rounded-2xl border border-slate-200 p-5 flex flex-col justify-center shadow-sm hover:shadow transition-all space-y-5">
-                          {/* Options in this group */}
                           <div className="space-y-3 flex-1 flex flex-col justify-center">
                             {group.options.map((opt) => {
                               const isSelected = currentQuestion.type === 'multi'
@@ -1028,7 +939,6 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                     if (currentQuestion.type === 'multi') {
                                       handleMultiToggle(opt.value);
                                     } else {
-                                      // 단일 선택 시 자동 진행
                                       setTempSelectedSimple(opt.value);
                                       handleSingleSelect(currentQuestionId!, opt.value);
                                     }
@@ -1039,9 +949,16 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                                       : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50/50 text-slate-700'
                                   }`}
                                 >
-                                  <span className="text-base sm:text-lg md:text-xl font-bold leading-snug">
-                                    {getDisplayText(opt, 'text', 'simple')}
-                                  </span>
+                                  <div className="flex-1 pr-4">
+                                    <span className="text-base sm:text-lg md:text-xl font-black leading-snug block">
+                                      {getDisplayText(opt, 'text', 'simple')}
+                                    </span>
+                                    {optionDetails[`${currentQuestionId}_${opt.value}`] && (
+                                      <span className="text-xs sm:text-sm text-slate-400 mt-1 block font-semibold leading-normal">
+                                        {optionDetails[`${currentQuestionId}_${opt.value}`]}
+                                      </span>
+                                    )}
+                                  </div>
                                   <div className={`rounded-full border-2 transition-all shrink-0 w-6 h-6 flex items-center justify-center ${
                                     isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-350 bg-white'
                                   }`}>
@@ -1056,10 +973,9 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     })}
                   </div>
                 </div>
-              </div>
-            )
-          )}
-        </div>
+              )
+            )}
+          </div>
 
         {/* Bottom Navigation Buttons */}
         <div className="flex justify-between items-center gap-6 border-t border-slate-200/60 pt-6">
@@ -1229,10 +1145,10 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                     return (
                       <div
                         key={id}
-                        onClick={() => !isLabelStyle && handleNodeClick(id)}
+                        onClick={() => handleNodeClick(id)}
                         className={`absolute pointer-events-auto flex flex-col justify-center p-4 select-none transition-all duration-300 ${dimOpacity} ${
                           isLabelStyle
-                            ? 'rounded-xl border-2 border-blue-200 bg-blue-50/60 text-blue-800 shadow-sm cursor-default'
+                            ? 'rounded-xl border-2 border-blue-200 bg-blue-50/60 text-blue-800 shadow-sm cursor-pointer hover:shadow-md hover:border-blue-400'
                             : isResult
                               ? `rounded-2xl border-2 ${
                                   isHighlightedResult
@@ -1525,14 +1441,14 @@ export default function AlgorithmRunner({ algorithm, mode, uiMode = 'detail', on
                       <div
                         key={id}
                         onClick={() => handleNodeClick(id)}
-                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 ${
+                        className={`absolute pointer-events-auto flex flex-col justify-between rounded-xl border p-3 select-none transition-all duration-300 cursor-pointer hover:shadow-md hover:border-primary/50 ${
                           isHighlightedResult
-                            ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 cursor-default ring-4 ring-primary/30'
+                            ? 'border-2 border-primary bg-primary text-white shadow-lg scale-[1.04] z-20 ring-4 ring-primary/30'
                             : isActive
-                              ? 'border-2 border-primary bg-primary/5 shadow-md ring-4 ring-primary/20 scale-[1.02] z-20 cursor-default'
+                              ? 'border-2 border-primary bg-primary/5 shadow-md ring-4 ring-primary/20 scale-[1.02] z-20'
                               : isCompleted
-                                ? 'border-sky-300 bg-sky-50 text-slate-800 shadow-sm cursor-pointer hover:shadow-md hover:border-sky-400'
-                                : 'border-slate-205 bg-slate-105 text-slate-405 opacity-75 cursor-not-allowed pointer-events-none'
+                                ? 'border-sky-300 bg-sky-50 text-slate-800 shadow-sm'
+                                : 'border-slate-200 bg-slate-50 text-slate-500 opacity-80'
                         }`}
                         style={{
                           left: `${node.x}px`,
