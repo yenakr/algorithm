@@ -60,80 +60,15 @@ export interface AlgorithmRunnerProps {
 
 export const cleanInternalCodes = (text: string): string => {
   if (!text) return '';
-  let cleaned = text
-    .replace(/^[BTF]-[A-H]\.?\s*/gi, '')
-    .replace(/\b[BTF]-[A-H]\.?\s*/gi, '')
-    .replace(/["']?[BTF]-[A-H]["']?/gi, '');
-  cleaned = cleaned
-    .replace(/도움 불필요\(위생 자립\)/g, '도움 없이 진행 가능')
-    .replace(/도움 불필요/g, '도움 없이 진행 가능')
-    .replace(/용변 후 처리 돕기/g, '용변 후 처리 보조')
-    .replace(/화장실 이동 돕기/g, '화장실 이동 보조');
-
-  // Strip off parenthesis descriptions for '예' or '아니오'
-  if (/^(예|아니오)\s*\(.*\)/.test(cleaned)) {
-    cleaned = cleaned.replace(/^((?:예|아니오))\s*\(.*\)/, '$1');
-  }
-  return cleaned.trim();
+  return text.trim();
 };
 
 export const cleanEdgeLabel = (label: string): string => {
-  if (!label) return '';
-  const labelMap: Record<string, string> = {
-    '0점': '양호',
-    '1점': '약간의 어려움',
-    '2점 이상': '어려움',
-    '0점 (양호)': '양호',
-    '1~2점 (약간의 어려움)': '약간의 어려움',
-    '3~4점 (심한 어려움)': '심한 어려움',
-    '0~1점 (양호)': '양호',
-    '2~4점 (어려움)': '어려움'
-  };
-  if (labelMap[label]) {
-    return labelMap[label];
-  }
   return label;
 };
 
 export const getCustomEdgeLabel = (fromId: string, toId: string, originalLabel: string, algorithmId: string): string => {
-  // Toileting Care
-  if (algorithmId === 'toileting') {
-    if (fromId === 'q1') {
-      if (originalLabel.includes('양호') || originalLabel.includes('0~1점')) return '아니오';
-      return '예';
-    }
-    if (fromId === 'q2_a' || fromId === 'q2_b') {
-      if (originalLabel.includes('양호') || originalLabel.includes('0~1점')) return '아니오';
-      return '예';
-    }
-    if (fromId === 'q3_a1' || fromId === 'q3_a2' || fromId === 'q3_b1' || fromId === 'q3_b2') {
-      if (originalLabel.includes('양호') || originalLabel.includes('0~1점') || originalLabel.includes('0점')) return '예';
-      return '아니오';
-    }
-  }
-
-  // Feeding Care
-  if (algorithmId === 'feeding') {
-    return cleanEdgeLabel(originalLabel);
-  }
-
-  // Transfer Care
-  if (algorithmId === 'transfer') {
-    if (fromId === 'q1') {
-      if (originalLabel === '1점' || originalLabel.includes('약간')) return '가벼운 어려움';
-      return '중간 이상 어려움';
-    }
-    if (fromId === 'q2') {
-      if (originalLabel === '예' || originalLabel.includes('yes')) return '예';
-      return '아니오';
-    }
-    if (fromId === 'q4') {
-      if (originalLabel === '예' || originalLabel.includes('yes')) return '예';
-      return '아니오';
-    }
-  }
-
-  return cleanEdgeLabel(originalLabel);
+  return originalLabel;
 };
 
 export const getRobotTypeForResult = (resultId: string) => {
@@ -517,94 +452,88 @@ export const learningGuides: Record<string, { title: string; content: string; de
 
 // Node positioning and styling configurations (Detail Mode React Flow coordinates)
 export const transferNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 460, y: 0, label: "자리이동하기 기능평가", typeLabel: "기능평가" },
+  q1: { x: 460, y: 0, label: "자리이동하기 기능평가*", typeLabel: "기능평가" },
   q2: { x: 775, y: 220, label: "하지 근력 평가", typeLabel: "하지 근력" },
+  q3: { x: 1060, y: 440, label: "슬링 적용방식 고려", typeLabel: "슬링 적용방식" },
   q4: { x: 480, y: 440, label: "스스로 상체를 일으킬 수 없는가?", typeLabel: "상체 조절" },
-  q3: { x: 1060, y: 440, label: "환경적 요소 고려", typeLabel: "설치 환경" },
-  q3_2: { x: 1360, y: 640, label: "슬링 적용방식 고려", typeLabel: "공사 평가" },
-  'T-B': { x: 150, y: 840, label: "이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
-  'T-C': { x: 370, y: 840, label: "전동형 기립보조리프트 (예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
-  'T-D': { x: 590, y: 840, label: "비전동형 기립보조기기", isResult: true, typeLabel: "추천 결과" },
-  'T-E': { x: 810, y: 840, label: "전신슬링리프트 (천장 고정형)", isResult: true, typeLabel: "추천 결과" },
-  'T-F': { x: 1030, y: 840, label: "전신슬링리프트 (벽 고정형)", isResult: true, typeLabel: "추천 결과" },
-  'T-H': { x: 1250, y: 840, label: "전신슬링리프트 (이동식 겐트리)", isResult: true, typeLabel: "추천 결과" },
-  'T-G': { x: 1470, y: 840, label: "전신슬링리프트 (이동식)", isResult: true, typeLabel: "추천 결과" },
+  'T-B': { x: 150, y: 660, label: "이승보조장비 이용", isResult: true, typeLabel: "추천 결과" },
+  'T-C': { x: 370, y: 660, label: "전동형 기립보조리프트 (예: 히그, 업고플러스)", isResult: true, typeLabel: "추천 결과" },
+  'T-D': { x: 590, y: 660, label: "비전동형 기립보조기기", isResult: true, typeLabel: "추천 결과" },
+  'T-E': { x: 810, y: 660, label: "슬링 없음 (예: 로베아)", isResult: true, typeLabel: "추천 결과" },
+  'T-F': { x: 1030, y: 660, label: "슬링 자동 삽입 (예: 맨엔텔 자세 변환형 전동의자)", isResult: true, typeLabel: "추천 결과" },
+  'T-G': { x: 1250, y: 660, label: "슬링 수동 체결 (예: 슬라, 사스케)", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const toiletingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
-  q1: { x: 770, y: 0, label: "배뇨감 인지 평가", typeLabel: "인지 평가" },
-  q2_a: { x: 330, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
-  q2_b: { x: 1210, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
+  q1: { x: 800, y: 0, label: "배뇨감 인지 평가", typeLabel: "인지 평가" },
+  q2_a: { x: 350, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
+  q2_b: { x: 1250, y: 220, label: "화장실 이동 평가", typeLabel: "이동 평가" },
   q3_a1: { x: 110, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
-  q3_a2: { x: 550, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
-  q3_b1: { x: 990, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
-  q3_b2: { x: 1430, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
-  'B-A': { x: 0, y: 660, label: "도움 불필요", isResult: true, typeLabel: "추천 결과" },
+  q3_a2: { x: 590, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  q3_b1: { x: 1030, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  q3_b2: { x: 1470, y: 440, label: "용변 후 청결 평가", typeLabel: "청결 평가" },
+  'B-A': { x: 0, y: 660, label: "도움 필요", isResult: true, typeLabel: "추천 결과" },
   'B-B': { x: 220, y: 660, label: "용변 후 처리 돕기 (비데 등)", isResult: true, typeLabel: "추천 결과" },
-  'B-C': { x: 440, y: 660, label: "화장실 이동 돕기", isResult: true, typeLabel: "추천 결과" },
-  'B-D': { x: 660, y: 660, label: "화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용", isResult: true, typeLabel: "추천 결과" },
-  'B-E': { x: 880, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용", isResult: true, typeLabel: "추천 결과" },
-  'B-F': { x: 1100, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용 + 용변 후 처리 돕기", isResult: true, typeLabel: "추천 결과" },
-  'B-G': { x: 1320, y: 660, label: "자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
-  'B-H': { x: 1540, y: 660, label: "자동 배설처리로봇 간헐적 이용 / 흡인형 스마트 기저귀 로봇시스템 지속적 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-C': { x: 440, y: 660, label: "화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-D': { x: 660, y: 660, label: "화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용\n용변 후 처리 돕기 추가 또는 자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-E': { x: 880, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용\n용변 후 처리 돕기 추가", isResult: true, typeLabel: "추천 결과" },
+  'B-F': { x: 1100, y: 660, label: "화장실 이동 돕기 + 침상 배설 또는 이동 변기 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-G': { x: 1320, y: 660, label: "시간에 맞춘 배뇨훈련 또는 배변 프로그램 적용", isResult: true, typeLabel: "추천 결과" },
+  'B-H': { x: 1540, y: 660, label: "자동 배설처리로봇 간헐적 이용", isResult: true, typeLabel: "추천 결과" },
+  'B-I': { x: 1760, y: 660, label: "자동 배설처리로봇 간헐적 이용\n흡인형 스마트 기저귀 로봇시스템 지속적 이용", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const transferEdges = [
-  { from: 'q1', to: 'T-B', label: "1점", condition: (ans: any) => ans['q1'] === '1' },
-  { from: 'q1', to: 'q2', label: "2점 이상", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
-  { from: 'q2', to: 'q3', label: "예", condition: (ans: any) => ans['q2'] === 'yes' },
-  { from: 'q2', to: 'q4', label: "아니오", condition: (ans: any) => ans['q2'] === 'no' },
-  { from: 'q4', to: 'T-C', label: "아니오", condition: (ans: any) => ans['q4'] === 'no' },
-  { from: 'q4', to: 'T-D', label: "예", condition: (ans: any) => ans['q4'] === 'yes' },
-  { from: 'q3', to: 'T-E', label: "천장식", condition: (ans: any) => ans['q3'] === 'ceiling' },
-  { from: 'q3', to: 'T-F', label: "벽식", condition: (ans: any) => ans['q3'] === 'wall' },
-  { from: 'q3', to: 'q3_2', label: "이동식", condition: (ans: any) => ans['q3'] === 'movable' },
-  { from: 'q3_2', to: 'T-H', label: "프레임 가능", condition: (ans: any) => ans['q3_2'] === 'yes' },
-  { from: 'q3_2', to: 'T-G', label: "프레임 불가", condition: (ans: any) => ans['q3_2'] === 'no' }
+  { from: 'q1', to: 'T-B', label: "아니오", condition: (ans: any) => ans['q1'] === 'no' },
+  { from: 'q1', to: 'q2', label: "예", condition: (ans: any) => ans['q1'] === 'yes' },
+  { from: 'q2', to: 'q3', label: "아니오", condition: (ans: any) => ans['q2'] === 'no' },
+  { from: 'q2', to: 'q4', label: "예", condition: (ans: any) => ans['q2'] === 'yes' },
+  { from: 'q4', to: 'T-D', label: "아니오", condition: (ans: any) => ans['q4'] === 'no' },
+  { from: 'q4', to: 'T-C', label: "예", condition: (ans: any) => ans['q4'] === 'yes' },
+  { from: 'q3', to: 'T-E', label: "슬링 없음 (예: 로베아)", condition: (ans: any) => ans['q3'] === 'none' },
+  { from: 'q3', to: 'T-F', label: "슬링 자동 삽입", condition: (ans: any) => ans['q3'] === 'auto' },
+  { from: 'q3', to: 'T-G', label: "슬링 수동 체결", condition: (ans: any) => ans['q3'] === 'manual' }
 ];
 
 export const toiletingEdges = [
-  { from: 'q1', to: 'q2_a', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 0 && parseInt(ans['q1'] || '-1') <= 1 },
-  { from: 'q1', to: 'q2_b', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q1'] || '-1') >= 2 },
-  { from: 'q2_a', to: 'q3_a1', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 0 && parseInt(ans['q2_a'] || '-1') <= 1 },
-  { from: 'q2_a', to: 'q3_a2', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q2_a'] || '-1') >= 2 },
-  { from: 'q2_b', to: 'q3_b1', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q2_b'] || '-1') >= 0 && parseInt(ans['q2_b'] || '-1') <= 1 },
-  { from: 'q2_b', to: 'q3_b2', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q2_b'] || '-1') >= 2 },
-  { from: 'q3_a1', to: 'B-A', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_a1'] || '-1') >= 0 && parseInt(ans['q3_a1'] || '-1') <= 1 },
-  { from: 'q3_a1', to: 'B-B', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_a1'] || '-1') >= 2 },
-  { from: 'q3_a2', to: 'B-C', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_a2'] || '-1') >= 0 && parseInt(ans['q3_a2'] || '-1') <= 1 },
-  { from: 'q3_a2', to: 'B-D', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_a2'] || '-1') >= 2 },
-  { from: 'q3_b1', to: 'B-E', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 0 && parseInt(ans['q3_b1'] || '-1') <= 1 },
-  { from: 'q3_b1', to: 'B-F', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_b1'] || '-1') >= 2 },
-  { from: 'q3_b2', to: 'B-G', label: "0~1점 (양호)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 0 && parseInt(ans['q3_b2'] || '-1') <= 1 },
-  { from: 'q3_b2', to: 'B-H', label: "2~4점 (어려움)", condition: (ans: any) => parseInt(ans['q3_b2'] || '-1') >= 2 },
+  { from: 'q1', to: 'q2_a', label: "아니오", condition: (ans: any) => ans['q1'] === 'no' },
+  { from: 'q1', to: 'q2_b', label: "예", condition: (ans: any) => ans['q1'] === 'yes' },
+  { from: 'q2_a', to: 'q3_a1', label: "아니오", condition: (ans: any) => ans['q2_a'] === 'no' },
+  { from: 'q2_a', to: 'q3_a2', label: "예", condition: (ans: any) => ans['q2_a'] === 'yes' },
+  { from: 'q2_b', to: 'q3_b1', label: "아니오", condition: (ans: any) => ans['q2_b'] === 'no' },
+  { from: 'q2_b', to: 'q3_b2', label: "예 (더 오른쪽)", condition: (ans: any) => ans['q2_b'] === 'yes_right' },
+  { from: 'q2_b', to: 'B-I', label: "예 (가장 오른쪽)", condition: (ans: any) => ans['q2_b'] === 'yes_far_right' },
+  { from: 'q3_a1', to: 'B-A', label: "아니오", condition: (ans: any) => ans['q3_a1'] === 'no' },
+  { from: 'q3_a1', to: 'B-B', label: "예", condition: (ans: any) => ans['q3_a1'] === 'yes' },
+  { from: 'q3_a2', to: 'B-C', label: "아니오", condition: (ans: any) => ans['q3_a2'] === 'no' },
+  { from: 'q3_a2', to: 'B-D', label: "예", condition: (ans: any) => ans['q3_a2'] === 'yes' },
+  { from: 'q3_b1', to: 'B-E', label: "아니오", condition: (ans: any) => ans['q3_b1'] === 'no' },
+  { from: 'q3_b1', to: 'B-F', label: "예", condition: (ans: any) => ans['q3_b1'] === 'yes' },
+  { from: 'q3_b2', to: 'B-G', label: "아니오", condition: (ans: any) => ans['q3_b2'] === 'no' },
+  { from: 'q3_b2', to: 'B-H', label: "예", condition: (ans: any) => ans['q3_b2'] === 'yes' },
 ];
 
 export const feedingNodes: Record<string, { x: number; y: number; label: string; isResult?: boolean; typeLabel: string }> = {
   q1: { x: 570, y: 0, label: "삼킴 기능 평가", typeLabel: "삼킴 평가" },
   q2: { x: 310, y: 240, label: "먹기/마시기 기능평가", typeLabel: "동작 평가" },
   q3: { x: 520, y: 480, label: "팔의 근력 평가", typeLabel: "근력 평가" },
-  'F-A': { x: 100, y: 720, label: "특수식사도구 이용", isResult: true, typeLabel: "추천 결과" },
+  'F-A': { x: 100, y: 720, label: "가벼운 정도의 어려움이 있다면,\n• 특수식사도구 이용 (코 부위가 절린 컵, 경사 접시 등)\n• 수동형 팔 지지대 이용", isResult: true, typeLabel: "추천 결과" },
   'F-B': { x: 380, y: 720, label: "전자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
-  'F-C': { x: 660, y: 720, label: "부분 식사보조기기 / 수동·반자동 식사돌봄로봇", isResult: true, typeLabel: "추천 결과" },
-  'F-D': { x: 940, y: 720, label: "구강 섭취 불가능 시 (의료진 지시, 경관영양 등)", isResult: true, typeLabel: "추천 결과" },
+  'F-C': { x: 660, y: 720, label: "팔의 근력에 따라,\n• 부분 식사보조기기 이용 (예: 스프링 팔 지지대)\n• 수동/반자동 식사돌봄로봇 이용", isResult: true, typeLabel: "추천 결과" },
+  'F-D': { x: 940, y: 720, label: "구강 섭취 불가능 시,\n• 의료진의 지시에 따름.\n• 건강 영양 또는 완전 비경구영양\n식사 시 찾은 사례와 기침 시,\n• 구강 섭취(물 포함) 중단\n• 의료진과 상의", isResult: true, typeLabel: "추천 결과" },
 };
 
 export const feedingEdges = [
   { from: 'q1', to: 'q2', label: "예", condition: (ans: any) => ans['q1'] === 'yes' },
   { from: 'q1', to: 'F-D', label: "아니오", condition: (ans: any) => ans['q1'] === 'no' },
-  { from: 'q2', to: 'F-A', label: "가벼운 어려움", condition: (ans: any) => ans['q2'] === 'light' },
-  { from: 'q2', to: 'q3', label: "중간 이상의 어려움", condition: (ans: any) => ans['q2'] === 'heavy' },
-  { from: 'q3', to: 'F-B', label: "3등급 미만", condition: (ans: any) => ans['q3'] === 'low' },
-  { from: 'q3', to: 'F-C', label: "3등급 이상", condition: (ans: any) => ans['q3'] === 'high' },
+  { from: 'q2', to: 'F-A', label: "아니오", condition: (ans: any) => ans['q2'] === 'no' },
+  { from: 'q2', to: 'q3', label: "예", condition: (ans: any) => ans['q2'] === 'yes' },
+  { from: 'q3', to: 'F-B', label: "예", condition: (ans: any) => ans['q3'] === 'yes' },
+  { from: 'q3', to: 'F-C', label: "아니오", condition: (ans: any) => ans['q3'] === 'no' },
 ];
 
 export const getShortOptionText = (text: string) => {
-  if (text.includes('사용 편의성')) return '사용 편의';
-  if (text.includes('비용 절감')) return '비용 절감';
-  if (text.includes('공사 과정 최소화')) return '공사 최소';
-  const parts = text.split(/[:;,]/);
-  return parts[0].trim();
+  return text.trim();
 };
 
 export const optionDetails: Record<string, string> = {
